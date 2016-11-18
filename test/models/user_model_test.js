@@ -1,10 +1,10 @@
 var chai = require('chai');
 var should = chai.should();
-var User = require('../models/User');
+var models = require('require.all')('../../models')
 
 describe('User Model', function() {
   it('should create a new user', function(done) {
-    var user = new User({
+    var user = new models.User({
       email: 'test@gmail.com',
       password: 'password'
     });
@@ -15,7 +15,7 @@ describe('User Model', function() {
   });
 
   it('should not create a user with the unique email', function(done) {
-    var user = new User({
+    var user = new models.User({
       email: 'test@gmail.com',
       password: 'password'
     });
@@ -26,7 +26,7 @@ describe('User Model', function() {
   });
 
   it('should find user by email', function(done) {
-    User.findOne({ email: 'test@gmail.com' }, function(err, user) {
+    models.User.findOne({ email: 'test@gmail.com' }, function(err, user) {
       if (err) return done(err);
       user.email.should.equal('test@gmail.com');
       done();
@@ -34,7 +34,7 @@ describe('User Model', function() {
   });
 
   it('should delete a user', function(done) {
-    User.remove({ email: 'test@gmail.com' }, function(err) {
+    models.User.remove({ email: 'test@gmail.com' }, function(err) {
       if (err) return done(err);
       done();
     });

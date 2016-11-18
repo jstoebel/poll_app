@@ -7,4 +7,4 @@ var voteSchema = new mongoose.Schema({
 
 var Vote = mongoose.model('Vote', voteSchema);
 
-modules.exports = Vote;
+module.exports = Vote;
