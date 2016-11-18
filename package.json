@@ -1,13 +1,13 @@
 {
-  "name": "hackathon-starter",
+  "name": "jstoebel-voting",
   "version": "3.5.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": "https://github.com/jstoebel/voting.git"
   },
   "scripts": {
-    "start": "node app.js",
-    "test": "mocha --reporter spec --timeout 5000"
+    "start": "env NODE_ENV=production node app.js",
+    "test": "env NODE_ENV=test mocha --reporter spec --timeout 5000 --recursive"
   },
   "dependencies": {
     "async": "^2.0.0-rc.4",
@@ -32,6 +32,7 @@
     "lob": "^3.9.0",
     "lodash": "^4.12.0",
     "lusca": "^1.4.0",
+    "minimist": "^1.2.0",
     "mongoose": "^4.4.16",
     "mongoose-relationship": "^0.1.5",
     "morgan": "^1.7.0",
@@ -52,6 +53,7 @@
     "passport-twitter": "^1.0.4",
     "paypal-rest-sdk": "^1.6.8",
     "request": "^2.72.0",
+    "require.all": "^2.0.3",
     "stripe": "^4.6.0",
     "tumblr.js": "^1.0.0",
     "twilio": "^3.3.0-edge",

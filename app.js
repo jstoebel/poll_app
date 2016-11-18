@@ -19,12 +19,15 @@ var sass = require('node-sass-middleware');
 var multer = require('multer');
 var upload = multer({ dest: path.join(__dirname, 'uploads') });
 
+var config = require('./config/config')
+
+
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  *
  * Default path: .env (You can remove the path argument entirely, after renaming `.env.example` to `.env`)
  */
-dotenv.load({ path: '.env.example' });
+dotenv.load();
 
 /**
  * Controllers (route handlers).
@@ -47,11 +50,14 @@ var app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB || process.env.MONGOLAB_URI);
+
+mongoose.connect(config.db.URL);
 mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
   process.exit(1);
 });
+console.log("connected to " + config.db.URL)
+
 
 /**
  * Express configuration.
@@ -221,8 +227,9 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), function() {
-  console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
+const port = process.env.PORT || 3000
+app.listen(port, function() {
+  console.log('Express server listening on port %d in %s mode', port, config.currentEnv);
 });
 
 module.exports = app;
