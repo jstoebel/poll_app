@@ -13,7 +13,6 @@ beforeEach(function (done) {
   function clearDB() {
     _.each(mongoose.connection.models, function(value, key){
       value.remove({}, function(err, removed) {
-        console.log(value.modelName + " -> cleared.")
       });
     })
 
