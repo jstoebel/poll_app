@@ -50,7 +50,7 @@ var app = express();
 /**
  * Connect to MongoDB.
  */
-
+console.log("trying to connect to "+config.db.URL)
 mongoose.connect(config.db.URL);
 mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
@@ -218,6 +218,8 @@ app.get('/auth/pinterest', passport.authorize('pinterest', { scope: 'read_public
 app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRedirect: '/login' }), function(req, res) {
   res.redirect('/api/pinterest');
 });
+
+app.use('/spam', require('./config/routes'))
 
 /**
  * Error Handler.

@@ -1,7 +1,12 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema,
+  ObjectId = Schema.ObjectId;
+  
 var voteSchema = new mongoose.Schema({
-  // need an owner
   // belongs to an option
+  user: { type: ObjectId, ref: 'User' },
+  option: { type: ObjectId, ref: 'Option' }
+
 
 }, {timestamps: true});
 

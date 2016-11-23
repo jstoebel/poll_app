@@ -13,4 +13,11 @@ factory.define('poll', models.Poll, {
   name: "some poll",
   user: factory.assoc('user', '_id')
 })
+
+factory.define('option', models.Option, {
+  name: "some option"
+})
+
+factory.define('vote', models.Option, {})
+
 module.exports = factory

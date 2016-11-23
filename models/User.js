@@ -1,6 +1,6 @@
-var bcrypt = require('bcrypt-nodejs');
-var crypto = require('crypto');
-var mongoose = require('mongoose');
+var bcrypt = require('bcrypt-nodejs'),
+  crypto = require('crypto'),
+  mongoose = require('mongoose');
 
 var userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
@@ -24,8 +24,6 @@ var userSchema = new mongoose.Schema({
     website: { type: String, default: '' },
     picture: { type: String, default: '' }
   },
-
-  polls: [{type: mongoose.Schema.ObjectId, ref: 'Poll'}]
 
 }, { timestamps: true });
 

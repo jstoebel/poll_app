@@ -1,11 +1,10 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema,
+  ObjectId = Schema.ObjectId;
+
 var pollSchema = new mongoose.Schema({
   name: String,
-
-  user: {type: mongoose.Schema.ObjectId, ref: 'User', childPath: 'polls'},
-
-  options: [{type: mongoose.Schema.ObjectId, ref: 'Option'}]
-
+  user:  { type: ObjectId, ref: 'User' }
 
 }, {timestamps: true});
 
