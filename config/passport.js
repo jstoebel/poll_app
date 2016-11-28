@@ -12,7 +12,7 @@ var OpenIDStrategy = require('passport-openid').Strategy;
 var OAuthStrategy = require('passport-oauth').OAuthStrategy;
 var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 
-var User = require('../models/User');
+var User = require('../src/models/User');
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);

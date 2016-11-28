@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router();
 var passport = require('passport');
-var controllers = require('require.all')('../controllers')
+var controllers = require('require.all')('../src/controllers')
 var passportConfig = require('./passport');
 
 /**
