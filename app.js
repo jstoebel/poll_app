@@ -18,7 +18,8 @@ var expressValidator = require('express-validator');
 var sass = require('node-sass-middleware');
 var multer = require('multer');
 var upload = multer({ dest: path.join(__dirname, 'uploads') });
-
+var httpProxy = require('http-proxy');
+var proxy = httpProxy.createProxyServer();
 var config = require('./config/config')
 
 
@@ -102,6 +103,19 @@ app.use(function(req, res, next) {
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 app.use('/', require('./config/routes'))
+
+if (config.currentEnv === "development"){
+  var bundle = require('./bundle.js');
+  bundle();
+  app.all('/build/*', function (req, res) {
+    proxy.web(req, res, {
+        target: 'http://localhost:8080'
+    });
+  });
+}
+proxy.on('error', function(e) {
+  console.log('Could not connect to proxy, please try again...');
+});
 
 /**
  * Error Handler.

@@ -2,7 +2,7 @@
 //Set the current environment to true in the env object
 var dotenv = require('dotenv');
 dotenv.load();
-exports.currentEnv = process.env.NODE_ENV || 'development'
+exports.currentEnv = process.env.NODE_ENV || 'production'
 
 exports.appName = "voting";
 

@@ -1,3 +1,4 @@
+
 {
   "name": "jstoebel-voting",
   "version": "3.5.0",
@@ -6,7 +7,7 @@
     "url": "https://github.com/jstoebel/voting.git"
   },
   "scripts": {
-    "start": "env NODE_ENV=production node app.js",
+    "start": "node app.js",
     "test": "env NODE_ENV=test mocha --reporter spec --timeout 5000 --recursive"
   },
   "dependencies": {

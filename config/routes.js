@@ -28,10 +28,14 @@ router.post('/account/password', passportConfig.isAuthenticated, controllers.use
 router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.postDeleteAccount);
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
-router.get('users/:userId/polls', controllers.home.index);
-router.post('users/:userID')
+router.get('/users/:userId/polls', controllers.poll.index);
+router.post('/polls', controllers.poll.create);
+router.get('/polls/:pollId', controllers.poll.show);
+router.get('/polls/:pollId/edit', controllers.poll.edit);
+router.put('/:pollId', controllers.poll.update);
+router.delete('/:pollId', controllers.poll.destory);
 
-
+router.post('/polls/:pollId/vote/new', controllers.vote.new)
 
 /**
  * OAuth authentication routes. (Sign in)
