@@ -45,11 +45,16 @@ var app = express();
  */
 console.log("trying to connect to "+config.db.URL)
 mongoose.connect(config.db.URL);
+
+mongoose.connection.on('connected', function () {
+  console.log("connected to " + config.db.URL)
+});
+
 mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
   process.exit(1);
 });
-console.log("connected to " + config.db.URL)
+
 
 
 /**
