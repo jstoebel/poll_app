@@ -13,6 +13,8 @@ var MongoStore = require('connect-mongo/es5')(session);
 var flash = require('express-flash');
 var path = require('path');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird')
+
 var passport = require('passport');
 var expressValidator = require('express-validator');
 var sass = require('node-sass-middleware');
@@ -43,13 +45,6 @@ var passportConfig = require('./config/passport');
  * Create Express server.
  */
 var app = express();
-
-// trying out Auth0
-const cors = require('cors');
-
-app.use(cors());
-
-// end
 
 /**
  * Connect to MongoDB.
@@ -127,33 +122,35 @@ app.use('/', require('./config/routes'))
 app.use(errorHandler());
 
 
-// We only want to run the workflow when not in production
-var isProduction = config.currentEnv=== 'production';
-var proxy = httpProxy.createProxyServer();
-if (!isProduction) {
+// UNCOMMENT THIS TO BUILD FROM WEBPACK IN DEVELOPMENT
 
-  // We require the bundler inside the if block because
-  // it is only needed in a development environment. Later
-  // you will see why this is a good idea
-  var bundle = require('./bundle.js');
-  bundle();
-
-  // Any requests to localhost:3000/build is proxied
-  // to webpack-dev-server
-  app.all('/build/*', function (req, res) {
-    proxy.web(req, res, {
-        target: 'http://localhost:8080'
-    });
-  });
-
-}
-
-// It is important to catch any errors from the proxy or the
-// server will crash. An example of this is connecting to the
-// server when webpack is bundling
-proxy.on('error', function(e) {
-  console.log('Could not connect to proxy, please try again...');
-});
+// // We only want to run the workflow when not in production
+// var isProduction = config.currentEnv=== 'production';
+// var proxy = httpProxy.createProxyServer();
+// if (!isProduction) {
+//
+//   // We require the bundler inside the if block because
+//   // it is only needed in a development environment. Later
+//   // you will see why this is a good idea
+//   var bundle = require('./bundle.js');
+//   bundle();
+//
+//   // Any requests to localhost:3000/build is proxied
+//   // to webpack-dev-server
+//   app.all('/build/*', function (req, res) {
+//     proxy.web(req, res, {
+//         target: 'http://localhost:8080'
+//     });
+//   });
+//
+// }
+//
+// // It is important to catch any errors from the proxy or the
+// // server will crash. An example of this is connecting to the
+// // server when webpack is bundling
+// proxy.on('error', function(e) {
+//   console.log('Could not connect to proxy, please try again...');
+// });
 
 /**
  * Start Express server.

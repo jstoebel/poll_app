@@ -1,6 +1,7 @@
 var bcrypt = require('bcrypt-nodejs'),
   crypto = require('crypto'),
   mongoose = require('mongoose');
+  Poll = require('./Poll')
 
 var userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
@@ -71,6 +72,16 @@ userSchema.methods.gravatar = function(size) {
   var md5 = crypto.createHash('md5').update(this.email).digest('hex');
   return 'https://gravatar.com/avatar/' + md5 + '?s=' + size + '&d=retro';
 };
+
+userSchema.methods.polls = function(){
+  console.log("hello from polls! My id is "+ this._id)
+  Poll.find({user: this._id}, function(err, polls){
+    if(err){console.log(err)}
+    console.log(polls)
+
+  })
+  return Poll.find({user: this._id}).exec()
+}
 
 var User = mongoose.model('User', userSchema);
 

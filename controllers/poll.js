@@ -1,7 +1,18 @@
 var models = require('require.all')('../models')
 
 exports.index = function(req, res) {
-  res.end("hello from index")
+  models.User.findById(req.user._id).exec()
+    .then(function(user){
+      user.polls()
+    })
+    .then(function(polls){
+      console.log(polls)
+    })
+    .catch(function(err){
+      console.log(err)
+    })
+
+    res.end()
 };
 
 exports.create = function(req, res) {
