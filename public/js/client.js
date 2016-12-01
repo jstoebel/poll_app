@@ -1,14 +1,16 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, browserHistory } from 'react-router'
-import App from './components/App'
-import About from './components/About'
-import Repos from './components/Repos'
+import PollIndex from './components/PollIndex'
+
 
 render((
   <Router history={browserHistory}>
-    <Route path="/" component={App}/>
-    <Route path="/repos" component={Repos}/>
-    <Route path="/about" component={About}/>
+    <Route path="/" component={PollIndex}/>
   </Router>
 ), document.getElementById('app'))
+
+
+// index all polls
+// create a new poll
+// edit a poll

@@ -87,13 +87,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use(function(req, res, next) {
-  if (req.path === '/api/upload') {
-    next();
-  } else {
-    lusca.csrf()(req, res, next);
-  }
-});
+// app.use(function(req, res, next) {
+//   if (req.path === '/api/upload') {
+//     next();
+//   } else {
+//     lusca.csrf()(req, res, next);
+//   }
+// });
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 app.use(function(req, res, next) {
@@ -119,7 +119,7 @@ app.use(errorHandler());
 
 
 // We only want to run the workflow when not in production
-var isProduction = process.env.NODE_ENV === 'production';
+var isProduction = config.currentEnv=== 'production';
 var proxy = httpProxy.createProxyServer();
 if (!isProduction) {
 

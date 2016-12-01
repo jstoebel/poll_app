@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "afd0de5b0b097408258f"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "726454dbf10838a19efa"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -1043,7 +1043,7 @@
 /* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	eval("'use strict';\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactDom = __webpack_require__(108);\n\nvar _reactRouter = __webpack_require__(255);\n\nvar _App = __webpack_require__(318);\n\nvar _App2 = _interopRequireDefault(_App);\n\nvar _About = __webpack_require__(319);\n\nvar _About2 = _interopRequireDefault(_About);\n\nvar _Repos = __webpack_require__(320);\n\nvar _Repos2 = _interopRequireDefault(_Repos);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _reactDom.render)(_react2.default.createElement(\n  _reactRouter.Router,\n  { history: _reactRouter.browserHistory },\n  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _App2.default }),\n  _react2.default.createElement(_reactRouter.Route, { path: '/repos', component: _Repos2.default }),\n  _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _About2.default })\n), document.getElementById('app'));\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/client.js\n// module id = 77\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/client.js?");
+	eval("'use strict';\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactDom = __webpack_require__(108);\n\nvar _reactRouter = __webpack_require__(255);\n\nvar _PollIndex = __webpack_require__(318);\n\nvar _PollIndex2 = _interopRequireDefault(_PollIndex);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _reactDom.render)(_react2.default.createElement(\n  _reactRouter.Router,\n  { history: _reactRouter.browserHistory },\n  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _PollIndex2.default })\n), document.getElementById('app'));\n\n// index all polls\n// create a new poll\n// edit a poll\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/client.js\n// module id = 77\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/client.js?");
 
 /***/ },
 /* 78 */
@@ -2489,19 +2489,7 @@
 /* 318 */
 /***/ function(module, exports, __webpack_require__) {
 
-	eval("'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nexports.default = _react2.default.createClass({\n  displayName: 'App',\n  render: function render() {\n    return _react2.default.createElement(\n      'div',\n      null,\n      'Hello, React Router!'\n    );\n  }\n});\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/components/App.js\n// module id = 318\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/components/App.js?");
-
-/***/ },
-/* 319 */
-/***/ function(module, exports, __webpack_require__) {
-
-	eval("'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nexports.default = _react2.default.createClass({\n  displayName: 'About',\n  render: function render() {\n    return _react2.default.createElement(\n      'div',\n      null,\n      'About'\n    );\n  }\n});\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/components/About.js\n// module id = 319\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/components/About.js?");
-
-/***/ },
-/* 320 */
-/***/ function(module, exports, __webpack_require__) {
-
-	eval("'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nexports.default = _react2.default.createClass({\n  displayName: 'Repos',\n  render: function render() {\n    return _react2.default.createElement(\n      'div',\n      null,\n      'Repos'\n    );\n  }\n});\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/components/Repos.js\n// module id = 320\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/components/Repos.js?");
+	eval("\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = __webpack_require__(78);\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nexports.default = _react2.default.createClass({\n  displayName: \"PollIndex\",\n  render: function render() {\n\n    fetch(\"/polls\").then(function (data) {\n      return console.log(data);\n    });\n    return _react2.default.createElement(\n      \"div\",\n      null,\n      \"My Polls\"\n    );\n  }\n});\n\n//////////////////\n// WEBPACK FOOTER\n// ./public/js/components/PollIndex.js\n// module id = 318\n// module chunks = 0\n//# sourceURL=webpack:///./public/js/components/PollIndex.js?");
 
 /***/ }
 /******/ ]);
