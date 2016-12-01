@@ -25,6 +25,8 @@ var httpProxy = require('http-proxy');
 
 
 
+
+
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  *
@@ -41,6 +43,13 @@ var passportConfig = require('./config/passport');
  * Create Express server.
  */
 var app = express();
+
+// trying out Auth0
+const cors = require('cors');
+
+app.use(cors());
+
+// end
 
 /**
  * Connect to MongoDB.

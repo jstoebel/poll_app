@@ -20,6 +20,6 @@ exports.update = function(req, res) {
   res.end("hello from update")
 };
 
-exports.destory = function(req, res) {
+exports.destroy = function(req, res) {
   res.end("hello from destory")
 };

@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var controllers = require('require.all')('../controllers')
 var passportConfig = require('./passport');
+var authConfig = require('./auth')
 
 /**
  * Primary router routes.
