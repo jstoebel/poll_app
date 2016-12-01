@@ -21,6 +21,10 @@ var upload = multer({ dest: path.join(__dirname, 'uploads') });
 var httpProxy = require('http-proxy');
 var proxy = httpProxy.createProxyServer();
 var config = require('./config/config')
+var httpProxy = require('http-proxy');
+
+
+
 
 
 /**
@@ -39,6 +43,13 @@ var passportConfig = require('./config/passport');
  * Create Express server.
  */
 var app = express();
+
+// trying out Auth0
+const cors = require('cors');
+
+app.use(cors());
+
+// end
 
 /**
  * Connect to MongoDB.
@@ -85,13 +96,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use(function(req, res, next) {
-  if (req.path === '/api/upload') {
-    next();
-  } else {
-    lusca.csrf()(req, res, next);
-  }
-});
+// app.use(function(req, res, next) {
+//   if (req.path === '/api/upload') {
+//     next();
+//   } else {
+//     lusca.csrf()(req, res, next);
+//   }
+// });
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 app.use(function(req, res, next) {
@@ -114,6 +125,35 @@ app.use('/', require('./config/routes'))
  * Error Handler.
  */
 app.use(errorHandler());
+
+
+// We only want to run the workflow when not in production
+var isProduction = config.currentEnv=== 'production';
+var proxy = httpProxy.createProxyServer();
+if (!isProduction) {
+
+  // We require the bundler inside the if block because
+  // it is only needed in a development environment. Later
+  // you will see why this is a good idea
+  var bundle = require('./bundle.js');
+  bundle();
+
+  // Any requests to localhost:3000/build is proxied
+  // to webpack-dev-server
+  app.all('/build/*', function (req, res) {
+    proxy.web(req, res, {
+        target: 'http://localhost:8080'
+    });
+  });
+
+}
+
+// It is important to catch any errors from the proxy or the
+// server will crash. An example of this is connecting to the
+// server when webpack is bundling
+proxy.on('error', function(e) {
+  console.log('Could not connect to proxy, please try again...');
+});
 
 /**
  * Start Express server.

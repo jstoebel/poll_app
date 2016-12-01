@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var controllers = require('require.all')('../controllers')
 var passportConfig = require('./passport');
+var authConfig = require('./auth')
 
 /**
  * Primary router routes.
@@ -28,14 +29,14 @@ router.post('/account/password', passportConfig.isAuthenticated, controllers.use
 router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.postDeleteAccount);
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
-router.get('/users/:userId/polls', controllers.poll.index);
-router.post('/polls', controllers.poll.create);
-router.get('/polls/:pollId', controllers.poll.show);
-router.get('/polls/:pollId/edit', controllers.poll.edit);
-router.put('/:pollId', controllers.poll.update);
-router.delete('/:pollId', controllers.poll.destory);
+router.get('/polls', passportConfig.isAuthenticated, controllers.poll.index);
+router.post('/polls', passportConfig.isAuthenticated, controllers.poll.create);
+router.get('/polls/:pollId', passportConfig.isAuthenticated, controllers.poll.show);
+router.get('/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
+router.put('/:pollId', passportConfig.isAuthenticated, controllers.poll.update);
+router.delete('/:pollId', passportConfig.isAuthenticated, controllers.poll.destroy);
 
-router.post('/polls/:pollId/vote/new', controllers.vote.new)
+router.post('/polls/:pollId/vote/new', passportConfig.isAuthenticated, controllers.vote.new)
 
 /**
  * OAuth authentication routes. (Sign in)
