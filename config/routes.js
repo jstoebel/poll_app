@@ -30,6 +30,7 @@ router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controll
 
 router.get('/polls', passportConfig.isAuthenticated, controllers.poll.index);
 router.post('/polls', passportConfig.isAuthenticated, controllers.poll.create);
+router.get('/new', passportConfig.isAuthenticated, controllers.poll.new);
 router.get('/polls/:pollId', passportConfig.isAuthenticated, controllers.poll.show);
 router.get('/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
 router.put('/:pollId', passportConfig.isAuthenticated, controllers.poll.update);
@@ -88,5 +89,7 @@ router.get('/auth/pinterest', passport.authorize('pinterest', { scope: 'read_pub
 router.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRedirect: '/login' }), function(req, res) {
   res.redirect('/api/pinterest');
 });
+
+console.log(router);
 
 module.exports = router;

@@ -6,13 +6,18 @@ exports.index = function(req, res) {
       user.polls()
     })
     .then(function(polls){
-      console.log(polls)
+      res.render('polls/index', {
+        polls: polls
+      });
     })
     .catch(function(err){
       console.log(err)
     })
 
-    res.end()
+};
+
+exports.new = function(req, res) {
+  res.end("hello from new")
 };
 
 exports.create = function(req, res) {
