@@ -3,7 +3,6 @@ var router = express.Router();
 var passport = require('passport');
 var controllers = require('require.all')('../controllers')
 var passportConfig = require('./passport');
-var authConfig = require('./auth')
 
 /**
  * Primary router routes.
@@ -30,6 +29,7 @@ router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
 router.get('/polls', passportConfig.isAuthenticated, controllers.poll.index);
+router.get('/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
 router.post('/polls', passportConfig.isAuthenticated, controllers.poll.create);
 router.get('/polls/:pollId', passportConfig.isAuthenticated, controllers.poll.show);
 router.get('/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);

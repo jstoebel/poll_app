@@ -5,6 +5,10 @@ var nodemailer = require('nodemailer');
 var passport = require('passport');
 var User = require('../models/User');
 
+var jwt = require('jsonwebtoken'),
+      crypto = require('crypto'),
+      config = require('../config/config');
+
 /**
  * GET /login
  * Login page.
@@ -27,6 +31,23 @@ exports.postLogin = function(req, res, next) {
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
+
+    function generateToken(user) {
+        return jwt.sign(user, config.secret, {
+            expiresIn: 10080 // in seconds
+        });
+    }
+
+    function setUserInfo(request) {
+        return {
+            _id: request._id,
+            firstName: request.profile.firstName,
+            lastName: request.profile.lastName,
+            email: request.email,
+            role: request.role,
+        };
+    }
+
   var errors = req.validationErrors();
 
   if (errors) {
@@ -46,8 +67,14 @@ exports.postLogin = function(req, res, next) {
       if (err) {
         return next(err);
       }
-      req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+    req.flash('success', { msg: 'Success! You are logged in.' });
+    var userInfo = setUserInfo(req.user);
+    res.status(200).json({
+        token: 'JWT ' + generateToken(userInfo),
+        user: userInfo
+    });
+
+    //   res.redirect(req.session.returnTo || '/');
     });
   })(req, res, next);
 };

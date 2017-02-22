@@ -9,3 +9,5 @@ exports.appName = "voting";
 // either Heroku's URL or create my own
 exports.db = {URL: process.env.MONGODB_URI ||
   "mongodb://localhost:27017/"+exports.appName.toLowerCase()+"_"+exports.currentEnv}
+
+exports.secret = process.env.SESSION_SECRET;

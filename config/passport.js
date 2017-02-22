@@ -12,7 +12,11 @@ var OpenIDStrategy = require('passport-openid').Strategy;
 var OAuthStrategy = require('passport-oauth').OAuthStrategy;
 var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 
+var JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+
 var User = require('../models/User');
+var config = require('./config')
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -91,6 +95,35 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, passw
     });
   });
 }));
+
+/*
+JWT Strategy
+*/
+
+var jwtOptions = {
+  // Telling Passport to check authorization headers for JWT
+  jwtFromRequest: ExtractJwt.fromAuthHeader(),
+  // Telling Passport where to find the secret
+  secretOrKey: config.secret
+};
+
+var jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
+  User.findById(payload._id, function(err, user) {
+    if (err) { return done(err, false); }
+
+    if (user) {
+      done(null, user);
+    } else {
+      done(null, false);
+    }
+  });
+});
+
+passport.use(jwtLogin);
+
+/*
+End JWT Strategy
+*/
 
 /**
  * OAuth Strategy Overview

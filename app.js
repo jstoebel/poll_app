@@ -44,11 +44,6 @@ var passportConfig = require('./config/passport');
  */
 var app = express();
 
-// trying out Auth0
-const cors = require('cors');
-
-app.use(cors());
-
 // end
 
 /**

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, browserHistory } from 'react-router'
-import PollIndex from './components/PollIndex'
+import PollIndex from './components/polls/PollIndex'
 
 
 render((
