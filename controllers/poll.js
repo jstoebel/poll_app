@@ -1,7 +1,23 @@
 var models = require('require.all')('../models')
 
 exports.index = function(req, res) {
-  res.end("hello from index")
+
+  models.Poll.find(function(err, polls){
+    if (err) {
+      throw err;
+    }
+
+    // stub out for now
+    var polls = [
+      {name: "test poll", user: "test user"}
+    ]
+
+    res.render('home', {
+      polls: polls
+    });
+
+  })
+
 };
 
 exports.new = function(req, res) {

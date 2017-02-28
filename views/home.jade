@@ -3,10 +3,7 @@ extends layout
 block content
   .container
     .row
-      .col-xs-12.col-md-6.col-md-offset-3
-        a(href="/polls/new")
-          button.btn.btn-default(type="button") New Poll
-        .well
-          each poll, i in polls
-            .btn.btn-info.btn-block= poll.name
-  
+      .col-xs-12.col-md-6.col-md-offset-3#app
+        
+  script(src="build/bundle.js")
+  //- script(src="js/client.js")
