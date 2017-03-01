@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import { render } from 'react-dom'
 import { Router, Route, browserHistory } from 'react-router'
-import App from "./components/polls/PollIndex";
+
+import Main from "./components/main";
+import Index from "./components/polls/index";
+
 
 // class App extends React.Component {
 //
@@ -19,7 +22,9 @@ import App from "./components/polls/PollIndex";
 
 render((
   <Router history={browserHistory}>
-    <Route path="/" component={App}/>
+    <Route component={Main} path="app">
+        <Route path="/" component={Index}/>
+    </Route>
   </Router>
 ), document.getElementById('app'))
 

@@ -6,7 +6,7 @@ exports.index = function(req, res) {
     if (err) {
       throw err;
     }
-
+    console.log("responding with index controller");
     // stub out for now
     var polls = [
       {name: "test poll", user: "test user"}

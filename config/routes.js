@@ -28,7 +28,7 @@ router.post('/account/password', passportConfig.isAuthenticated, controllers.use
 router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.postDeleteAccount);
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
-router.get('/polls', passportConfig.isAuthenticated, controllers.poll.index);
+router.get('/polls', controllers.poll.index);
 router.get('/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
 router.post('/polls', passportConfig.isAuthenticated, controllers.poll.create);
 router.get('/polls/:pollId', passportConfig.isAuthenticated, controllers.poll.show);
