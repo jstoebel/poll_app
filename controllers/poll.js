@@ -7,14 +7,13 @@ exports.index = function(req, res) {
       throw err;
     }
     console.log("responding with index controller");
+
     // stub out for now
     var polls = [
-      {name: "test poll", user: "test user"}
-    ]
+      {_id: 8675309, name: "test poll", user: "test user"}
+    ];
 
-    res.render('home', {
-      polls: polls
-    });
+    res.end(JSON.stringify( {polls: polls} ) );
 
   })
 

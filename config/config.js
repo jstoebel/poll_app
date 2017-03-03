@@ -2,6 +2,7 @@
 
 var dotenv = require('dotenv');
 dotenv.load();
+
 exports.currentEnv = process.env.NODE_ENV || 'production'
 
 exports.appName = "voting";

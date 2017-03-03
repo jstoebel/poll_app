@@ -1,53 +1,54 @@
 import React, {Component} from 'react';
-import * as axios from 'axios'
+import { Link } from 'react-router';
+import axios from 'axios';
 
 class Index extends React.Component {
 
-  getInitialState() {
-    return {
+  constructor(props){
+
+    super(props);
+    this.state = {
       polls: []
     }
   }
 
   componentDidMount() {
-    console.log("did mount");
     var _this = this;
-    // this.serverRequest =
-      axios
-        .get("/polls")
-        .then(function(result) {
-          console.log("response:");
-          console.log(result);
-          console.log("^ response");
+
+      axios('/api/polls')
+        .then(function(result){
+          console.log(result.data.polls);
           _this.setState({
-            polls: result.polls
-          });
+            polls: result.data.polls
+          })
         })
         .catch(function(err){
           console.log(err);
         })
+
   }
 
-  componentWillUnmount() {
-    this.serverRequest.abort();
-  }
-
-  eachPoll() {
-
-    this.state.polls.forEach(function(poll){
+  eachPoll(poll, i) {
 
       return(
-        <div class="btn btn-info btn-block">
-          {poll.name}
+        <div
+          className="btn btn-info btn-block"
+          key={poll._id}
+          href={"/poll/" + poll._id}
+        >
+            {poll.name}
         </div>
       )
-    })
   }
 
   render() {
     return(
       <div id="poll-index">
-        here are the polls
+        <h1>Polls</h1>
+        <div>  <Link to="/new">New</Link>  </div>
+        { this.state.polls.map(this.eachPoll) }
+
+        { this.props.children}
       </div>
     )
   }
