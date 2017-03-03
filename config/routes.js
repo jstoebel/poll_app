@@ -31,7 +31,7 @@ router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controll
 router.get('/api/polls', controllers.poll.index);
 router.get('/api/polls/:pollId', controllers.poll.show);
 
-router.get('/api/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
+// router.get('/api/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
 router.post('/api/polls', passportConfig.isAuthenticated, controllers.poll.create);
 router.get('/api/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
 router.put('/api/:pollId', passportConfig.isAuthenticated, controllers.poll.update);

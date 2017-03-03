@@ -6,12 +6,6 @@ exports.index = function(req, res) {
     if (err) {
       throw err;
     }
-    console.log("responding with index controller");
-
-    // stub out for now
-    var polls = [
-      {_id: 8675309, name: "test poll", user: "test user"}
-    ];
 
     res.end(JSON.stringify( {polls: polls} ) );
 
@@ -24,7 +18,21 @@ exports.new = function(req, res) {
 }
 
 exports.create = function(req, res) {
-  res.end("hello from create")
+  console.log(req.body);
+
+  var params = {
+    name: req.body.name,
+    user: req.user._id
+  }
+
+  var poll = new models.Poll(params);
+  poll.save(function(err, poll){
+    if (err){
+        res.status(400).json({msg: "Failed to create poll"})
+    }
+
+    res.json({msg: `Successfully created poll ${params.name}` })
+  })
 };
 
 exports.show = function(req, res) {

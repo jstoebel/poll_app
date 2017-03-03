@@ -26727,7 +26727,7 @@
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          null,
+	          { className: 'btn btn-default' },
 	          '  ',
 	          _react2.default.createElement(
 	            _reactRouter.Link,
@@ -28269,12 +28269,14 @@
 	    var _this = _possibleConstructorReturn(this, (New.__proto__ || Object.getPrototypeOf(New)).call(this, props));
 
 	    _this.state = {
-	      pollName: ""
+	      pollName: "",
+	      flashes: []
 	    };
 
 	    // methods that need access this `this`
 	    _this.handleChange = _this.handleChange.bind(_this);
 	    _this.handleSubmit = _this.handleSubmit.bind(_this);
+	    _this.eachFlash = _this.eachFlash.bind(_this);
 	    return _this;
 	  }
 
@@ -28288,10 +28290,61 @@
 	      this.setState({ pollName: event.target.value });
 	    }
 	  }, {
+	    key: '_create',
+	    value: function _create() {
+	      return $.ajax({
+	        url: '/api/polls',
+	        type: 'POST',
+	        data: {
+	          name: this.state.pollName
+	        },
+	        beforeSend: function () {
+	          this.setState({ loading: true });
+	        }.bind(this)
+	      });
+	    }
+	  }, {
+	    key: '_onSuccess',
+	    value: function _onSuccess(resp) {
+
+	      this.setState({
+	        flashes: [{ flash: resp.msg, success: true }]
+	      });
+	      console.log(state.flashes);
+	    }
+	  }, {
+	    key: '_onError',
+	    value: function _onError(error) {
+	      console.log(error);
+	      this.setState({
+	        flashes: [{ flash: resp.msg, success: false }]
+	      });
+	    }
+	  }, {
 	    key: 'handleSubmit',
 	    value: function handleSubmit(event) {
-	      console.log('A poll was submitted: ' + this.state.pollName);
 	      event.preventDefault();
+	      console.log('A poll was submitted: ' + this.state.pollName);
+	      var formData = {
+	        pollName: this.state.pollName
+	      };
+
+	      var xhr = this._create();
+	      xhr.done(this._onSuccess).fail(this._onError);
+	    }
+	  }, {
+	    key: 'eachFlash',
+	    value: function eachFlash(flash, i) {
+	      _react2.default.createElement(
+	        'div',
+	        { 'class': 'alert alert-{flash.ok ? \'success\' : \'danger\'} alert-dismissable' },
+	        _react2.default.createElement(
+	          'a',
+	          { href: '#', 'class': 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
+	          '\xD7'
+	        ),
+	        flash.msg
+	      );
 	    }
 	  }, {
 	    key: 'render',
@@ -28299,6 +28352,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
+	        this.state.flashes.map(this.eachFlash),
 	        _react2.default.createElement(
 	          'form',
 	          { onSubmit: this.handleSubmit },
