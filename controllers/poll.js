@@ -23,7 +23,9 @@ exports.create = function(req, res) {
   var params = {
     name: req.body.name,
     user: req.user._id
-  }
+  };
+
+
 
   var poll = new models.Poll(params);
   poll.save(function(err, poll){
@@ -31,12 +33,28 @@ exports.create = function(req, res) {
         res.status(400).json({msg: "Failed to create poll"})
     }
 
-    res.json({msg: `Successfully created poll ${params.name}` })
+    // next make the options
+    var options = req
+      .body
+      .options
+      .split("\n")
+      .map(function(opt){
+        return {name: opt}
+    });
+
+    models.Option.insertMany(options, function(err, options){
+      res.json({msg: `Successfully created poll ${params.name}` })
+    })
   })
+
 };
 
 exports.show = function(req, res) {
-  res.end("hello from show")
+  console.log(req.params);
+  models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
+    console.log(poll);
+    res.json(JSON.stringify(poll))
+  })
 };
 
 exports.edit = function(req, res) {

@@ -66,13 +66,18 @@
 
 	var _new2 = _interopRequireDefault(_new);
 
+	var _show = __webpack_require__(263);
+
+	var _show2 = _interopRequireDefault(_show);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRouter.Router,
 	  { history: _reactRouter.browserHistory },
 	  _react2.default.createElement(_reactRouter.Route, { component: _index2.default, path: '/' }),
-	  _react2.default.createElement(_reactRouter.Route, { component: _new2.default, path: '/new' })
+	  _react2.default.createElement(_reactRouter.Route, { component: _new2.default, path: '/new' }),
+	  _react2.default.createElement(_reactRouter.Route, { component: _show2.default, path: '/poll/:pollId' })
 	), document.getElementById('app'));
 
 	// index all polls
@@ -26692,26 +26697,26 @@
 	      var _this = this;
 
 	      (0, _axios2.default)('/api/polls').then(function (result) {
-	        console.log(result.data.polls);
 	        _this.setState({
 	          polls: result.data.polls
 	        });
-	      }).catch(function (err) {
-	        console.log(err);
-	      });
+	      }).catch(function (err) {});
 	    }
 	  }, {
 	    key: 'eachPoll',
 	    value: function eachPoll(poll, i) {
 
 	      return _react2.default.createElement(
-	        'div',
-	        {
-	          className: 'btn btn-info btn-block',
-	          key: poll._id,
-	          href: "/poll/" + poll._id
-	        },
-	        poll.name
+	        _reactRouter.Link,
+	        { to: "/poll/" + poll._id, key: poll._id },
+	        _react2.default.createElement(
+	          'div',
+	          {
+	            className: 'btn btn-info btn-block'
+
+	          },
+	          poll.name
+	        )
 	      );
 	    }
 	  }, {
@@ -26726,15 +26731,13 @@
 	          'Polls'
 	        ),
 	        _react2.default.createElement(
-	          'div',
-	          { className: 'btn btn-default' },
-	          '  ',
+	          _reactRouter.Link,
+	          { to: '/new' },
 	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: '/new' },
+	            'div',
+	            { className: 'btn btn-default' },
 	            'New'
-	          ),
-	          '  '
+	          )
 	        ),
 	        this.state.polls.map(this.eachPoll),
 	        this.props.children
@@ -28254,6 +28257,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -28277,17 +28282,21 @@
 	    _this.handleChange = _this.handleChange.bind(_this);
 	    _this.handleSubmit = _this.handleSubmit.bind(_this);
 	    _this.eachFlash = _this.eachFlash.bind(_this);
+	    _this._onSuccess = _this._onSuccess.bind(_this);
+	    _this._onError = _this._onError.bind(_this);
+
 	    return _this;
 	  }
 
 	  _createClass(New, [{
-	    key: 'sendFormData',
-	    value: function sendFormData() {}
-	  }, {
 	    key: 'handleChange',
 	    value: function handleChange(event) {
 	      // handle changing state of fields
-	      this.setState({ pollName: event.target.value });
+
+	      var target = event.target;
+	      var value = target.value;
+	      var name = target.name;
+	      this.setState(_defineProperty({}, name, value));
 	    }
 	  }, {
 	    key: '_create',
@@ -28296,7 +28305,8 @@
 	        url: '/api/polls',
 	        type: 'POST',
 	        data: {
-	          name: this.state.pollName
+	          name: this.state.pollName,
+	          options: this.state.pollOptions
 	        },
 	        beforeSend: function () {
 	          this.setState({ loading: true });
@@ -28307,17 +28317,19 @@
 	    key: '_onSuccess',
 	    value: function _onSuccess(resp) {
 
+	      var newFlashes = this.state.flashes;
+	      newFlashes.push({ msg: resp.msg, success: true });
 	      this.setState({
-	        flashes: [{ flash: resp.msg, success: true }]
+	        flashes: newFlashes
 	      });
-	      console.log(state.flashes);
 	    }
 	  }, {
 	    key: '_onError',
 	    value: function _onError(error) {
-	      console.log(error);
+	      var newFlashes = this.state.flashes;
+	      newFlashes.push({ msg: resp.msg, success: false });
 	      this.setState({
-	        flashes: [{ flash: resp.msg, success: false }]
+	        flashes: newFlashes
 	      });
 	    }
 	  }, {
@@ -28335,12 +28347,16 @@
 	  }, {
 	    key: 'eachFlash',
 	    value: function eachFlash(flash, i) {
-	      _react2.default.createElement(
+
+	      return _react2.default.createElement(
 	        'div',
-	        { 'class': 'alert alert-{flash.ok ? \'success\' : \'danger\'} alert-dismissable' },
+	        {
+	          className: "alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable",
+	          key: i
+	        },
 	        _react2.default.createElement(
 	          'a',
-	          { href: '#', 'class': 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
+	          { href: '#', className: 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
 	          '\xD7'
 	        ),
 	        flash.msg
@@ -28349,10 +28365,22 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        this.state.flashes.map(this.eachFlash),
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          ' Create a new poll '
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'flashes' },
+	          ' ',
+	          this.state.flashes.map(this.eachFlash),
+	          ' '
+	        ),
 	        _react2.default.createElement(
 	          'form',
 	          { onSubmit: this.handleSubmit },
@@ -28361,14 +28389,37 @@
 	            { className: 'form-group row' },
 	            _react2.default.createElement(
 	              'label',
-	              { className: 'col-2 col-form-label' },
+	              { className: 'col-2 col-form-label form-text' },
 	              'Poll Name'
 	            ),
 	            _react2.default.createElement(
 	              'div',
 	              { className: 'col-10' },
-	              _react2.default.createElement('input', { className: 'form-control', name: 'pollName', type: 'text', value: this.state.pollName, onChange: this.handleChange })
+	              _react2.default.createElement('input', {
+	                className: 'form-control',
+	                name: 'pollName',
+	                type: 'text',
+	                value: this.state.pollName,
+	                onChange: this.handleChange
+	              })
 	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group row' },
+	            _react2.default.createElement(
+	              'label',
+	              { className: 'form-text' },
+	              'Options (One choice per line)'
+	            ),
+	            _react2.default.createElement('textarea', {
+	              className: 'form-control',
+	              rows: '3',
+	              type: 'text',
+	              name: 'pollOptions',
+	              value: this.state.pollOptions,
+	              onChange: this.handleChange
+	            })
 	          ),
 	          _react2.default.createElement('input', { className: 'btn btn-info', type: 'submit', value: 'Submit' })
 	        )
@@ -28380,6 +28431,165 @@
 	}(_react2.default.Component);
 
 	exports.default = New;
+
+/***/ },
+/* 263 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Show = function (_React$Component) {
+	  _inherits(Show, _React$Component);
+
+	  function Show(props) {
+	    _classCallCheck(this, Show);
+
+	    // methods that need access this `this`
+	    var _this = _possibleConstructorReturn(this, (Show.__proto__ || Object.getPrototypeOf(Show)).call(this, props));
+
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.handleSubmit = _this.handleSubmit.bind(_this);
+	    _this._getSuccess = _this._getSuccess.bind(_this);
+	    _this._getError = _this._getError.bind(_this);
+
+	    _this._onSuccess = _this._onSuccess.bind(_this);
+	    _this._onError = _this._onError.bind(_this);
+
+	    return _this;
+	  }
+
+	  _createClass(Show, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+
+	      // // fetch record from /api/polls/:pollId
+	      console.log("did mount");
+	      var xhr = this._getRecord();
+	      // xhr.done(this._getSuccess)
+	      xhr.done(function (resp) {
+	        this.setState({ poll: resp });
+	      }).fail(this._getError);
+	    }
+	  }, {
+	    key: '_getRecord',
+	    value: function _getRecord() {
+	      return $.ajax({
+	        url: '/api/polls/' + this.props.params.pollId,
+	        type: 'GET',
+	        beforeSend: function () {
+	          this.setState({ loading: true });
+	        }.bind(this)
+	      });
+	    }
+	  }, {
+	    key: '_getSuccess',
+	    value: function _getSuccess(resp) {
+
+	      console.log("get success");
+	      console.log(resp);
+	    }
+	  }, {
+	    key: '_getError',
+	    value: function _getError() {
+	      console.log("error fetching record");
+	    }
+	  }, {
+	    key: 'handleChange',
+	    value: function handleChange(event) {
+	      // handle changing state of fields
+
+	    }
+	  }, {
+	    key: '_create',
+	    value: function _create() {
+	      // submit vote
+	      // return $.ajax({
+	      //   url: '/api/polls',
+	      //   type: 'POST',
+	      //   data: {
+	      //     name: this.state.pollName,
+	      //     options: this.state.pollOptions
+	      //   },
+	      //   beforeSend: function () {
+	      //     this.setState({loading: true});
+	      //   }.bind(this)
+	      // })
+	    }
+	  }, {
+	    key: '_onSuccess',
+	    value: function _onSuccess(resp) {}
+	  }, {
+	    key: '_onError',
+	    value: function _onError(error) {}
+	  }, {
+	    key: 'handleSubmit',
+	    value: function handleSubmit(event) {
+	      event.preventDefault();
+	      var formData = {
+	        pollName: this.state.pollName
+	      };
+
+	      var xhr = this._create();
+	      xhr.done(this._onSuccess).fail(this._onError);
+	    }
+	  }, {
+	    key: 'eachFlash',
+	    value: function eachFlash(flash, i) {
+
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          className: "alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable",
+	          key: i
+	        },
+	        _react2.default.createElement(
+	          'a',
+	          { href: '#', className: 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
+	          '\xD7'
+	        ),
+	        flash.msg
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      console.log(this.state);
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          ' ',
+	          this.state.poll.name,
+	          ' '
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Show;
+	}(_react2.default.Component);
+
+	exports.default = Show;
 
 /***/ }
 /******/ ]);

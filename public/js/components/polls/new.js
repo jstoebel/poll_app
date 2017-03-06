@@ -14,16 +14,19 @@ class New extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.eachFlash = this.eachFlash.bind(this);
-  }
-
-  sendFormData() {
-
+    this._onSuccess = this._onSuccess.bind(this);
+    this._onError = this._onError.bind(this);
 
   }
 
   handleChange(event) {
     // handle changing state of fields
-    this.setState({pollName: event.target.value});
+
+    const target = event.target;
+    const value = target.value;
+    const name = target.name
+    this.setState({[name]: value})
+
   }
 
   _create() {
@@ -31,7 +34,8 @@ class New extends React.Component {
       url: '/api/polls',
       type: 'POST',
       data: {
-        name: this.state.pollName
+        name: this.state.pollName,
+        options: this.state.pollOptions
       },
       beforeSend: function () {
         this.setState({loading: true});
@@ -41,20 +45,19 @@ class New extends React.Component {
 
   _onSuccess(resp) {
 
+    var newFlashes = this.state.flashes
+    newFlashes.push({msg: resp.msg, success: true})
     this.setState({
-      flashes: [
-        {flash: resp.msg, success: true}
-      ]
+      flashes : newFlashes
     })
-    console.log(state.flashes);
+
   }
 
   _onError(error) {
-    console.log(error);
+    var newFlashes = this.state.flashes
+    newFlashes.push({msg: resp.msg, success: false})
     this.setState({
-      flashes: [
-        {flash: resp.msg, success: false}
-      ]
+      flashes : newFlashes
     })
   }
 
@@ -71,24 +74,56 @@ class New extends React.Component {
   }
 
   eachFlash(flash, i) {
-    <div class="alert alert-{flash.ok ? 'success' : 'danger'} alert-dismissable">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      {flash.msg}
-    </div>
+    
+    return (
+      <div
+        className={"alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable" }
+        key={i}
+      >
+          <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {flash.msg}
+      </div>
+
+    )
   }
 
   render() {
+
     return(
 
       <div>
-        {this.state.flashes.map(this.eachFlash)}
+        <h1> Create a new poll </h1>
+        <div className="flashes"> {this.state.flashes.map(this.eachFlash)} </div>
+
         <form onSubmit={this.handleSubmit}>
           <div className="form-group row">
-            <label className="col-2 col-form-label">Poll Name</label>
+            <label className="col-2 col-form-label form-text">Poll Name</label>
             <div className="col-10">
-              <input className="form-control" name="pollName"  type="text" value={this.state.pollName} onChange={this.handleChange} />
+              <input
+                className="form-control"
+                name="pollName"
+                type="text"
+                value={this.state.pollName}
+                onChange={this.handleChange}
+              />
             </div>
           </div>
+
+
+          <div className="form-group row">
+            <label className="form-text">Options (One choice per line)</label>
+            <textarea
+              className="form-control"
+              rows="3"
+              type="text"
+              name="pollOptions"
+              value={this.state.pollOptions}
+              onChange={this.handleChange}
+            >
+
+            </textarea>
+          </div>
+
 
           <input className="btn btn-info"  type="submit" value="Submit" />
         </form>

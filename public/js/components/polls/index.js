@@ -17,13 +17,11 @@ class Index extends React.Component {
 
       axios('/api/polls')
         .then(function(result){
-          console.log(result.data.polls);
           _this.setState({
             polls: result.data.polls
           })
         })
         .catch(function(err){
-          console.log(err);
         })
 
   }
@@ -31,13 +29,14 @@ class Index extends React.Component {
   eachPoll(poll, i) {
 
       return(
-        <div
-          className="btn btn-info btn-block"
-          key={poll._id}
-          href={"/poll/" + poll._id}
-        >
-            {poll.name}
-        </div>
+          <Link to={"/poll/" + poll._id} key={poll._id}>
+            <div
+            className="btn btn-info btn-block"
+
+            >
+              {poll.name}
+            </div>
+          </Link>
       )
   }
 
@@ -45,7 +44,12 @@ class Index extends React.Component {
     return(
       <div id="poll-index">
         <h1>Polls</h1>
-        <div className="btn btn-default">  <Link to="/new">New</Link>  </div>
+
+        <Link to="/new">
+          <div className="btn btn-default">
+            New
+          </div>
+        </Link>
         { this.state.polls.map(this.eachPoll) }
 
         { this.props.children}
