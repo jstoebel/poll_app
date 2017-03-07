@@ -75,9 +75,13 @@
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRouter.Router,
 	  { history: _reactRouter.browserHistory },
-	  _react2.default.createElement(_reactRouter.Route, { component: _index2.default, path: '/' }),
-	  _react2.default.createElement(_reactRouter.Route, { component: _new2.default, path: '/new' }),
-	  _react2.default.createElement(_reactRouter.Route, { component: _show2.default, path: '/poll/:pollId' })
+	  _react2.default.createElement(
+	    _reactRouter.Route,
+	    { path: '/', component: _main2.default },
+	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _index2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { component: _new2.default, path: '/new' }),
+	    _react2.default.createElement(_reactRouter.Route, { component: _show2.default, path: '/poll/:pollId' })
+	  )
 	), document.getElementById('app'));
 
 	// index all polls
@@ -26711,10 +26715,7 @@
 	        { to: "/poll/" + poll._id, key: poll._id },
 	        _react2.default.createElement(
 	          'div',
-	          {
-	            className: 'btn btn-info btn-block'
-
-	          },
+	          { className: 'btn btn-info btn-block' },
 	          poll.name
 	        )
 	      );
@@ -28318,10 +28319,14 @@
 	    value: function _onSuccess(resp) {
 
 	      var newFlashes = this.state.flashes;
-	      newFlashes.push({ msg: resp.msg, success: true });
-	      this.setState({
-	        flashes: newFlashes
-	      });
+	      if (resp.success) {
+	        newFlashes.push({ msg: resp.msg, success: true });
+	        this.setState({
+	          flashes: newFlashes
+	        });
+	      } else {
+	        // TODO: redirect to login  
+	      }
 	    }
 	  }, {
 	    key: '_onError',
@@ -28477,26 +28482,20 @@
 	  }
 
 	  _createClass(Show, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      console.log("will mount");
 	      // // fetch record from /api/polls/:pollId
-	      console.log("did mount");
 	      var xhr = this._getRecord();
 	      // xhr.done(this._getSuccess)
-	      xhr.done(function (resp) {
-	        this.setState({ poll: resp });
-	      }).fail(this._getError);
+	      xhr.done(this._getSuccess).fail(this._getError);
 	    }
 	  }, {
 	    key: '_getRecord',
 	    value: function _getRecord() {
 	      return $.ajax({
 	        url: '/api/polls/' + this.props.params.pollId,
-	        type: 'GET',
-	        beforeSend: function () {
-	          this.setState({ loading: true });
-	        }.bind(this)
+	        type: 'GET'
 	      });
 	    }
 	  }, {
@@ -28505,10 +28504,13 @@
 
 	      console.log("get success");
 	      console.log(resp);
+	      this.setState({
+	        poll: resp
+	      });
 	    }
 	  }, {
 	    key: '_getError',
-	    value: function _getError() {
+	    value: function _getError(error) {
 	      console.log("error fetching record");
 	    }
 	  }, {
@@ -28571,7 +28573,7 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log(this.state);
+	      console.log("render show!");
 	      return _react2.default.createElement(
 	        'div',
 	        null,
@@ -28579,7 +28581,7 @@
 	          'h1',
 	          null,
 	          ' ',
-	          this.state.poll.name,
+	          this.state ? this.state.poll.name : "loading...",
 	          ' '
 	        )
 	      );

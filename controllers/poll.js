@@ -43,7 +43,7 @@ exports.create = function(req, res) {
     });
 
     models.Option.insertMany(options, function(err, options){
-      res.json({msg: `Successfully created poll ${params.name}` })
+      res.json({msg: `Successfully created poll ${params.name}`, success: true })
     })
   })
 
@@ -53,7 +53,7 @@ exports.show = function(req, res) {
   console.log(req.params);
   models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
     console.log(poll);
-    res.json(JSON.stringify(poll))
+    res.json(poll)
   })
 };
 

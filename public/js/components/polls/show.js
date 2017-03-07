@@ -16,24 +16,19 @@ class Show extends React.Component {
 
   }
 
-  componentDidMount() {
-
+  componentWillMount() {
+    console.log("will mount");
     // // fetch record from /api/polls/:pollId
     var xhr = this._getRecord();
     // xhr.done(this._getSuccess)
-    xhr.done(function(resp){
-      this.setState({poll: resp})
-    })
+    xhr.done(this._getSuccess)
       .fail(this._getError)
   }
 
   _getRecord() {
     return $.ajax({
       url: '/api/polls/' + this.props.params.pollId,
-      type: 'GET',
-      beforeSend: function () {
-        this.setState({loading: true});
-      }.bind(this)
+      type: 'GET'
     })
   }
 
@@ -41,6 +36,9 @@ class Show extends React.Component {
 
     console.log("get success");
     console.log(resp);
+    this.setState({
+      poll: resp
+    })
   }
 
   _getError(error) {
@@ -102,11 +100,11 @@ class Show extends React.Component {
   }
 
   render() {
-    console.log(this.state);
+    console.log("render show!");
     return(
 
       <div>
-        <h1> {this.state.poll.name} </h1>
+        <h1> {this.state ? this.state.poll.name : "loading..."} </h1>
 
       </div>
 

@@ -30,10 +30,7 @@ class Index extends React.Component {
 
       return(
           <Link to={"/poll/" + poll._id} key={poll._id}>
-            <div
-            className="btn btn-info btn-block"
-
-            >
+            <div className="btn btn-info btn-block">
               {poll.name}
             </div>
           </Link>

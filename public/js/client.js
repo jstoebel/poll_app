@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { render } from 'react-dom'
-import { Router, Route, browserHistory } from 'react-router'
+import { Router, Route, browserHistory, IndexRoute } from 'react-router'
 
 import Main from "./components/main";
 import Index from "./components/polls/index";
@@ -9,11 +9,20 @@ import Show from "./components/polls/show";
 
 render((
   <Router history={browserHistory}>
-    <Route component={Index} path="/" />
-    <Route component={New} path="/new" />
-    <Route component={Show} path="/poll/:pollId" />
+    <Route path="/" component={Main}>
+      <IndexRoute component={Index}/>
+      <Route component={New} path="/new" />
+      <Route component={Show} path="/poll/:pollId" />
+
+
+    </Route>
+
   </Router>
 ), document.getElementById('app'))
+
+
+
+
 
 
 // index all polls

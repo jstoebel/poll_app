@@ -46,10 +46,15 @@ class New extends React.Component {
   _onSuccess(resp) {
 
     var newFlashes = this.state.flashes
-    newFlashes.push({msg: resp.msg, success: true})
-    this.setState({
-      flashes : newFlashes
-    })
+    if (resp.success) {
+      newFlashes.push({msg: resp.msg, success: true})
+      this.setState({
+        flashes : newFlashes
+      })
+    } else {
+        // TODO: redirect to login  
+    }
+
 
   }
 
@@ -74,7 +79,7 @@ class New extends React.Component {
   }
 
   eachFlash(flash, i) {
-    
+
     return (
       <div
         className={"alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable" }
