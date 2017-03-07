@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
-  
+
 var voteSchema = new mongoose.Schema({
   // belongs to an option
   user: { type: ObjectId, ref: 'User' },
@@ -12,4 +12,4 @@ var voteSchema = new mongoose.Schema({
 
 var Vote = mongoose.model('Vote', voteSchema);
 
-module.exports = Vote;
+module.exports = {vote: Vote, schema: voteSchema};

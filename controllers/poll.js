@@ -25,26 +25,27 @@ exports.create = function(req, res) {
     user: req.user._id
   };
 
-
-
   var poll = new models.Poll(params);
+
+  req
+  .body
+  .options
+  .split("\n")
+  .forEach(function(opt){
+    poll.options.push({name: opt, votes: 0})
+  });
+
   poll.save(function(err, poll){
     if (err){
+        console.log(err);
         res.status(400).json({msg: "Failed to create poll"})
+    } else {
+      // next make the options
+      res.json({msg: `Successfully created poll ${params.name}`, success: true })
+
     }
 
-    // next make the options
-    var options = req
-      .body
-      .options
-      .split("\n")
-      .map(function(opt){
-        return {name: opt}
-    });
 
-    models.Option.insertMany(options, function(err, options){
-      res.json({msg: `Successfully created poll ${params.name}`, success: true })
-    })
   })
 
 };

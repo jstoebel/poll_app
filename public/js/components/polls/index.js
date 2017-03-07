@@ -27,7 +27,7 @@ class Index extends React.Component {
   }
 
   eachPoll(poll, i) {
-
+      console.log(poll);
       return(
           <Link to={"/poll/" + poll._id} key={poll._id}>
             <div className="btn btn-info btn-block">
