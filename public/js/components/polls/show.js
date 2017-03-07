@@ -14,6 +14,11 @@ class Show extends React.Component {
     this._onSuccess = this._onSuccess.bind(this);
     this._onError = this._onError.bind(this);
 
+    this.renderPoll = this.renderPoll.bind(this);
+    this.renderLoading = this.renderLoading.bind(this);
+
+    this.state = {poll: ""}
+
   }
 
   componentWillMount() {
@@ -85,30 +90,68 @@ class Show extends React.Component {
       .fail(this._onError)
   }
 
-  eachFlash(flash, i) {
+  pollSummary(option, i) {
 
     return (
-      <div
-        className={"alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable" }
+      <li
         key={i}
       >
-          <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-          {flash.msg}
-      </div>
+          {option.name + " : " + option.votes}
+      </li>
 
+    )
+  }
+
+  eachOption(option, i) {
+    return (
+      <div>
+        {<option value="1">One</option>}
+      </div>
+    )
+  }
+
+  renderPoll() {
+    return (
+      <div className="container">
+        <h1> {this.state.poll ? this.state.poll.name : "loading..."} </h1>
+        <div className="row">
+
+          <div className="col-xs-12 col-md-6" id="results-pie">
+            <h2> Votes </h2>
+            <ul>
+              {this.state.poll.options.map(this.pollSummary)}
+            </ul>
+
+          </div>
+
+          <div className="col-xs-12 col-md-6" id="show-menu">
+            <select class="custom-select">
+              <option selected>Open this select menu</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+    )
+  }
+
+  renderLoading() {
+    return (
+      <div> Loading... </div>
     )
   }
 
   render() {
     console.log("render show!");
-    return(
-
+    return (
       <div>
-        <h1> {this.state ? this.state.poll.name : "loading..."} </h1>
-
+        {this.state.poll ? this.renderPoll() : this.renderLoading()}
       </div>
-
     )
+
   }
 
 }
