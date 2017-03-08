@@ -28537,9 +28537,25 @@
 
 	    var arc = d3.svg.arc().outerRadius(radius);
 
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(piedata)).enter().append('path').attr('fill', function (d, i) {
+	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(piedata)).enter().append('g').attr('class', 'slice');
+
+	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
 	      return colors(i);
 	    }).attr('d', arc);
+
+	    var text = d3.select(faux).selectAll('g.slice').append('text').text(function (d, i) {
+	      return d.data.label;
+	    }).attr('text-anchor', 'middle').attr('fill', 'white').attr('transform', function (d) {
+	      d.innerRadius = 0;
+	      d.outerRadius = radius;
+	      return 'translate(' + arc.centroid(d) + ')';
+	    });
+
+	    // .enter().append('path')
+	    //     .attr('fill', function(d, i) {
+	    //         return colors(i);
+	    //     })
+	    //     .attr('d', arc)
 	  },
 	  renderLoading: function renderLoading() {},
 	  render: function render() {
