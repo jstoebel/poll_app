@@ -28459,9 +28459,17 @@
 
 	var _reactFauxDom2 = _interopRequireDefault(_reactFauxDom);
 
+	var _reactDimensions = __webpack_require__(281);
+
+	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	// import {event as currentEvent} from 'd3-selection';
+
 
 	var Show = _react2.default.createClass({
 	  displayName: 'Show',
@@ -28469,117 +28477,244 @@
 	  mixins: [_reactFauxDom2.default.mixins.core, _reactFauxDom2.default.mixins.anim],
 
 	  getInitialState: function getInitialState() {
-	    console.log("get initial state");
 	    return {
-	      chart: 'loading...'
+	      chart: "loading...",
+	      pollOption: "",
+	      poll: { options: [] } // mock this object until the real one is loaded in
 	    };
 	  },
-	  componentWillMount: function componentWillMount() {
-	    // // fetch record from /api/polls/:pollId
-
-	    console.log("componentWillMount");
-	    // var xhr = this._getRecord();
-	    // // xhr.done(this._getSuccess)
-	    // xhr.done(this._getSuccess)
-	    //   .fail(this._getError)
-	  },
+	  componentWillMount: function componentWillMount() {},
 	  _getRecord: function _getRecord() {
 	    return $.ajax({
 	      url: '/api/polls/' + this.props.params.pollId,
 	      type: 'GET'
 	    });
 	  },
+	  _getSuccess: function _getSuccess(resp) {
 
-
-	  // _getSuccess(resp) {
-	  //
-	  //   console.log(resp);
-	  //   this.setState({
-	  //     poll: resp
-	  //   })
-	  // },
-
+	    console.log("starting _getSuccess");
+	    this.setupPie(resp);
+	    this.setState({
+	      poll: resp
+	    });
+	  },
 	  _getError: function _getError(error) {
 	    console.log("error fetching record");
 	  },
+	  _submitRecord: function _submitRecord() {
+	    return $.ajax({
+	      url: '/api/polls/vote',
+	      type: 'POST',
+	      data: {
+	        pollId: this.state.poll._id,
+	        optionId: this.state.pollOption
+	      }
+	    });
+	  },
+	  _submitSuccess: function _submitSuccess(resp) {
+	    console.log("submit success!");
+	    console.log(resp);
+	  },
+	  _submitError: function _submitError(error) {
+	    console.log("submit error!");
+	    console.log(error);
+	  },
 	  componentDidMount: function componentDidMount() {
-
 	    var xhr = this._getRecord();
 	    // xhr.done(this._getSuccess)
-	    xhr.done(this.setupPie).fail(this._getError);
+	    xhr.done(this._getSuccess).fail(this._getError);
+	  },
+	  handleChange: function handleChange(event) {
+	    // handle changing state of fields
+
+	    var target = event.target;
+	    var value = target.value;
+	    var name = target.name;
+	    this.setState(_defineProperty({}, name, value));
+	  },
+	  handleSubmit: function handleSubmit(event) {
+	    event.preventDefault();
+	    console.log('A poll was voted on: ' + this.state.pollOption);
+
+	    var xhr = this._submitRecord();
+	    xhr.done(this._submitSuccess).fail(this._submitError);
 	  },
 	  setupPie: function setupPie(poll) {
 	    // resp: the http response from the server
 	    // sets up the pie chart and loads it into state
+	    console.log(poll);
 
-	    console.log("setupPie!");
 	    var faux = this.connectFauxDOM('div.renderedD3', 'chart');
 
-	    var width = 400,
-	        height = 400,
-	        radius = 200,
+	    var totalVotes = poll.options.reduce(function (total, option, i) {
+	      return total += option.votes;
+	    }, 0);
+
+	    // only try to draw a pie chart if there are any votes
+	    var width = 0.4 * this.props.containerWidth,
+	        height = width,
+	        radius = 0.5 * width,
 	        colors = d3.scale.category20c();
 
-	    var piedata = [{
-	      label: "Barot",
-	      value: 10
-	    }, {
-	      label: "Gerard",
-	      value: 10
-	    }, {
-	      label: "Jennifer",
-	      value: 50
+	    // var piedata = [
+	    //     {
+	    //         name: "spam",
+	    //         votes: 300
+	    //     },
+	    //     {
+	    //         name: "eggs",
+	    //         votes: 100
+	    //     },
+	    //     {
+	    //         name: "baked beans",
+	    //         votes: 1
+	    //     }
+	    // ]
+
+	    // generate data to render, either from record or in the case of no votes
+	    // mock up some stand in data
+	    var pieData = totalVotes > 0 ? poll.options : [{
+	      name: "no votes yet",
+	      votes: 1
 	    }];
 
+	    console.log(pieData);
+
 	    var pie = d3.layout.pie().value(function (d) {
-	      return d.value;
+	      return d.votes;
 	    });
 
-	    var arc = d3.svg.arc().outerRadius(radius);
+	    var arc = d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
 
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(piedata)).enter().append('g').attr('class', 'slice');
+	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice').on('mouseover', function (d, i) {
+	      console.log("mouse over!");
+	      console.log(_d.event);
+	      tooltip.style('opacity', .2);
+
+	      tooltip.html(d.name + ': ' + d.votes).style('left', _d.event.pageX - 35 + 'px').style('top', _d.event.pageY - 30 + 'px');
+	    }).on('mouseout', function (d) {
+	      tooltip.style('opacity', 0);
+	    });
 
 	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
 	      return colors(i);
 	    }).attr('d', arc);
 
 	    var text = d3.select(faux).selectAll('g.slice').append('text').text(function (d, i) {
-	      return d.data.label;
+	      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
+	        // don't show label if no votes or under 5%
+	        return "";
+	      } else {
+	        return d.data.name;
+	      }
 	    }).attr('text-anchor', 'middle').attr('fill', 'white').attr('transform', function (d) {
 	      d.innerRadius = 0;
 	      d.outerRadius = radius;
 	      return 'translate(' + arc.centroid(d) + ')';
 	    });
 
-	    // .enter().append('path')
-	    //     .attr('fill', function(d, i) {
-	    //         return colors(i);
-	    //     })
-	    //     .attr('d', arc)
+	    var tooltip = d3.select(faux).append('div').classed('tooltip', true);
 	  },
-	  renderLoading: function renderLoading() {},
-	  render: function render() {
+	  eachOption: function eachOption(option, i) {
+	    return _react2.default.createElement(
+	      'option',
+	      { value: option._id, key: i },
+	      ' ',
+	      option.name,
+	      ' '
+	    );
+	  },
 
-	    console.log("render!");
-	    console.log(this.state);
+
+	  // setupSubmitBtn(){
+	  //   // renders the submit button as eithe
+	  // }
+
+	  setupMenu: function setupMenu() {
+
+	    if (this.state.poll) {
+	      return _react2.default.createElement(
+	        'form',
+	        { onSubmit: this.handleSubmit },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'form-horizontal' },
+	          _react2.default.createElement(
+	            'select',
+	            {
+	              className: 'selectpicker col-sm-12',
+	              name: 'pollOption',
+	              value: this.state.pollOption,
+	              onChange: this.handleChange
+	            },
+	            _react2.default.createElement(
+	              'option',
+	              { selected: true, className: 'text-center' },
+	              'Vote in this poll'
+	            ),
+	            this.state.poll.options.map(this.eachOption)
+	          )
+	        ),
+	        _react2.default.createElement('input', {
+	          className:  true ? "" : "disabled",
+	          type: 'submit', value: 'Submit' })
+	      );
+	    } else {
+	      return _react2.default.createElement(
+	        'form',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'form-horizontal' },
+	          _react2.default.createElement(
+	            'select',
+	            {
+	              className: 'custom-select',
+	              name: 'pollOption'
+	            },
+	            _react2.default.createElement(
+	              'option',
+	              { selected: true, className: 'text-center' },
+	              'Loading...'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement('input', { className: 'btn btn-info disabled', type: 'submit', value: 'Submit' })
+	      );
+	    }
+	  },
+	  render: function render() {
 	    return _react2.default.createElement(
 	      'div',
 	      null,
 	      _react2.default.createElement(
 	        'h2',
-	        null,
+	        { className: 'text-center' },
 	        'Here is some fancy data:'
 	      ),
 	      _react2.default.createElement(
 	        'div',
-	        { className: 'renderedD3' },
-	        this.state.chart
+	        { className: 'container-fluid' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'renderedD3 col-xs-12 col-md-6' },
+	            this.state.chart
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-xs-12 col-md-6', id: 'show-menu' },
+	            this.setupMenu()
+	          )
+	        )
 	      )
 	    );
 	  }
 	});
 
-	exports.default = Show;
+	exports.default = (0, _reactDimensions2.default)()(Show); // renders component inside a an element with known width and height
 
 /***/ },
 /* 264 */
@@ -41103,6 +41238,328 @@
 	}
 
 	module.exports = anim
+
+
+/***/ },
+/* 281 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var React = __webpack_require__(1);
+	var onElementResize = __webpack_require__(282);
+
+	var defaultContainerStyle = {
+	  width: '100%',
+	  height: '100%',
+	  padding: 0,
+	  border: 0
+	};
+
+	function defaultGetWidth(element) {
+	  return element.clientWidth;
+	}
+
+	function defaultGetHeight(element) {
+	  return element.clientHeight;
+	}
+
+	/**
+	 * Wraps a react component and adds properties `containerHeight` and
+	 * `containerWidth`. Useful for responsive design. Properties update on
+	 * window resize. **Note** that the parent element must have either a
+	 * height or a width, or nothing will be rendered
+	 *
+	 * Can be used as a
+	 * [higher-order component](http://babeljs.io/blog/2015/06/07/react-on-es6-plus/#property-initializers)
+	 * or as an [ES7 class decorator](https://github.com/wycats/javascript-decorators)
+	 * (see examples)
+	 *
+	 * @param {object} [options]
+	 * @param {function} [options.getHeight] A function that is passed an element and returns element
+	 * height, where element is the wrapper div. Defaults to `(element) => element.clientHeight`
+	 * @param {function} [options.getWidth]  A function that is passed an element and returns element
+	 * width, where element is the wrapper div. Defaults to `(element) => element.clientWidth`
+	 * @param {object} [options.containerStyle] A style object for the `<div>` that will wrap your component.
+	 * The dimensions of this `div` are what are passed as props to your component. The default style is
+	 * `{ width: '100%', height: '100%', padding: 0, border: 0 }` which will cause the `div` to fill its
+	 * parent in most cases. If you are using a flexbox layout you will want to change this default style.
+	 * @param {string} [options.className] Control the class name set on the wrapper `<div>`
+	 * @param {boolean} [options.elementResize=false] Set true to watch the wrapper `div` for changes in
+	 * size which are not a result of window resizing - e.g. changes to the flexbox and other layout.
+	 * @return {function}                   A higher-order component that can be
+	 * used to enhance a react component `Dimensions()(MyComponent)`
+	 *
+	 * @example
+	 * // ES2015
+	 * import React from 'react'
+	 * import Dimensions from 'react-dimensions'
+	 *
+	 * class MyComponent extends React.Component {
+	 *   render() (
+	 *     <div
+	 *       containerWidth={this.props.containerWidth}
+	 *       containerHeight={this.props.containerHeight}
+	 *     >
+	 *     </div>
+	 *   )
+	 * }
+	 *
+	 * export default Dimensions()(MyComponent) // Enhanced component
+	 *
+	 * @example
+	 * // ES5
+	 * var React = require('react')
+	 * var Dimensions = require('react-dimensions')
+	 *
+	 * var MyComponent = React.createClass({
+	 *   render: function() {(
+	 *     <div
+	 *       containerWidth={this.props.containerWidth}
+	 *       containerHeight={this.props.containerHeight}
+	 *     >
+	 *     </div>
+	 *   )}
+	 * }
+	 *
+	 * module.exports = Dimensions()(MyComponent) // Enhanced component
+	 *
+	 */
+	module.exports = function Dimensions() {
+	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	  var _ref$getHeight = _ref.getHeight;
+	  var getHeight = _ref$getHeight === undefined ? defaultGetHeight : _ref$getHeight;
+	  var _ref$getWidth = _ref.getWidth;
+	  var getWidth = _ref$getWidth === undefined ? defaultGetWidth : _ref$getWidth;
+	  var _ref$containerStyle = _ref.containerStyle;
+	  var containerStyle = _ref$containerStyle === undefined ? defaultContainerStyle : _ref$containerStyle;
+	  var _ref$className = _ref.className;
+	  var className = _ref$className === undefined ? null : _ref$className;
+	  var _ref$elementResize = _ref.elementResize;
+	  var elementResize = _ref$elementResize === undefined ? false : _ref$elementResize;
+
+	  return function (ComposedComponent) {
+	    return function (_React$Component) {
+	      _inherits(DimensionsHOC, _React$Component);
+
+	      function DimensionsHOC() {
+	        var _Object$getPrototypeO;
+
+	        var _temp, _this, _ret;
+
+	        _classCallCheck(this, DimensionsHOC);
+
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	          args[_key] = arguments[_key];
+	        }
+
+	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(DimensionsHOC)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.state = {}, _this.updateDimensions = function () {
+	          var container = _this.refs.container;
+	          var containerWidth = getWidth(container);
+	          var containerHeight = getHeight(container);
+
+	          if (containerWidth !== _this.state.containerWidth || containerHeight !== _this.state.containerHeight) {
+	            _this.setState({ containerWidth: containerWidth, containerHeight: containerHeight });
+	          }
+	        }, _this.onResize = function () {
+	          if (_this.rqf) return;
+	          _this.rqf = _this.getWindow().requestAnimationFrame(function () {
+	            _this.rqf = null;
+	            _this.updateDimensions();
+	          });
+	        }, _temp), _possibleConstructorReturn(_this, _ret);
+	      }
+	      // ES7 Class properties
+	      // http://babeljs.io/blog/2015/06/07/react-on-es6-plus/#property-initializers
+
+
+	      // Using arrow functions and ES7 Class properties to autobind
+	      // http://babeljs.io/blog/2015/06/07/react-on-es6-plus/#arrow-functions
+
+
+	      _createClass(DimensionsHOC, [{
+	        key: 'getWindow',
+
+
+	        // If the component is mounted in a different window to the javascript
+	        // context, as with https://github.com/JakeGinnivan/react-popout
+	        // then the `window` global will be different from the `window` that
+	        // contains the component.
+	        // Depends on `defaultView` which is not supported <IE9
+	        value: function getWindow() {
+	          return this.refs.container ? this.refs.container.ownerDocument.defaultView || window : window;
+	        }
+	      }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	          if (!this.refs.container) {
+	            throw new Error('Cannot find container div');
+	          }
+	          this.updateDimensions();
+	          if (elementResize) {
+	            // Experimental: `element-resize-event` fires when an element resizes.
+	            // It attaches its own window resize listener and also uses
+	            // requestAnimationFrame, so we can just call `this.updateDimensions`.
+	            onElementResize(this.refs.container, this.updateDimensions);
+	          } else {
+	            this.getWindow().addEventListener('resize', this.onResize, false);
+	          }
+	        }
+	      }, {
+	        key: 'componentWillUnmount',
+	        value: function componentWillUnmount() {
+	          this.getWindow().removeEventListener('resize', this.onResize);
+	        }
+
+	        /**
+	         * Returns the underlying wrapped component instance.
+	         * Useful if you need to access a method or property of the component
+	         * passed to react-dimensions.
+	         *
+	         * @return {object} The rendered React component
+	         **/
+
+	      }, {
+	        key: 'getWrappedInstance',
+	        value: function getWrappedInstance() {
+	          this.refs.wrappedInstance;
+	        }
+	      }, {
+	        key: 'render',
+	        value: function render() {
+	          var _state = this.state;
+	          var containerWidth = _state.containerWidth;
+	          var containerHeight = _state.containerHeight;
+
+	          if (!containerWidth && !containerHeight) {
+	            console.warn('Wrapper div has no height or width, try overriding style with `containerStyle` option');
+	          }
+	          return React.createElement(
+	            'div',
+	            { className: className, style: containerStyle, ref: 'container' },
+	            (containerWidth || containerHeight) && React.createElement(ComposedComponent, _extends({}, this.state, this.props, {
+	              updateDimensions: this.updateDimensions,
+	              ref: 'wrappedInstance'
+	            }))
+	          );
+	        }
+	      }]);
+
+	      return DimensionsHOC;
+	    }(React.Component);
+	  };
+	};
+
+
+/***/ },
+/* 282 */
+/***/ function(module, exports) {
+
+	var exports = function exports(element, fn) {
+	  var window = this
+	  var document = window.document
+	  var isIE
+	  var requestFrame
+
+	  var attachEvent = document.attachEvent
+	  if (typeof navigator !== 'undefined') {
+	    isIE = navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/Edge/)
+	  }
+
+	  requestFrame = (function () {
+	    var raf = window.requestAnimationFrame ||
+	      window.mozRequestAnimationFrame ||
+	        window.webkitRequestAnimationFrame ||
+	          function fallbackRAF(func) {
+	            return window.setTimeout(func, 20)
+	          }
+	    return function requestFrameFunction(func) {
+	      return raf(func)
+	    }
+	  })()
+
+	  var cancelFrame = (function () {
+	    var cancel = window.cancelAnimationFrame ||
+	      window.mozCancelAnimationFrame ||
+	        window.webkitCancelAnimationFrame ||
+	          window.clearTimeout
+	    return function cancelFrameFunction(id) {
+	      return cancel(id)
+	    }
+	  })()
+
+	  function resizeListener(e) {
+	    var win = e.target || e.srcElement
+	    if (win.__resizeRAF__) {
+	      cancelFrame(win.__resizeRAF__)
+	    }
+	    win.__resizeRAF__ = requestFrame(function () {
+	      var trigger = win.__resizeTrigger__
+	      if(trigger !== undefined) {
+	        trigger.__resizeListeners__.forEach(function (fn) {
+	          fn.call(trigger, e)
+	        })
+	      }
+	    })
+	  }
+
+	  function objectLoad() {
+	    this.contentDocument.defaultView.__resizeTrigger__ = this.__resizeElement__
+	    this.contentDocument.defaultView.addEventListener('resize', resizeListener)
+	  }
+
+	  if (!element.__resizeListeners__) {
+	    element.__resizeListeners__ = []
+	    if (attachEvent) {
+	      element.__resizeTrigger__ = element
+	      element.attachEvent('onresize', resizeListener)
+	    } else {
+	      if (getComputedStyle(element).position === 'static') {
+	        element.style.position = 'relative'
+	      }
+	      var obj = element.__resizeTrigger__ = document.createElement('object')
+	      obj.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1; opacity: 0;')
+	      obj.setAttribute('class', 'resize-sensor')
+	      obj.__resizeElement__ = element
+	      obj.onload = objectLoad
+	      obj.type = 'text/html'
+	      if (isIE) {
+	        element.appendChild(obj)
+	      }
+	      obj.data = 'about:blank'
+	      if (!isIE) {
+	        element.appendChild(obj)
+	      }
+	    }
+	  }
+	  element.__resizeListeners__.push(fn)
+	}
+
+	exports.unbind = function(element, fn){
+	  var attachEvent = document.attachEvent;
+	  element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
+	  if (!element.__resizeListeners__.length) {
+	    if (attachEvent) {
+	      element.detachEvent('onresize', resizeListener);
+	    } else {
+	      element.__resizeTrigger__.contentDocument.defaultView.removeEventListener('resize', resizeListener);
+	      element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+	    }
+	  }
+	}
+
+	module.exports = (typeof window === 'undefined') ? exports : exports.bind(window)
 
 
 /***/ }

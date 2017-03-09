@@ -33,9 +33,13 @@ router.get('/api/polls/:pollId', controllers.poll.show);
 
 // router.get('/api/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
 router.post('/api/polls', passportConfig.isAuthenticated, controllers.poll.create);
+router.post("/api/polls/vote", passportConfig.isAuthenticated, controllers.poll.vote)
+
+
 router.get('/api/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
 router.put('/api/:pollId', passportConfig.isAuthenticated, controllers.poll.update);
-router.delete('/api/:pollId', passportConfig.isAuthenticated, controllers.poll.destroy);
+
+router.delete('/api/poll/destroy', controllers.poll.destroy);
 
 router.post('/polls/:pollId/vote/new', passportConfig.isAuthenticated, controllers.vote.new)
 

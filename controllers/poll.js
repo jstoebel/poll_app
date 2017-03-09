@@ -18,7 +18,6 @@ exports.new = function(req, res) {
 }
 
 exports.create = function(req, res) {
-  console.log(req.body);
 
   var params = {
     name: req.body.name,
@@ -51,12 +50,33 @@ exports.create = function(req, res) {
 };
 
 exports.show = function(req, res) {
-  console.log(req.params);
   models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
-    console.log(poll);
     res.json(poll)
   })
 };
+
+exports.vote = function(req, res) {
+
+  console.log(req.body);
+
+  models.Poll.findOneAndUpdate(
+    { "_id": req.body.pollId, "options._id": req.body.optionId },
+    {
+      $inc: {
+        "options.$.votes": 1
+      }
+    },
+    function(err,doc) {
+        if (err){
+          console.log(err);
+          res.status(400).json({msg: "Failed to update poll"})
+        } else {
+          res.status(201).json({msg: "Vote successful"})
+        }
+    }
+  );
+
+}
 
 exports.edit = function(req, res) {
   res.end("hello from edit")
@@ -67,5 +87,17 @@ exports.update = function(req, res) {
 };
 
 exports.destroy = function(req, res) {
-  res.end("hello from destory")
+  // destroy all polls
+
+  models.Poll.remove({}, function(err){
+    if (err) {
+      res.status(204).json({msg: "Polls couldn't delete records"})
+    } else {
+
+      models.Poll.count({}, function(err, c) {
+        res.status(200).json({msg: "Polls remaining: " + c})
+      });
+    }
+  })
+
 };
