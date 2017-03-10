@@ -1,10 +1,12 @@
 import React from 'react'
 import * as d3 from 'd3'
-// import {event as currentEvent} from 'd3-selection';
+import d3Legend from 'd3-legend'
 import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom'
 import Dimensions from 'react-dimensions'
 
+d3Legend(d3)
+console.log(d3.legend)
 
 const Show = React.createClass({
   mixins: [
@@ -16,7 +18,7 @@ const Show = React.createClass({
     return {
       chart: "loading...",
       pollOption: "",
-      poll: { options: []}  // mock this object until the real one is loaded in
+      poll: { options: []},  // mock this object until the real one is loaded in
       tooltip: {
         x: 0,
         y: 0
@@ -144,19 +146,6 @@ const Show = React.createClass({
       .selectAll('path').data(pie(pieData))
       .enter().append('g')
         .attr('class', 'slice')
-        .on('mouseover', function(d, i){
-          console.log("mouse over!")
-          console.log(currentEvent)
-          tooltip.style('opacity', .2)
-
-          tooltip.html(d.name + d.votes ? ` (${d.votes})` : "")
-              .style('left', (currentEvent.pageX - 35) + 'px')
-              .style('top',  (currentEvent.pageY - 30) + 'px')
-        })
-
-        .on('mouseout', function(d){
-          tooltip.style('opacity', 0)
-        })
 
     var slices = d3.select(faux).selectAll('g.slice')
       .append('path')
@@ -182,9 +171,6 @@ const Show = React.createClass({
       d.outerRadius = radius;
       return 'translate('+ arc.centroid(d)+')'
     })
-
-    var tooltip = d3.select(faux).append('div')
-      .classed('tooltip',  true)
 
   },
 

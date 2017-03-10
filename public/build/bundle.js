@@ -28455,11 +28455,15 @@
 
 	var d3 = _interopRequireWildcard(_d);
 
-	var _reactFauxDom = __webpack_require__(265);
+	var _d3Legend = __webpack_require__(265);
+
+	var _d3Legend2 = _interopRequireDefault(_d3Legend);
+
+	var _reactFauxDom = __webpack_require__(266);
 
 	var _reactFauxDom2 = _interopRequireDefault(_reactFauxDom);
 
-	var _reactDimensions = __webpack_require__(281);
+	var _reactDimensions = __webpack_require__(282);
 
 	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
 
@@ -28468,8 +28472,9 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	// import {event as currentEvent} from 'd3-selection';
 
+	(0, _d3Legend2.default)(d3);
+	console.log(d3.legend);
 
 	var Show = _react2.default.createClass({
 	  displayName: 'Show',
@@ -28480,7 +28485,11 @@
 	    return {
 	      chart: "loading...",
 	      pollOption: "",
-	      poll: { options: [] } // mock this object until the real one is loaded in
+	      poll: { options: [] }, // mock this object until the real one is loaded in
+	      tooltip: {
+	        x: 0,
+	        y: 0
+	      }
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {},
@@ -28556,26 +28565,10 @@
 	        radius = 0.5 * width,
 	        colors = d3.scale.category20c();
 
-	    // var piedata = [
-	    //     {
-	    //         name: "spam",
-	    //         votes: 300
-	    //     },
-	    //     {
-	    //         name: "eggs",
-	    //         votes: 100
-	    //     },
-	    //     {
-	    //         name: "baked beans",
-	    //         votes: 1
-	    //     }
-	    // ]
-
 	    // generate data to render, either from record or in the case of no votes
 	    // mock up some stand in data
 	    var pieData = totalVotes > 0 ? poll.options : [{
-	      name: "no votes yet",
-	      votes: 1
+	      name: "no votes yet"
 	    }];
 
 	    console.log(pieData);
@@ -28586,15 +28579,7 @@
 
 	    var arc = d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
 
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice').on('mouseover', function (d, i) {
-	      console.log("mouse over!");
-	      console.log(_d.event);
-	      tooltip.style('opacity', .2);
-
-	      tooltip.html(d.name + ': ' + d.votes).style('left', _d.event.pageX - 35 + 'px').style('top', _d.event.pageY - 30 + 'px');
-	    }).on('mouseout', function (d) {
-	      tooltip.style('opacity', 0);
-	    });
+	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice');
 
 	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
 	      return colors(i);
@@ -28612,8 +28597,6 @@
 	      d.outerRadius = radius;
 	      return 'translate(' + arc.centroid(d) + ')';
 	    });
-
-	    var tooltip = d3.select(faux).append('div').classed('tooltip', true);
 	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
@@ -38279,10 +38262,86 @@
 /* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(266)
-	var Window = __webpack_require__(278)
-	var core = __webpack_require__(279)
-	var anim = __webpack_require__(280)
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// d3.legend.js
+	// (C) 2012 ziggy.jonsson.nyc@gmail.com
+	// MIT licence
+
+	(function (root, factory) {
+		if (true) {
+			// AMD. Register as an anonymous module with d3 as a dependency.
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(264)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else if (typeof module === 'object' && module.exports) {
+			// CommonJS
+			module.exports = function(d3) {
+				d3.legend = factory(d3);
+				return d3.legend;
+			};
+		} else {
+			// Browser global.
+			root.d3.legend = factory(root.d3);
+		}
+	}(this, function (d3) {
+		return function(g) {
+			g.each(function() {
+				var g = d3.select(this),
+					items = {},
+					svg = d3.select(g.property('nearestViewportElement')),
+					legendPadding = g.attr('data-style-padding') || 5,
+					lb = g.selectAll('.legend-box').data([true]),
+					li = g.selectAll('.legend-items').data([true]);
+
+				lb.enter().append('rect').classed('legend-box', true);
+				li.enter().append('g').classed('legend-items', true);
+
+				svg.selectAll('[data-legend]').each(function() {
+					var self = d3.select(this);
+					items[self.attr('data-legend')] = {
+						pos: self.attr('data-legend-pos') || this.getBBox().y,
+						color: self.style('fill') !== 'none' ? self.style('fill') : self.style('stroke')
+					};
+				});
+
+				items = d3.entries(items).sort(function(a, b) { return a.value.pos - b.value.pos; });
+
+				li.selectAll('text')
+					.data(items, function(d) { return d.key; })
+					.call(function(d) { d.enter().append('text'); })
+					.call(function(d) { d.exit().remove(); })
+					.attr('y', function(d, i) { return i + 'em'; })
+					.attr('x', '1em')
+					.text(function(d) { return d.key; });
+
+				li.selectAll('circle')
+					.data(items, function(d) { return d.key; })
+					.call(function(d) { d.enter().append('circle'); })
+					.call(function(d) { d.exit().remove(); })
+					.attr('cy', function(d, i) { return i - 0.25 + 'em'; })
+					.attr('cx', 0)
+					.attr('r', '0.4em')
+					.style('fill', function(d) {
+						return d.value.color;
+					});
+
+				// Reposition and resize the box
+				var lbbox = li[0][0].getBBox();
+				lb.attr('x', (lbbox.x - legendPadding))
+					.attr('y', (lbbox.y - legendPadding))
+					.attr('height', (lbbox.height + 2 * legendPadding))
+					.attr('width', (lbbox.width + 2 * legendPadding));
+			});
+			return g;
+		};
+	}));
+
+
+/***/ },
+/* 266 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Element = __webpack_require__(267)
+	var Window = __webpack_require__(279)
+	var core = __webpack_require__(280)
+	var anim = __webpack_require__(281)
 
 	var ReactFauxDOM = {
 	  Element: Element,
@@ -38310,18 +38369,18 @@
 
 
 /***/ },
-/* 266 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1)
-	var styleAttr = __webpack_require__(267)
-	var querySelectorAll = __webpack_require__(268)
-	var camelCase = __webpack_require__(272)
-	var isString = __webpack_require__(273)
-	var isUndefined = __webpack_require__(274)
-	var assign = __webpack_require__(275)
-	var mapValues = __webpack_require__(276)
-	var styleCamelCase = __webpack_require__(277)
+	var styleAttr = __webpack_require__(268)
+	var querySelectorAll = __webpack_require__(269)
+	var camelCase = __webpack_require__(273)
+	var isString = __webpack_require__(274)
+	var isUndefined = __webpack_require__(275)
+	var assign = __webpack_require__(276)
+	var mapValues = __webpack_require__(277)
+	var styleCamelCase = __webpack_require__(278)
 
 	function Element (nodeName, parentNode) {
 	  this.nodeName = nodeName
@@ -38673,7 +38732,7 @@
 
 
 /***/ },
-/* 267 */
+/* 268 */
 /***/ function(module, exports) {
 
 	
@@ -38785,13 +38844,13 @@
 	module.exports.normalize = normalize;
 
 /***/ },
-/* 268 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(269);
+	module.exports = __webpack_require__(270);
 
 /***/ },
-/* 269 */
+/* 270 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38800,8 +38859,8 @@
 	 * @author yiminghe@gmail.com
 	 */
 
-	var util = __webpack_require__(270);
-	var parser = __webpack_require__(271);
+	var util = __webpack_require__(271);
+	var parser = __webpack_require__(272);
 
 	var EXPANDO_SELECTOR_KEY = '_ks_data_selector_id_',
 	  caches = {},
@@ -39494,7 +39553,7 @@
 	 */
 
 /***/ },
-/* 270 */
+/* 271 */
 /***/ function(module, exports) {
 
 	/**
@@ -39845,7 +39904,7 @@
 	};
 
 /***/ },
-/* 271 */
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -41054,7 +41113,7 @@
 	}
 
 /***/ },
-/* 272 */
+/* 273 */
 /***/ function(module, exports) {
 
 	var hyphenExpression = /\-+([a-z])/gi
@@ -41077,7 +41136,7 @@
 
 
 /***/ },
-/* 273 */
+/* 274 */
 /***/ function(module, exports) {
 
 	function isString (value) {
@@ -41088,7 +41147,7 @@
 
 
 /***/ },
-/* 274 */
+/* 275 */
 /***/ function(module, exports) {
 
 	function isUndefined (value) {
@@ -41099,7 +41158,7 @@
 
 
 /***/ },
-/* 275 */
+/* 276 */
 /***/ function(module, exports) {
 
 	function assign (dest) {
@@ -41121,7 +41180,7 @@
 
 
 /***/ },
-/* 276 */
+/* 277 */
 /***/ function(module, exports) {
 
 	function mapValues (source, fn) {
@@ -41140,10 +41199,10 @@
 
 
 /***/ },
-/* 277 */
+/* 278 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var camelCase = __webpack_require__(272)
+	var camelCase = __webpack_require__(273)
 
 	function styleCamelCase (name) {
 	  var camel = camelCase(name)
@@ -41166,7 +41225,7 @@
 
 
 /***/ },
-/* 278 */
+/* 279 */
 /***/ function(module, exports) {
 
 	var Window = {
@@ -41181,11 +41240,11 @@
 
 
 /***/ },
-/* 279 */
+/* 280 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(266)
-	var mapValues = __webpack_require__(276)
+	var Element = __webpack_require__(267)
+	var mapValues = __webpack_require__(277)
 
 	var mixin = {
 	  componentWillMount: function () {
@@ -41209,7 +41268,7 @@
 
 
 /***/ },
-/* 280 */
+/* 281 */
 /***/ function(module, exports) {
 
 	var anim = {
@@ -41241,7 +41300,7 @@
 
 
 /***/ },
-/* 281 */
+/* 282 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41257,7 +41316,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var React = __webpack_require__(1);
-	var onElementResize = __webpack_require__(282);
+	var onElementResize = __webpack_require__(283);
 
 	var defaultContainerStyle = {
 	  width: '100%',
@@ -41463,7 +41522,7 @@
 
 
 /***/ },
-/* 282 */
+/* 283 */
 /***/ function(module, exports) {
 
 	var exports = function exports(element, fn) {
