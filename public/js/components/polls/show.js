@@ -1,12 +1,13 @@
 import React from 'react'
 import * as d3 from 'd3'
-import d3Legend from 'd3-legend'
+import legend from 'd3-svg-legend'
 import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom'
 import Dimensions from 'react-dimensions'
 
-d3Legend(d3)
+legend(d3)
 console.log(d3.legend)
+
 
 const Show = React.createClass({
   mixins: [
@@ -101,8 +102,6 @@ const Show = React.createClass({
   setupPie(poll) {
     // resp: the http response from the server
     // sets up the pie chart and loads it into state
-    console.log(poll);
-
 
     const faux = this.connectFauxDOM('div.renderedD3', 'chart')
 
@@ -125,8 +124,6 @@ const Show = React.createClass({
           name: "no votes yet",
         }
       ]
-
-    console.log(pieData)
 
     var pie = d3.layout.pie()
     .value(function(d) {
@@ -155,22 +152,38 @@ const Show = React.createClass({
       .attr('d', arc)
 
     var text = d3.select(faux).selectAll('g.slice')
-    .append('text')
-    .text(function(d, i) {
-      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
-        // don't show label if no votes or under 5%
-        return ""
-      } else {
-        return d.data.name;
-      }
-    })
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .attr('transform', function(d) {
-      d.innerRadius = 0;
-      d.outerRadius = radius;
-      return 'translate('+ arc.centroid(d)+')'
-    })
+      .append('text')
+      .text(function(d, i) {
+        if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
+          // don't show label if no votes or under 5%
+          return ""
+        } else {
+          return d.data.name;
+        }
+      })
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .attr('transform', function(d) {
+        d.innerRadius = 0;
+        d.outerRadius = radius;
+        return 'translate('+ arc.centroid(d)+')'
+      })
+
+    myChart.append("g")
+      .attr("class", "legendOrdinal")
+      .attr("transform", "translate(20,20)");
+
+    var legendOrdinal = legendColor()
+      //d3 symbol creates a path-string, for example
+      //"M0,-8.059274488676564L9.306048591020996,
+      //8.059274488676564 -9.306048591020996,8.059274488676564Z"
+      .shape("path", d3.svg.symbol().type("triangle-up").size(150)())
+      .shapePadding(10)
+      .scale(colors);
+
+    svg.select(".legendOrdinal")
+      .call(legendOrdinal);
+
 
   },
 
