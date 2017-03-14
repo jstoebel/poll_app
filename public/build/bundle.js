@@ -28454,15 +28454,15 @@
 
 	var d3 = _interopRequireWildcard(_d);
 
-	var _d3SvgLegend = __webpack_require__(265);
+	var _noExtend = __webpack_require__(265);
 
-	var _d3SvgLegend2 = _interopRequireDefault(_d3SvgLegend);
+	var _noExtend2 = _interopRequireDefault(_noExtend);
 
-	var _reactFauxDom = __webpack_require__(271);
+	var _reactFauxDom = __webpack_require__(270);
 
 	var _reactFauxDom2 = _interopRequireDefault(_reactFauxDom);
 
-	var _reactDimensions = __webpack_require__(287);
+	var _reactDimensions = __webpack_require__(286);
 
 	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
 
@@ -28471,9 +28471,6 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	(0, _d3SvgLegend2.default)(d3);
-	console.log(d3.legend);
 
 	var Show = _react2.default.createClass({
 	  displayName: 'Show',
@@ -28501,7 +28498,7 @@
 	  _getSuccess: function _getSuccess(resp) {
 
 	    console.log("starting _getSuccess");
-	    this.setupPie(resp);
+	    // this.setupPie(resp);
 	    this.setState({
 	      poll: resp
 	    });
@@ -28551,7 +28548,9 @@
 	    // resp: the http response from the server
 	    // sets up the pie chart and loads it into state
 
-	    var faux = this.connectFauxDOM('div.renderedD3', 'chart');
+	    // const faux = this.connectFauxDOM('div.renderedD3', 'chart')
+	    console.log("setupPie");
+	    var poll = this.state.poll;
 
 	    var totalVotes = poll.options.reduce(function (total, option, i) {
 	      return total += option.votes;
@@ -28575,13 +28574,14 @@
 
 	    var arc = d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
 
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice');
+	    // var myChart = d3.select(faux).append('svg')
+	    var myChart = d3.select(".pieChart").attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice');
 
-	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
+	    var slices = d3.select(".pieChart").selectAll('g.slice').append('path').attr('fill', function (d, i) {
 	      return colors(i);
 	    }).attr('d', arc);
 
-	    var text = d3.select(faux).selectAll('g.slice').append('text').text(function (d, i) {
+	    var text = d3.select(".pieChart").selectAll('g.slice').append('text').text(function (d, i) {
 	      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
 	        // don't show label if no votes or under 5%
 	        return "";
@@ -28594,15 +28594,19 @@
 	      return 'translate(' + arc.centroid(d) + ')';
 	    });
 
-	    myChart.append("g").attr("class", "legendOrdinal").attr("transform", "translate(20,20)");
+	    d3.select(".pieChart").append("g").attr("class", "legendOrdinal").attr("transform", "translate(200,200)");
 
-	    var legendOrdinal = legendColor()
+	    var legendOrdinal = _noExtend2.default.color()
 	    //d3 symbol creates a path-string, for example
 	    //"M0,-8.059274488676564L9.306048591020996,
 	    //8.059274488676564 -9.306048591020996,8.059274488676564Z"
 	    .shape("path", d3.svg.symbol().type("triangle-up").size(150)()).shapePadding(10).scale(colors);
 
-	    svg.select(".legendOrdinal").call(legendOrdinal);
+	    console.log("calling legend");
+
+	    // myChart.select(".legendOrdinal")
+	    //   .call(legendOrdinal);
+
 	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
@@ -28690,7 +28694,11 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'renderedD3 col-xs-12 col-md-6' },
-	            this.state.chart
+	            _react2.default.createElement(
+	              'svg',
+	              { className: 'pieChart' },
+	              this.setupPie()
+	            )
 	          ),
 	          _react2.default.createElement(
 	            'div',
@@ -38268,29 +38276,18 @@
 /* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var d3 = __webpack_require__(264);
-
-	d3.legend = __webpack_require__(266);
-
-	module.exports = d3;
+	module.exports = {
+	  color: __webpack_require__(266),
+	  size: __webpack_require__(268),
+	  symbol: __webpack_require__(269)
+	};
 
 
 /***/ },
 /* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = {
-	  color: __webpack_require__(267),
-	  size: __webpack_require__(269),
-	  symbol: __webpack_require__(270)
-	};
-
-
-/***/ },
-/* 267 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var helper = __webpack_require__(268);
+	var helper = __webpack_require__(267);
 
 	module.exports = function(){
 
@@ -38499,7 +38496,7 @@
 
 
 /***/ },
-/* 268 */
+/* 267 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -38669,10 +38666,10 @@
 
 
 /***/ },
-/* 269 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var helper = __webpack_require__(268);
+	var helper = __webpack_require__(267);
 
 	module.exports =  function(){
 
@@ -38874,10 +38871,10 @@
 
 
 /***/ },
-/* 270 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var helper = __webpack_require__(268);
+	var helper = __webpack_require__(267);
 
 	module.exports = function(){
 
@@ -39038,13 +39035,13 @@
 
 
 /***/ },
-/* 271 */
+/* 270 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(272)
-	var Window = __webpack_require__(284)
-	var core = __webpack_require__(285)
-	var anim = __webpack_require__(286)
+	var Element = __webpack_require__(271)
+	var Window = __webpack_require__(283)
+	var core = __webpack_require__(284)
+	var anim = __webpack_require__(285)
 
 	var ReactFauxDOM = {
 	  Element: Element,
@@ -39072,18 +39069,18 @@
 
 
 /***/ },
-/* 272 */
+/* 271 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1)
-	var styleAttr = __webpack_require__(273)
-	var querySelectorAll = __webpack_require__(274)
-	var camelCase = __webpack_require__(278)
-	var isString = __webpack_require__(279)
-	var isUndefined = __webpack_require__(280)
-	var assign = __webpack_require__(281)
-	var mapValues = __webpack_require__(282)
-	var styleCamelCase = __webpack_require__(283)
+	var styleAttr = __webpack_require__(272)
+	var querySelectorAll = __webpack_require__(273)
+	var camelCase = __webpack_require__(277)
+	var isString = __webpack_require__(278)
+	var isUndefined = __webpack_require__(279)
+	var assign = __webpack_require__(280)
+	var mapValues = __webpack_require__(281)
+	var styleCamelCase = __webpack_require__(282)
 
 	function Element (nodeName, parentNode) {
 	  this.nodeName = nodeName
@@ -39435,7 +39432,7 @@
 
 
 /***/ },
-/* 273 */
+/* 272 */
 /***/ function(module, exports) {
 
 	
@@ -39547,13 +39544,13 @@
 	module.exports.normalize = normalize;
 
 /***/ },
-/* 274 */
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(275);
+	module.exports = __webpack_require__(274);
 
 /***/ },
-/* 275 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -39562,8 +39559,8 @@
 	 * @author yiminghe@gmail.com
 	 */
 
-	var util = __webpack_require__(276);
-	var parser = __webpack_require__(277);
+	var util = __webpack_require__(275);
+	var parser = __webpack_require__(276);
 
 	var EXPANDO_SELECTOR_KEY = '_ks_data_selector_id_',
 	  caches = {},
@@ -40256,7 +40253,7 @@
 	 */
 
 /***/ },
-/* 276 */
+/* 275 */
 /***/ function(module, exports) {
 
 	/**
@@ -40607,7 +40604,7 @@
 	};
 
 /***/ },
-/* 277 */
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -41816,7 +41813,7 @@
 	}
 
 /***/ },
-/* 278 */
+/* 277 */
 /***/ function(module, exports) {
 
 	var hyphenExpression = /\-+([a-z])/gi
@@ -41839,7 +41836,7 @@
 
 
 /***/ },
-/* 279 */
+/* 278 */
 /***/ function(module, exports) {
 
 	function isString (value) {
@@ -41850,7 +41847,7 @@
 
 
 /***/ },
-/* 280 */
+/* 279 */
 /***/ function(module, exports) {
 
 	function isUndefined (value) {
@@ -41861,7 +41858,7 @@
 
 
 /***/ },
-/* 281 */
+/* 280 */
 /***/ function(module, exports) {
 
 	function assign (dest) {
@@ -41883,7 +41880,7 @@
 
 
 /***/ },
-/* 282 */
+/* 281 */
 /***/ function(module, exports) {
 
 	function mapValues (source, fn) {
@@ -41902,10 +41899,10 @@
 
 
 /***/ },
-/* 283 */
+/* 282 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var camelCase = __webpack_require__(278)
+	var camelCase = __webpack_require__(277)
 
 	function styleCamelCase (name) {
 	  var camel = camelCase(name)
@@ -41928,7 +41925,7 @@
 
 
 /***/ },
-/* 284 */
+/* 283 */
 /***/ function(module, exports) {
 
 	var Window = {
@@ -41943,11 +41940,11 @@
 
 
 /***/ },
-/* 285 */
+/* 284 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(272)
-	var mapValues = __webpack_require__(282)
+	var Element = __webpack_require__(271)
+	var mapValues = __webpack_require__(281)
 
 	var mixin = {
 	  componentWillMount: function () {
@@ -41971,7 +41968,7 @@
 
 
 /***/ },
-/* 286 */
+/* 285 */
 /***/ function(module, exports) {
 
 	var anim = {
@@ -42003,7 +42000,7 @@
 
 
 /***/ },
-/* 287 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -42019,7 +42016,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var React = __webpack_require__(1);
-	var onElementResize = __webpack_require__(288);
+	var onElementResize = __webpack_require__(287);
 
 	var defaultContainerStyle = {
 	  width: '100%',
@@ -42225,7 +42222,7 @@
 
 
 /***/ },
-/* 288 */
+/* 287 */
 /***/ function(module, exports) {
 
 	var exports = function exports(element, fn) {

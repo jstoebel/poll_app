@@ -1,13 +1,9 @@
 import React from 'react'
 import * as d3 from 'd3'
-import legend from 'd3-svg-legend'
+import legend from 'd3-svg-legend/no-extend'
 import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom'
 import Dimensions from 'react-dimensions'
-
-legend(d3)
-console.log(d3.legend)
-
 
 const Show = React.createClass({
   mixins: [
@@ -41,7 +37,7 @@ const Show = React.createClass({
   _getSuccess(resp) {
 
     console.log("starting _getSuccess")
-    this.setupPie(resp);
+    // this.setupPie(resp);
     this.setState({
       poll: resp
     })
@@ -103,7 +99,9 @@ const Show = React.createClass({
     // resp: the http response from the server
     // sets up the pie chart and loads it into state
 
-    const faux = this.connectFauxDOM('div.renderedD3', 'chart')
+    // const faux = this.connectFauxDOM('div.renderedD3', 'chart')
+    console.log("setupPie")
+    var poll = this.state.poll;
 
     var totalVotes = poll.options.reduce(function(total, option, i){
       return total += option.votes
@@ -134,7 +132,8 @@ const Show = React.createClass({
     .outerRadius(radius)
     .innerRadius(.7 * radius)
 
-    var myChart = d3.select(faux).append('svg')
+    // var myChart = d3.select(faux).append('svg')
+    var myChart = d3.select(".pieChart")
       .attr('width', width)
       .attr('height', height)
       .attr()
@@ -144,14 +143,14 @@ const Show = React.createClass({
       .enter().append('g')
         .attr('class', 'slice')
 
-    var slices = d3.select(faux).selectAll('g.slice')
+    var slices = d3.select(".pieChart").selectAll('g.slice')
       .append('path')
       .attr('fill', function(d, i) {
         return colors(i);
       })
       .attr('d', arc)
 
-    var text = d3.select(faux).selectAll('g.slice')
+    var text = d3.select(".pieChart").selectAll('g.slice')
       .append('text')
       .text(function(d, i) {
         if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
@@ -169,11 +168,11 @@ const Show = React.createClass({
         return 'translate('+ arc.centroid(d)+')'
       })
 
-    myChart.append("g")
+    d3.select(".pieChart").append("g")
       .attr("class", "legendOrdinal")
-      .attr("transform", "translate(20,20)");
+      .attr("transform", "translate(200,200)");
 
-    var legendOrdinal = legendColor()
+    var legendOrdinal = legend.color()
       //d3 symbol creates a path-string, for example
       //"M0,-8.059274488676564L9.306048591020996,
       //8.059274488676564 -9.306048591020996,8.059274488676564Z"
@@ -181,8 +180,10 @@ const Show = React.createClass({
       .shapePadding(10)
       .scale(colors);
 
-    svg.select(".legendOrdinal")
-      .call(legendOrdinal);
+    console.log("calling legend")
+
+    // myChart.select(".legendOrdinal")
+    //   .call(legendOrdinal);
 
 
   },
@@ -250,7 +251,9 @@ const Show = React.createClass({
         <div className="container-fluid">
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
-              {this.state.chart}
+              <svg className="pieChart">
+                {this.setupPie()}
+              </svg>
             </div>
 
             <div className="col-xs-12 col-md-6" id="show-menu">
