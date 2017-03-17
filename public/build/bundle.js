@@ -26709,7 +26709,6 @@
 	  }, {
 	    key: 'eachPoll',
 	    value: function eachPoll(poll, i) {
-	      console.log(poll);
 	      return _react2.default.createElement(
 	        _reactRouter.Link,
 	        { to: "/poll/" + poll._id, key: poll._id },
@@ -28463,6 +28462,14 @@
 
 	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
 
+	var _pie = __webpack_require__(283);
+
+	var _pie2 = _interopRequireDefault(_pie);
+
+	var _tooltip = __webpack_require__(284);
+
+	var _tooltip2 = _interopRequireDefault(_tooltip);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -28480,7 +28487,11 @@
 	    return {
 	      chart: "loading...",
 	      pollOption: "",
-	      poll: { options: [] } // mock this object until the real one is loaded in
+	      poll: { options: [] }, // mock this object until the real one is loaded in
+	      tooltip: {
+	        x: 0,
+	        y: 0
+	      }
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {},
@@ -28492,8 +28503,7 @@
 	  },
 	  _getSuccess: function _getSuccess(resp) {
 
-	    console.log("starting _getSuccess");
-	    this.setupPie(resp);
+	    // this.setupPie(resp);
 	    this.setState({
 	      poll: resp
 	    });
@@ -28539,82 +28549,6 @@
 	    var xhr = this._submitRecord();
 	    xhr.done(this._submitSuccess).fail(this._submitError);
 	  },
-	  setupPie: function setupPie(poll) {
-	    // resp: the http response from the server
-	    // sets up the pie chart and loads it into state
-	    console.log(poll);
-
-	    var faux = this.connectFauxDOM('div.renderedD3', 'chart');
-
-	    var totalVotes = poll.options.reduce(function (total, option, i) {
-	      return total += option.votes;
-	    }, 0);
-
-	    // only try to draw a pie chart if there are any votes
-	    var width = 0.4 * this.props.containerWidth,
-	        height = width,
-	        radius = 0.5 * width,
-	        colors = d3.scale.category20c();
-
-	    // var piedata = [
-	    //     {
-	    //         name: "spam",
-	    //         votes: 300
-	    //     },
-	    //     {
-	    //         name: "eggs",
-	    //         votes: 100
-	    //     },
-	    //     {
-	    //         name: "baked beans",
-	    //         votes: 1
-	    //     }
-	    // ]
-
-	    // generate data to render, either from record or in the case of no votes
-	    // mock up some stand in data
-	    var pieData = totalVotes > 0 ? poll.options : [{
-	      name: "no votes yet",
-	      votes: 1
-	    }];
-
-	    console.log(pieData);
-
-	    var pie = d3.layout.pie().value(function (d) {
-	      return d.votes;
-	    });
-
-	    var arc = d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
-
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice').on('mouseover', function (d, i) {
-	      console.log("mouse over!");
-	      console.log(_d.event);
-	      tooltip.style('opacity', .2);
-
-	      tooltip.html(d.name + ': ' + d.votes).style('left', _d.event.pageX - 35 + 'px').style('top', _d.event.pageY - 30 + 'px');
-	    }).on('mouseout', function (d) {
-	      tooltip.style('opacity', 0);
-	    });
-
-	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
-	      return colors(i);
-	    }).attr('d', arc);
-
-	    var text = d3.select(faux).selectAll('g.slice').append('text').text(function (d, i) {
-	      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
-	        // don't show label if no votes or under 5%
-	        return "";
-	      } else {
-	        return d.data.name;
-	      }
-	    }).attr('text-anchor', 'middle').attr('fill', 'white').attr('transform', function (d) {
-	      d.innerRadius = 0;
-	      d.outerRadius = radius;
-	      return 'translate(' + arc.centroid(d) + ')';
-	    });
-
-	    var tooltip = d3.select(faux).append('div').classed('tooltip', true);
-	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
 	      'option',
@@ -28624,12 +28558,6 @@
 	      ' '
 	    );
 	  },
-
-
-	  // setupSubmitBtn(){
-	  //   // renders the submit button as eithe
-	  // }
-
 	  setupMenu: function setupMenu() {
 
 	    if (this.state.poll) {
@@ -28684,6 +28612,9 @@
 	    }
 	  },
 	  render: function render() {
+	    var width = 0.4 * this.props.containerWidth,
+	        height = width,
+	        radius = 0.5 * width;
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -28701,7 +28632,17 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'renderedD3 col-xs-12 col-md-6' },
-	            this.state.chart
+	            _react2.default.createElement(
+	              'svg',
+	              { height: height, width: width },
+	              _react2.default.createElement(_pie2.default, {
+	                data: this.state.poll,
+	                width: width,
+	                height: height,
+	                radius: radius
+	              }),
+	              _react2.default.createElement(_tooltip2.default, null)
+	            )
 	          ),
 	          _react2.default.createElement(
 	            'div',
@@ -41561,6 +41502,271 @@
 
 	module.exports = (typeof window === 'undefined') ? exports : exports.bind(window)
 
+
+/***/ },
+/* 283 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(264);
+
+	var d3 = _interopRequireWildcard(_d);
+
+	var _reactDimensions = __webpack_require__(281);
+
+	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // setupPie(poll) {
+	//   // resp: the http response from the server
+	//   // sets up the pie chart and loads it into state
+	//   console.log(poll);
+	//
+	//
+	//   const faux = this.connectFauxDOM('div.renderedD3', 'chart')
+	//
+	//   var totalVotes = poll.options.reduce(function(total, option, i){
+	//     return total += option.votes
+	//   }, 0)
+	//
+	//   // only try to draw a pie chart if there are any votes
+	//   var width = 0.4 * this.props.containerWidth,
+	//     height = width,
+	//     radius = 0.5 * width,
+	//     colors = d3.scale.category20c();
+	//
+	//   // generate data to render, either from record or in the case of no votes
+	//   // mock up some stand in data
+	//   var pieData = totalVotes > 0 ?
+	//     poll.options :
+	//     [
+	//       {
+	//         name: "no votes yet",
+	//       }
+	//     ]
+	//
+	//   console.log(pieData)
+	//
+	//   var pie = d3.layout.pie()
+	//   .value(function(d) {
+	//     return d.votes;
+	//   })
+	//
+	//   var arc = d3.svg.arc()
+	//   .outerRadius(radius)
+	//   .innerRadius(.7 * radius)
+	//
+	//   var myChart = d3.select(faux).append('svg')
+	//     .attr('width', width)
+	//     .attr('height', height)
+	//     .attr()
+	//     .append('g')
+	//     .attr('transform', 'translate('+(width-radius)+','+(height-radius)+')')
+	//     .selectAll('path').data(pie(pieData))
+	//     .enter().append('g')
+	//       .attr('class', 'slice')
+	//       .on('mouseover', function(d, i){
+	//         console.log("mouse over!")
+	//         console.log(currentEvent)
+	//         tooltip.style('opacity', .2)
+	//
+	//         tooltip.html(d.name + d.votes ? ` (${d.votes})` : "")
+	//             .style('left', (currentEvent.pageX - 35) + 'px')
+	//             .style('top',  (currentEvent.pageY - 30) + 'px')
+	//       })
+	//
+	//       .on('mouseout', function(d){
+	//         tooltip.style('opacity', 0)
+	//       })
+	//
+	//   var slices = d3.select(faux).selectAll('g.slice')
+	//     .append('path')
+	//     .attr('fill', function(d, i) {
+	//       return colors(i);
+	//     })
+	//     .attr('d', arc)
+	//
+	//   var text = d3.select(faux).selectAll('g.slice')
+	//   .append('text')
+	//   .text(function(d, i) {
+	//     if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
+	//       // don't show label if no votes or under 5%
+	//       return ""
+	//     } else {
+	//       return d.data.name;
+	//     }
+	//   })
+	//   .attr('text-anchor', 'middle')
+	//   .attr('fill', 'white')
+	//   .attr('transform', function(d) {
+	//     d.innerRadius = 0;
+	//     d.outerRadius = radius;
+	//     return 'translate('+ arc.centroid(d)+')'
+	//   })
+	//
+	//   var tooltip = d3.select(faux).append('div')
+	//     .classed('tooltip',  true)
+	//
+	// }
+
+	var pie = d3.layout.pie().value(function (d) {
+	  return d.votes;
+	});
+
+	var getArc = function getArc(radius) {
+	  return d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
+	};
+
+	var Pie = function (_React$Component) {
+	  _inherits(Pie, _React$Component);
+
+	  function Pie() {
+	    _classCallCheck(this, Pie);
+
+	    return _possibleConstructorReturn(this, (Pie.__proto__ || Object.getPrototypeOf(Pie)).apply(this, arguments));
+	  }
+
+	  _createClass(Pie, [{
+	    key: 'getData',
+	    value: function getData() {
+
+	      var poll = this.props.data;
+	      var totalVotes = poll.options.reduce(function (total, option, i) {
+	        return total += option.votes;
+	      }, 0);
+
+	      var data = totalVotes > 0 ? poll.options : [{
+	        name: "no votes yet"
+	      }];
+
+	      return data;
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
+	      console.log("Pie: did upate");
+	      this.renderSlices();
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      console.log("Pie: did mount");
+	      this.renderSlices();
+	    }
+	    // render () {
+	    //   return (<div> hello from pie. my poll is: {this.props.data.name} </div>)
+	    // }
+
+	  }, {
+	    key: 'renderSlices',
+	    value: function renderSlices() {
+	      console.log("Pie: renderSlices");
+	      var pieData = this.getData();
+	      var node = this.refs.outerG;
+	      console.log(node);
+	      var d3Node = d3.select(node).append('span');
+	      // console.log(node)
+	      // console.log(d3.select(node).selectAll('path'))
+	      // console.log(    d3.select(node).selectAll('path').data(pie(pieData))
+	      //       .enter().append('g')
+	      //       .attr('class', 'slice'))
+	      // d3.select(node).selectAll('path').data(pie(pieData))
+	      //   .enter().append('g')
+	      //   .attr('class', 'slice')
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+
+	      // props: width, height, radius
+	      console.log("Pie: render");
+	      var translate = 'translate(' + (this.props.width - this.props.radius) + ', ' + (this.props.height - this.props.radius) + ')';
+
+	      return _react2.default.createElement('g', { transform: translate, ref: 'outerG' });
+	    }
+	  }]);
+
+	  return Pie;
+	}(_react2.default.Component);
+
+	exports.default = Pie;
+
+/***/ },
+/* 284 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(264);
+
+	var d3 = _interopRequireWildcard(_d);
+
+	var _reactDimensions = __webpack_require__(281);
+
+	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Tooltip = function (_React$Component) {
+	  _inherits(Tooltip, _React$Component);
+
+	  function Tooltip() {
+	    _classCallCheck(this, Tooltip);
+
+	    return _possibleConstructorReturn(this, (Tooltip.__proto__ || Object.getPrototypeOf(Tooltip)).apply(this, arguments));
+	  }
+
+	  _createClass(Tooltip, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        ' hello from tooltip: '
+	      );
+	    }
+	  }]);
+
+	  return Tooltip;
+	}(_react2.default.Component);
+
+	exports.default = Tooltip;
 
 /***/ }
 /******/ ]);

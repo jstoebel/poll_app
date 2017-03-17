@@ -1,9 +1,12 @@
-import React from 'react'
-import * as d3 from 'd3'
+import React from 'react';
+import * as d3 from 'd3';
 // import {event as currentEvent} from 'd3-selection';
 import {event as currentEvent} from 'd3';
-import Faux from 'react-faux-dom'
-import Dimensions from 'react-dimensions'
+import Faux from 'react-faux-dom';
+import Dimensions from 'react-dimensions';
+
+import Pie from "./pie";
+import Tooltip from "./tooltip";
 
 
 const Show = React.createClass({
@@ -16,7 +19,7 @@ const Show = React.createClass({
     return {
       chart: "loading...",
       pollOption: "",
-      poll: { options: []}  // mock this object until the real one is loaded in
+      poll: { options: []},  // mock this object until the real one is loaded in
       tooltip: {
         x: 0,
         y: 0
@@ -37,8 +40,7 @@ const Show = React.createClass({
 
   _getSuccess(resp) {
 
-    console.log("starting _getSuccess")
-    this.setupPie(resp);
+    // this.setupPie(resp);
     this.setState({
       poll: resp
     })
@@ -96,108 +98,12 @@ const Show = React.createClass({
       .fail(this._submitError)
   },
 
-  setupPie(poll) {
-    // resp: the http response from the server
-    // sets up the pie chart and loads it into state
-    console.log(poll);
-
-
-    const faux = this.connectFauxDOM('div.renderedD3', 'chart')
-
-    var totalVotes = poll.options.reduce(function(total, option, i){
-      return total += option.votes
-    }, 0)
-
-    // only try to draw a pie chart if there are any votes
-    var width = 0.4 * this.props.containerWidth,
-      height = width,
-      radius = 0.5 * width,
-      colors = d3.scale.category20c();
-
-    // generate data to render, either from record or in the case of no votes
-    // mock up some stand in data
-    var pieData = totalVotes > 0 ?
-      poll.options :
-      [
-        {
-          name: "no votes yet",
-        }
-      ]
-
-    console.log(pieData)
-
-    var pie = d3.layout.pie()
-    .value(function(d) {
-      return d.votes;
-    })
-
-    var arc = d3.svg.arc()
-    .outerRadius(radius)
-    .innerRadius(.7 * radius)
-
-    var myChart = d3.select(faux).append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .attr()
-      .append('g')
-      .attr('transform', 'translate('+(width-radius)+','+(height-radius)+')')
-      .selectAll('path').data(pie(pieData))
-      .enter().append('g')
-        .attr('class', 'slice')
-        .on('mouseover', function(d, i){
-          console.log("mouse over!")
-          console.log(currentEvent)
-          tooltip.style('opacity', .2)
-
-          tooltip.html(d.name + d.votes ? ` (${d.votes})` : "")
-              .style('left', (currentEvent.pageX - 35) + 'px')
-              .style('top',  (currentEvent.pageY - 30) + 'px')
-        })
-
-        .on('mouseout', function(d){
-          tooltip.style('opacity', 0)
-        })
-
-    var slices = d3.select(faux).selectAll('g.slice')
-      .append('path')
-      .attr('fill', function(d, i) {
-        return colors(i);
-      })
-      .attr('d', arc)
-
-    var text = d3.select(faux).selectAll('g.slice')
-    .append('text')
-    .text(function(d, i) {
-      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
-        // don't show label if no votes or under 5%
-        return ""
-      } else {
-        return d.data.name;
-      }
-    })
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .attr('transform', function(d) {
-      d.innerRadius = 0;
-      d.outerRadius = radius;
-      return 'translate('+ arc.centroid(d)+')'
-    })
-
-    var tooltip = d3.select(faux).append('div')
-      .classed('tooltip',  true)
-
-  },
-
   eachOption(option, i) {
     return (
       <option value={option._id} key={i}> {option.name} </option>
 
     )
   },
-
-  // setupSubmitBtn(){
-  //   // renders the submit button as eithe
-  // }
 
   setupMenu(){
 
@@ -245,13 +151,24 @@ const Show = React.createClass({
   },
 
   render () {
+    var width = 0.4 * this.props.containerWidth,
+      height = width,
+      radius = 0.5 * width
     return (
       <div>
         <h2 className="text-center">Here is some fancy data:</h2>
         <div className="container-fluid">
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
-              {this.state.chart}
+              <svg height={height} width={width}>
+                <Pie
+                  data={this.state.poll}
+                  width={width}
+                  height={height}
+                  radius={radius}
+                />
+                <Tooltip />
+              </svg>
             </div>
 
             <div className="col-xs-12 col-md-6" id="show-menu">
