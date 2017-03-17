@@ -1,52 +1,67 @@
 import React from 'react'
 import * as d3 from 'd3'
+import LabeledArc from './arc'
 
 class pieChart extends React.Component {
 
-  componentDidUpdate() {
-    console.log("Pie: did upate")
-    this.renderSlices();
+
+  /*
+  required props
+    x
+    y
+    outerRadius
+    innerRadius
+    data (example):
+      [
+        {value: 92-34, label: 'Code lines'},
+        {value: 34, label: 'Empty lines'}
+      ]
+  */
+
+  constructor() {
+    super();
+
+    this.pie = d3.layout.pie()
+                 .value((d) => d.value);
+    this.colors = d3.scale.category10();
   }
 
-  componentDidMount() {
-    console.log("Pie: did mount")
-    this.renderSlices();
-  }
-  // render () {
-  //   return (<div> hello from pie. my poll is: {this.props.data.name} </div>)
-  // }
+  getData() {
 
-  renderSlices () {
-    console.log("Pie: renderSlices");
-    var pieData = this.getData();
-    var node = this.refs.outerG;
-    console.log(node);
-    var d3Node = d3.select(node).append('span')
-    // console.log(node)
-    // console.log(d3.select(node).selectAll('path'))
-    // console.log(    d3.select(node).selectAll('path').data(pie(pieData))
-    //       .enter().append('g')
-    //       .attr('class', 'slice'))
-    // d3.select(node).selectAll('path').data(pie(pieData))
-    //   .enter().append('g')
-    //   .attr('class', 'slice')
+    var poll = this.props.data;
+    var totalVotes = poll.options.reduce(function(total, option, i){
+      return total += option.votes
+    }, 0)
 
+    var data = totalVotes > 0 ?
+    poll.options :
+    [ { name: "no votes yet"} ]
+
+    return data;
   }
 
-  render () {
+  arcGenerator(d, i) {
+    return (
+    <LabeledArc key={`arc-${i}`}
+      data={d}
+      innerRadius={this.props.innerRadius}
+      outerRadius={this.props.outerRadius}
+      color={this.colors(i)} />
+    );
+  }
 
-    // props: width, height, radius
-    console.log("Pie: render")
-    const translate = `translate(${this.props.width-this.props.radius}, ${this.props.height-this.props.radius})`
+  render() {
+    let pie = this.pie(this.props.data),
+    translate = `translate(${this.props.x}, ${this.props.y})`;
 
     return (
-
-      <g transform={translate} ref="outerG" >
+      <g transform={translate}>
+          {pie.map((d, i) => this.arcGenerator(d, i))}
       </g>
-
     )
-
   }
+
+
 
 }
 

@@ -5,7 +5,7 @@ import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom';
 import Dimensions from 'react-dimensions';
 
-import Pie from "./pie";
+import pieChart from "./pie_chart";
 import Tooltip from "./tooltip";
 
 
@@ -40,7 +40,6 @@ const Show = React.createClass({
 
   _getSuccess(resp) {
 
-    // this.setupPie(resp);
     this.setState({
       poll: resp
     })
@@ -97,6 +96,29 @@ const Show = React.createClass({
     xhr.done(this._submitSuccess)
       .fail(this._submitError)
   },
+
+  pieData() {
+    // returns data for the pie chart in the expected format based on state.
+
+    var poll = this.state.poll
+    if (poll) {
+      var totalVotes = poll.options.reduce(function(total, option, i){
+        return total += option.votes
+      }, 0)
+
+      var newData = totalVotes > 0 ?
+      poll.options.map(function(option, i){
+        
+      }) :
+      [ { name: "no votes yet"} ]
+
+    } else {
+      var newData = [];
+    }
+
+    this.setState({ pieData: newData})
+
+  }
 
   eachOption(option, i) {
     return (
@@ -161,13 +183,10 @@ const Show = React.createClass({
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
               <svg height={height} width={width}>
-                <Pie
-                  data={this.state.poll}
-                  width={width}
-                  height={height}
-                  radius={radius}
+                <pieChart
+
+
                 />
-                <Tooltip />
               </svg>
             </div>
 
