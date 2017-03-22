@@ -2,7 +2,7 @@ import React from 'react'
 import * as d3 from 'd3'
 import LabeledArc from './arc'
 
-class pieChart extends React.Component {
+class PieChart extends React.Component {
 
 
   /*
@@ -51,6 +51,7 @@ class pieChart extends React.Component {
   }
 
   render() {
+    console.log("rendering pieChart");
     let pie = this.pie(this.props.data),
     translate = `translate(${this.props.x}, ${this.props.y})`;
 
@@ -65,4 +66,4 @@ class pieChart extends React.Component {
 
 }
 
-export default Pie;
+export default PieChart;

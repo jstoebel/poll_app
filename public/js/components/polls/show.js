@@ -5,7 +5,7 @@ import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom';
 import Dimensions from 'react-dimensions';
 
-import pieChart from "./pie_chart";
+import PieChart from "./pie_chart";
 import Tooltip from "./tooltip";
 
 
@@ -108,7 +108,7 @@ const Show = React.createClass({
 
       var newData = totalVotes > 0 ?
       poll.options.map(function(option, i){
-        
+
       }) :
       [ { name: "no votes yet"} ]
 
@@ -118,7 +118,7 @@ const Show = React.createClass({
 
     this.setState({ pieData: newData})
 
-  }
+  },
 
   eachOption(option, i) {
     return (
@@ -183,9 +183,10 @@ const Show = React.createClass({
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
               <svg height={height} width={width}>
-                <pieChart
-
-
+                <PieChart
+                  x={100} y={100} outerRadius={100} innerRadius={50}
+                  data={[{value: 92-34, label: 'Code lines'},
+                    {value: 34, label: 'Empty lines'}]}
                 />
               </svg>
             </div>
