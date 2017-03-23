@@ -52,6 +52,7 @@ class PieChart extends React.Component {
 
   render() {
     console.log("rendering pieChart");
+    console.log(this.props)
     let pie = this.pie(this.props.data),
     translate = `translate(${this.props.x}, ${this.props.y})`;
 

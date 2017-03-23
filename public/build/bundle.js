@@ -28503,8 +28503,23 @@
 	  },
 	  _getSuccess: function _getSuccess(resp) {
 
+	    var poll = resp;
+	    if (poll) {
+	      var totalVotes = poll.options.reduce(function (total, option, i) {
+	        return total += option.votes;
+	      }, 0);
+
+	      var newData = totalVotes > 0 ? poll.options.map(function (option, i) {
+	        return { value: option.votes, label: option.name };
+	      }) : [{ value: 0, label: 'no votes yet' }];
+	    } else {
+	      var newData = [];
+	    }
+
 	    this.setState({
-	      poll: resp
+	      poll: poll,
+	      // pieData: newData
+	      pieData: [{ value: 1, label: "spam" }, { value: 10, label: "eggs" }]
 	    });
 	  },
 	  _getError: function _getError(error) {
@@ -28548,22 +28563,6 @@
 	    var xhr = this._submitRecord();
 	    xhr.done(this._submitSuccess).fail(this._submitError);
 	  },
-	  pieData: function pieData() {
-	    // returns data for the pie chart in the expected format based on state.
-
-	    var poll = this.state.poll;
-	    if (poll) {
-	      var totalVotes = poll.options.reduce(function (total, option, i) {
-	        return total += option.votes;
-	      }, 0);
-
-	      var newData = totalVotes > 0 ? poll.options.map(function (option, i) {}) : [{ name: "no votes yet" }];
-	    } else {
-	      var newData = [];
-	    }
-
-	    this.setState({ pieData: newData });
-	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
 	      'option',
@@ -28573,7 +28572,7 @@
 	      ' '
 	    );
 	  },
-	  setupMenu: function setupMenu() {
+	  renderMenu: function renderMenu() {
 
 	    if (this.state.poll) {
 	      return _react2.default.createElement(
@@ -28626,6 +28625,16 @@
 	      );
 	    }
 	  },
+	  renderPie: function renderPie() {
+	    if (this.state.pieData) {
+	      return _react2.default.createElement(_pie_chart2.default, {
+	        x: 100, y: 100, outerRadius: 100, innerRadius: 50,
+	        data: this.state.pieData
+	      });
+	    } else {
+	      return "Loading...";
+	    }
+	  },
 	  render: function render() {
 	    var width = 0.4 * this.props.containerWidth,
 	        height = width,
@@ -28650,16 +28659,13 @@
 	            _react2.default.createElement(
 	              'svg',
 	              { height: height, width: width },
-	              _react2.default.createElement(_pie_chart2.default, {
-	                x: 100, y: 100, outerRadius: 100, innerRadius: 50,
-	                data: [{ value: 92 - 34, label: 'Code lines' }, { value: 34, label: 'Empty lines' }]
-	              })
+	              this.renderPie()
 	            )
 	          ),
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-xs-12 col-md-6', id: 'show-menu' },
-	            this.setupMenu()
+	            this.renderMenu()
 	          )
 	        )
 	      )
@@ -41605,6 +41611,7 @@
 	      var _this2 = this;
 
 	      console.log("rendering pieChart");
+	      console.log(this.props);
 	      var pie = this.pie(this.props.data),
 	          translate = 'translate(' + this.props.x + ', ' + this.props.y + ')';
 

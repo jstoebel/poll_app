@@ -40,8 +40,25 @@ const Show = React.createClass({
 
   _getSuccess(resp) {
 
+    var poll = resp;
+    if (poll) {
+      var totalVotes = poll.options.reduce(function(total, option, i){
+        return total += option.votes
+      }, 0)
+
+      var newData = totalVotes > 0 ?
+        poll.options.map(function(option, i){
+          return {value: option.votes, label: option.name}
+        }) :
+        [{value: 0, label: 'no votes yet'}]
+
+    } else {
+      var newData = [];
+    }
+
     this.setState({
-      poll: resp
+      poll: poll,
+      pieData: newData
     })
   },
 
@@ -97,29 +114,6 @@ const Show = React.createClass({
       .fail(this._submitError)
   },
 
-  pieData() {
-    // returns data for the pie chart in the expected format based on state.
-
-    var poll = this.state.poll
-    if (poll) {
-      var totalVotes = poll.options.reduce(function(total, option, i){
-        return total += option.votes
-      }, 0)
-
-      var newData = totalVotes > 0 ?
-      poll.options.map(function(option, i){
-
-      }) :
-      [ { name: "no votes yet"} ]
-
-    } else {
-      var newData = [];
-    }
-
-    this.setState({ pieData: newData})
-
-  },
-
   eachOption(option, i) {
     return (
       <option value={option._id} key={i}> {option.name} </option>
@@ -127,7 +121,7 @@ const Show = React.createClass({
     )
   },
 
-  setupMenu(){
+  renderMenu(){
 
     if ( this.state.poll ) {
       return (
@@ -172,6 +166,19 @@ const Show = React.createClass({
 
   },
 
+  renderPie() {
+    if (this.state.pieData) {
+      return (
+        <PieChart
+          x={100} y={100} outerRadius={100} innerRadius={50}
+          data={this.state.pieData}
+        />
+      )
+    } else {
+      return "Loading..."
+    }
+  },
+
   render () {
     var width = 0.4 * this.props.containerWidth,
       height = width,
@@ -183,16 +190,12 @@ const Show = React.createClass({
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
               <svg height={height} width={width}>
-                <PieChart
-                  x={100} y={100} outerRadius={100} innerRadius={50}
-                  data={[{value: 92-34, label: 'Code lines'},
-                    {value: 34, label: 'Empty lines'}]}
-                />
+                {this.renderPie()}
               </svg>
             </div>
 
             <div className="col-xs-12 col-md-6" id="show-menu">
-              {this.setupMenu()}
+              {this.renderMenu()}
             </div>
           </div>
         </div>
