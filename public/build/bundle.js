@@ -26709,7 +26709,6 @@
 	  }, {
 	    key: 'eachPoll',
 	    value: function eachPoll(poll, i) {
-	      console.log(poll);
 	      return _react2.default.createElement(
 	        _reactRouter.Link,
 	        { to: "/poll/" + poll._id, key: poll._id },
@@ -28455,19 +28454,32 @@
 
 	var d3 = _interopRequireWildcard(_d);
 
-	var _reactFauxDom = __webpack_require__(265);
+	var _d3SvgLegend = __webpack_require__(265);
+
+	var legend = _interopRequireWildcard(_d3SvgLegend);
+
+	var _reactFauxDom = __webpack_require__(271);
 
 	var _reactFauxDom2 = _interopRequireDefault(_reactFauxDom);
 
-	var _reactDimensions = __webpack_require__(281);
+	var _reactDimensions = __webpack_require__(287);
 
 	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
+
+	var _pie_chart = __webpack_require__(289);
+
+	var _pie_chart2 = _interopRequireDefault(_pie_chart);
+
+	var _tooltip = __webpack_require__(292);
+
+	var _tooltip2 = _interopRequireDefault(_tooltip);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	// import {event as currentEvent} from 'd3-selection';
 
 
@@ -28480,7 +28492,11 @@
 	    return {
 	      chart: "loading...",
 	      pollOption: "",
-	      poll: { options: [] } // mock this object until the real one is loaded in
+	      poll: { options: [] }, // mock this object until the real one is loaded in
+	      tooltip: {
+	        x: 0,
+	        y: 0
+	      }
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {},
@@ -28492,10 +28508,22 @@
 	  },
 	  _getSuccess: function _getSuccess(resp) {
 
-	    console.log("starting _getSuccess");
-	    this.setupPie(resp);
+	    var poll = resp;
+	    if (poll) {
+	      var totalVotes = poll.options.reduce(function (total, option, i) {
+	        return total += option.votes;
+	      }, 0);
+
+	      var newData = totalVotes > 0 ? poll.options.map(function (option, i) {
+	        return { value: option.votes, label: option.name };
+	      }) : [{ value: 0, label: 'no votes yet' }];
+	    } else {
+	      var newData = [];
+	    }
+
 	    this.setState({
-	      poll: resp
+	      poll: poll,
+	      pieData: newData
 	    });
 	  },
 	  _getError: function _getError(error) {
@@ -28539,82 +28567,6 @@
 	    var xhr = this._submitRecord();
 	    xhr.done(this._submitSuccess).fail(this._submitError);
 	  },
-	  setupPie: function setupPie(poll) {
-	    // resp: the http response from the server
-	    // sets up the pie chart and loads it into state
-	    console.log(poll);
-
-	    var faux = this.connectFauxDOM('div.renderedD3', 'chart');
-
-	    var totalVotes = poll.options.reduce(function (total, option, i) {
-	      return total += option.votes;
-	    }, 0);
-
-	    // only try to draw a pie chart if there are any votes
-	    var width = 0.4 * this.props.containerWidth,
-	        height = width,
-	        radius = 0.5 * width,
-	        colors = d3.scale.category20c();
-
-	    // var piedata = [
-	    //     {
-	    //         name: "spam",
-	    //         votes: 300
-	    //     },
-	    //     {
-	    //         name: "eggs",
-	    //         votes: 100
-	    //     },
-	    //     {
-	    //         name: "baked beans",
-	    //         votes: 1
-	    //     }
-	    // ]
-
-	    // generate data to render, either from record or in the case of no votes
-	    // mock up some stand in data
-	    var pieData = totalVotes > 0 ? poll.options : [{
-	      name: "no votes yet",
-	      votes: 1
-	    }];
-
-	    console.log(pieData);
-
-	    var pie = d3.layout.pie().value(function (d) {
-	      return d.votes;
-	    });
-
-	    var arc = d3.svg.arc().outerRadius(radius).innerRadius(.7 * radius);
-
-	    var myChart = d3.select(faux).append('svg').attr('width', width).attr('height', height).attr().append('g').attr('transform', 'translate(' + (width - radius) + ',' + (height - radius) + ')').selectAll('path').data(pie(pieData)).enter().append('g').attr('class', 'slice').on('mouseover', function (d, i) {
-	      console.log("mouse over!");
-	      console.log(_d.event);
-	      tooltip.style('opacity', .2);
-
-	      tooltip.html(d.name + ': ' + d.votes).style('left', _d.event.pageX - 35 + 'px').style('top', _d.event.pageY - 30 + 'px');
-	    }).on('mouseout', function (d) {
-	      tooltip.style('opacity', 0);
-	    });
-
-	    var slices = d3.select(faux).selectAll('g.slice').append('path').attr('fill', function (d, i) {
-	      return colors(i);
-	    }).attr('d', arc);
-
-	    var text = d3.select(faux).selectAll('g.slice').append('text').text(function (d, i) {
-	      if (d.data.votes / totalVotes < .05 || d.data.votes == 0) {
-	        // don't show label if no votes or under 5%
-	        return "";
-	      } else {
-	        return d.data.name;
-	      }
-	    }).attr('text-anchor', 'middle').attr('fill', 'white').attr('transform', function (d) {
-	      d.innerRadius = 0;
-	      d.outerRadius = radius;
-	      return 'translate(' + arc.centroid(d) + ')';
-	    });
-
-	    var tooltip = d3.select(faux).append('div').classed('tooltip', true);
-	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
 	      'option',
@@ -28624,42 +28576,42 @@
 	      ' '
 	    );
 	  },
-
-
-	  // setupSubmitBtn(){
-	  //   // renders the submit button as eithe
-	  // }
-
-	  setupMenu: function setupMenu() {
+	  renderMenu: function renderMenu() {
 
 	    if (this.state.poll) {
+
 	      return _react2.default.createElement(
-	        'form',
-	        { onSubmit: this.handleSubmit },
+	        'div',
+	        null,
 	        _react2.default.createElement(
-	          'div',
-	          { className: 'form-horizontal' },
+	          'form',
+	          { onSubmit: this.handleSubmit },
 	          _react2.default.createElement(
-	            'select',
-	            {
-	              className: 'selectpicker col-sm-12',
-	              name: 'pollOption',
-	              value: this.state.pollOption,
-	              onChange: this.handleChange
-	            },
+	            'div',
+	            { className: 'form-horizontal' },
 	            _react2.default.createElement(
-	              'option',
-	              { selected: true, className: 'text-center' },
-	              'Vote in this poll'
-	            ),
-	            this.state.poll.options.map(this.eachOption)
-	          )
-	        ),
-	        _react2.default.createElement('input', {
-	          className:  true ? "" : "disabled",
-	          type: 'submit', value: 'Submit' })
+	              'select',
+	              {
+	                className: 'selectpicker col-sm-12',
+	                name: 'pollOption',
+	                value: this.state.pollOption,
+	                onChange: this.handleChange
+	              },
+	              _react2.default.createElement(
+	                'option',
+	                { selected: true, className: 'text-center' },
+	                'Vote in this poll'
+	              ),
+	              this.state.poll.options.map(this.eachOption)
+	            )
+	          ),
+	          _react2.default.createElement('input', {
+	            className:  true ? "" : "disabled",
+	            type: 'submit', value: 'Submit' })
+	        )
 	      );
 	    } else {
+
 	      return _react2.default.createElement(
 	        'form',
 	        null,
@@ -28683,7 +28635,36 @@
 	      );
 	    }
 	  },
+	  renderPie: function renderPie(height, width, radius) {
+	    if (this.state.pieData) {
+	      return _react2.default.createElement(_pie_chart2.default, {
+	        x: width / 2, y: height / 2, outerRadius: radius, innerRadius: radius / 2,
+	        data: this.state.pieData
+	      });
+	    } else {
+	      return "Loading...";
+	    }
+	  },
+
+
+	  // renderLegend() {
+	  //   if (this.state.pieData) {
+	  //     return (
+	  //
+	  //         <Legend
+	  //           x={100} y={100} width={50} height={50}
+	  //           data={this.state.pieData}
+	  //         />
+	  //     )
+	  //   } else {
+	  //     return "Loading..."
+	  //   }
+	  // }
+
 	  render: function render() {
+	    var width = 0.4 * this.props.containerWidth,
+	        height = width,
+	        radius = 0.5 * width;
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -28701,12 +28682,16 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'renderedD3 col-xs-12 col-md-6' },
-	            this.state.chart
+	            _react2.default.createElement(
+	              'svg',
+	              { height: height, width: width },
+	              this.renderPie(height, width, radius)
+	            )
 	          ),
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-xs-12 col-md-6', id: 'show-menu' },
-	            this.setupMenu()
+	            this.renderMenu()
 	          )
 	        )
 	      )
@@ -38279,10 +38264,783 @@
 /* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(266)
-	var Window = __webpack_require__(278)
-	var core = __webpack_require__(279)
-	var anim = __webpack_require__(280)
+	var d3 = __webpack_require__(264);
+
+	d3.legend = __webpack_require__(266);
+
+	module.exports = d3;
+
+
+/***/ },
+/* 266 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	  color: __webpack_require__(267),
+	  size: __webpack_require__(269),
+	  symbol: __webpack_require__(270)
+	};
+
+
+/***/ },
+/* 267 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var helper = __webpack_require__(268);
+
+	module.exports = function(){
+
+	  var scale = d3.scale.linear(),
+	    shape = "rect",
+	    shapeWidth = 15,
+	    shapeHeight = 15,
+	    shapeRadius = 10,
+	    shapePadding = 2,
+	    cells = [5],
+	    labels = [],
+	    classPrefix = "",
+	    useClass = false,
+	    title = "",
+	    labelFormat = d3.format(".01f"),
+	    labelOffset = 10,
+	    labelAlign = "middle",
+	    labelDelimiter = "to",
+	    orient = "vertical",
+	    ascending = false,
+	    path,
+	    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+	    function legend(svg){
+
+	      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+	        legendG = svg.selectAll('g').data([scale]);
+
+	      legendG.enter().append('g').attr('class', classPrefix + 'legendCells');
+
+
+	      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+	        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6),
+	        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+	        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+	      //add event handlers
+	      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+	      cell.exit().transition().style("opacity", 0).remove();
+
+	      helper.d3_drawShapes(shape, shapes, shapeHeight, shapeWidth, shapeRadius, path);
+
+	      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+	      // sets placement
+	      var text = cell.select("text"),
+	        shapeSize = shapes[0].map( function(d){ return d.getBBox(); });
+
+	      //sets scale
+	      //everything is fill except for line which is stroke,
+	      if (!useClass){
+	        if (shape == "line"){
+	          shapes.style("stroke", type.feature);
+	        } else {
+	          shapes.style("fill", type.feature);
+	        }
+	      } else {
+	        shapes.attr("class", function(d){ return classPrefix + "swatch " + type.feature(d); });
+	      }
+
+	      var cellTrans,
+	      textTrans,
+	      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+	      //positions cells and text
+	      if (orient === "vertical"){
+	        cellTrans = function(d,i) { return "translate(0, " + (i * (shapeSize[i].height + shapePadding)) + ")"; };
+	        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width + shapeSize[i].x +
+	          labelOffset) + "," + (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+	      } else if (orient === "horizontal"){
+	        cellTrans = function(d,i) { return "translate(" + (i * (shapeSize[i].width + shapePadding)) + ",0)"; }
+	        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) +
+	          "," + (shapeSize[i].height + shapeSize[i].y + labelOffset + 8) + ")"; };
+	      }
+
+	      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+	      helper.d3_title(svg, legendG, title, classPrefix);
+
+	      cell.transition().style("opacity", 1);
+
+	    }
+
+
+
+	  legend.scale = function(_) {
+	    if (!arguments.length) return scale;
+	    scale = _;
+	    return legend;
+	  };
+
+	  legend.cells = function(_) {
+	    if (!arguments.length) return cells;
+	    if (_.length > 1 || _ >= 2 ){
+	      cells = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.shape = function(_, d) {
+	    if (!arguments.length) return shape;
+	    if (_ == "rect" || _ == "circle" || _ == "line" || (_ == "path" && (typeof d === 'string')) ){
+	      shape = _;
+	      path = d;
+	    }
+	    return legend;
+	  };
+
+	  legend.shapeWidth = function(_) {
+	    if (!arguments.length) return shapeWidth;
+	    shapeWidth = +_;
+	    return legend;
+	  };
+
+	  legend.shapeHeight = function(_) {
+	    if (!arguments.length) return shapeHeight;
+	    shapeHeight = +_;
+	    return legend;
+	  };
+
+	  legend.shapeRadius = function(_) {
+	    if (!arguments.length) return shapeRadius;
+	    shapeRadius = +_;
+	    return legend;
+	  };
+
+	  legend.shapePadding = function(_) {
+	    if (!arguments.length) return shapePadding;
+	    shapePadding = +_;
+	    return legend;
+	  };
+
+	  legend.labels = function(_) {
+	    if (!arguments.length) return labels;
+	    labels = _;
+	    return legend;
+	  };
+
+	  legend.labelAlign = function(_) {
+	    if (!arguments.length) return labelAlign;
+	    if (_ == "start" || _ == "end" || _ == "middle") {
+	      labelAlign = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.labelFormat = function(_) {
+	    if (!arguments.length) return labelFormat;
+	    labelFormat = _;
+	    return legend;
+	  };
+
+	  legend.labelOffset = function(_) {
+	    if (!arguments.length) return labelOffset;
+	    labelOffset = +_;
+	    return legend;
+	  };
+
+	  legend.labelDelimiter = function(_) {
+	    if (!arguments.length) return labelDelimiter;
+	    labelDelimiter = _;
+	    return legend;
+	  };
+
+	  legend.useClass = function(_) {
+	    if (!arguments.length) return useClass;
+	    if (_ === true || _ === false){
+	      useClass = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.orient = function(_){
+	    if (!arguments.length) return orient;
+	    _ = _.toLowerCase();
+	    if (_ == "horizontal" || _ == "vertical") {
+	      orient = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.ascending = function(_) {
+	    if (!arguments.length) return ascending;
+	    ascending = !!_;
+	    return legend;
+	  };
+
+	  legend.classPrefix = function(_) {
+	    if (!arguments.length) return classPrefix;
+	    classPrefix = _;
+	    return legend;
+	  };
+
+	  legend.title = function(_) {
+	    if (!arguments.length) return title;
+	    title = _;
+	    return legend;
+	  };
+
+	  d3.rebind(legend, legendDispatcher, "on");
+
+	  return legend;
+
+	};
+
+
+/***/ },
+/* 268 */
+/***/ function(module, exports) {
+
+	module.exports = {
+
+	  d3_identity: function (d) {
+	    return d;
+	  },
+
+	  d3_mergeLabels: function (gen, labels) {
+
+	      if(labels.length === 0) return gen;
+
+	      gen = (gen) ? gen : [];
+
+	      var i = labels.length;
+	      for (; i < gen.length; i++) {
+	        labels.push(gen[i]);
+	      }
+	      return labels;
+	    },
+
+	  d3_linearLegend: function (scale, cells, labelFormat) {
+	    var data = [];
+
+	    if (cells.length > 1){
+	      data = cells;
+
+	    } else {
+	      var domain = scale.domain(),
+	      increment = (domain[domain.length - 1] - domain[0])/(cells - 1),
+	      i = 0;
+
+	      for (; i < cells; i++){
+	        data.push(domain[0] + i*increment);
+	      }
+	    }
+
+	    var labels = data.map(labelFormat);
+
+	    return {data: data,
+	            labels: labels,
+	            feature: function(d){ return scale(d); }};
+	  },
+
+	  d3_quantLegend: function (scale, labelFormat, labelDelimiter) {
+	    var labels = scale.range().map(function(d){
+	      var invert = scale.invertExtent(d),
+	      a = labelFormat(invert[0]),
+	      b = labelFormat(invert[1]);
+
+	      // if (( (a) && (a.isNan()) && b){
+	      //   console.log("in initial statement")
+	        return labelFormat(invert[0]) + " " + labelDelimiter + " " + labelFormat(invert[1]);
+	      // } else if (a || b) {
+	      //   console.log('in else statement')
+	      //   return (a) ? a : b;
+	      // }
+
+	    });
+
+	    return {data: scale.range(),
+	            labels: labels,
+	            feature: this.d3_identity
+	          };
+	  },
+
+	  d3_ordinalLegend: function (scale) {
+	    return {data: scale.domain(),
+	            labels: scale.domain(),
+	            feature: function(d){ return scale(d); }};
+	  },
+
+	  d3_drawShapes: function (shape, shapes, shapeHeight, shapeWidth, shapeRadius, path) {
+	    if (shape === "rect"){
+	        shapes.attr("height", shapeHeight).attr("width", shapeWidth);
+
+	    } else if (shape === "circle") {
+	        shapes.attr("r", shapeRadius)//.attr("cx", shapeRadius).attr("cy", shapeRadius);
+
+	    } else if (shape === "line") {
+	        shapes.attr("x1", 0).attr("x2", shapeWidth).attr("y1", 0).attr("y2", 0);
+
+	    } else if (shape === "path") {
+	      shapes.attr("d", path);
+	    }
+	  },
+
+	  d3_addText: function (svg, enter, labels, classPrefix){
+	    enter.append("text").attr("class", classPrefix + "label");
+	    svg.selectAll("g." + classPrefix + "cell text." + classPrefix + "label")
+	      .data(labels).text(this.d3_identity);
+	  },
+
+	  d3_calcType: function (scale, ascending, cells, labels, labelFormat, labelDelimiter){
+	    var type = scale.ticks ?
+	            this.d3_linearLegend(scale, cells, labelFormat) : scale.invertExtent ?
+	            this.d3_quantLegend(scale, labelFormat, labelDelimiter) : this.d3_ordinalLegend(scale);
+
+	    type.labels = this.d3_mergeLabels(type.labels, labels);
+
+	    if (ascending) {
+	      type.labels = this.d3_reverse(type.labels);
+	      type.data = this.d3_reverse(type.data);
+	    }
+
+	    return type;
+	  },
+
+	  d3_reverse: function(arr) {
+	    var mirror = [];
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	      mirror[i] = arr[l-i-1];
+	    }
+	    return mirror;
+	  },
+
+	  d3_placement: function (orient, cell, cellTrans, text, textTrans, labelAlign) {
+	    cell.attr("transform", cellTrans);
+	    text.attr("transform", textTrans);
+	    if (orient === "horizontal"){
+	      text.style("text-anchor", labelAlign);
+	    }
+	  },
+
+	  d3_addEvents: function(cells, dispatcher){
+	    var _ = this;
+
+	      cells.on("mouseover.legend", function (d) { _.d3_cellOver(dispatcher, d, this); })
+	          .on("mouseout.legend", function (d) { _.d3_cellOut(dispatcher, d, this); })
+	          .on("click.legend", function (d) { _.d3_cellClick(dispatcher, d, this); });
+	  },
+
+	  d3_cellOver: function(cellDispatcher, d, obj){
+	    cellDispatcher.cellover.call(obj, d);
+	  },
+
+	  d3_cellOut: function(cellDispatcher, d, obj){
+	    cellDispatcher.cellout.call(obj, d);
+	  },
+
+	  d3_cellClick: function(cellDispatcher, d, obj){
+	    cellDispatcher.cellclick.call(obj, d);
+	  },
+
+	  d3_title: function(svg, cellsSvg, title, classPrefix){
+	    if (title !== ""){
+
+	      var titleText = svg.selectAll('text.' + classPrefix + 'legendTitle');
+
+	      titleText.data([title])
+	        .enter()
+	        .append('text')
+	        .attr('class', classPrefix + 'legendTitle');
+
+	        svg.selectAll('text.' + classPrefix + 'legendTitle')
+	            .text(title)
+
+	      var yOffset = svg.select('.' + classPrefix + 'legendTitle')
+	          .map(function(d) { return d[0].getBBox().height})[0],
+	      xOffset = -cellsSvg.map(function(d) { return d[0].getBBox().x})[0];
+
+	      cellsSvg.attr('transform', 'translate(' + xOffset + ',' + (yOffset + 10) + ')');
+
+	    }
+	  }
+	}
+
+
+/***/ },
+/* 269 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var helper = __webpack_require__(268);
+
+	module.exports =  function(){
+
+	  var scale = d3.scale.linear(),
+	    shape = "rect",
+	    shapeWidth = 15,
+	    shapePadding = 2,
+	    cells = [5],
+	    labels = [],
+	    useStroke = false,
+	    classPrefix = "",
+	    title = "",
+	    labelFormat = d3.format(".01f"),
+	    labelOffset = 10,
+	    labelAlign = "middle",
+	    labelDelimiter = "to",
+	    orient = "vertical",
+	    ascending = false,
+	    path,
+	    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+	    function legend(svg){
+
+	      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+	        legendG = svg.selectAll('g').data([scale]);
+
+	      legendG.enter().append('g').attr('class', classPrefix + 'legendCells');
+
+
+	      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+	        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6),
+	        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+	        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+	      //add event handlers
+	      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+	      cell.exit().transition().style("opacity", 0).remove();
+
+	      //creates shape
+	      if (shape === "line"){
+	        helper.d3_drawShapes(shape, shapes, 0, shapeWidth);
+	        shapes.attr("stroke-width", type.feature);
+	      } else {
+	        helper.d3_drawShapes(shape, shapes, type.feature, type.feature, type.feature, path);
+	      }
+
+	      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+	      //sets placement
+	      var text = cell.select("text"),
+	        shapeSize = shapes[0].map(
+	          function(d, i){
+	            var bbox = d.getBBox()
+	            var stroke = scale(type.data[i]);
+
+	            if (shape === "line" && orient === "horizontal") {
+	              bbox.height = bbox.height + stroke;
+	            } else if (shape === "line" && orient === "vertical"){
+	              bbox.width = bbox.width;
+	            }
+
+	            return bbox;
+	        });
+
+	      var maxH = d3.max(shapeSize, function(d){ return d.height + d.y; }),
+	      maxW = d3.max(shapeSize, function(d){ return d.width + d.x; });
+
+	      var cellTrans,
+	      textTrans,
+	      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+	      //positions cells and text
+	      if (orient === "vertical"){
+
+	        cellTrans = function(d,i) {
+	            var height = d3.sum(shapeSize.slice(0, i + 1 ), function(d){ return d.height; });
+	            return "translate(0, " + (height + i*shapePadding) + ")"; };
+
+	        textTrans = function(d,i) { return "translate(" + (maxW + labelOffset) + "," +
+	          (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+	      } else if (orient === "horizontal"){
+	        cellTrans = function(d,i) {
+	            var width = d3.sum(shapeSize.slice(0, i + 1 ), function(d){ return d.width; });
+	            return "translate(" + (width + i*shapePadding) + ",0)"; };
+
+	        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) + "," +
+	              (maxH + labelOffset ) + ")"; };
+	      }
+
+	      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+	      helper.d3_title(svg, legendG, title, classPrefix);
+
+	      cell.transition().style("opacity", 1);
+
+	    }
+
+	  legend.scale = function(_) {
+	    if (!arguments.length) return scale;
+	    scale = _;
+	    return legend;
+	  };
+
+	  legend.cells = function(_) {
+	    if (!arguments.length) return cells;
+	    if (_.length > 1 || _ >= 2 ){
+	      cells = _;
+	    }
+	    return legend;
+	  };
+
+
+	  legend.shape = function(_, d) {
+	    if (!arguments.length) return shape;
+	    if (_ == "rect" || _ == "circle" || _ == "line" ){
+	      shape = _;
+	      path = d;
+	    }
+	    return legend;
+	  };
+
+	  legend.shapeWidth = function(_) {
+	    if (!arguments.length) return shapeWidth;
+	    shapeWidth = +_;
+	    return legend;
+	  };
+
+	  legend.shapePadding = function(_) {
+	    if (!arguments.length) return shapePadding;
+	    shapePadding = +_;
+	    return legend;
+	  };
+
+	  legend.labels = function(_) {
+	    if (!arguments.length) return labels;
+	    labels = _;
+	    return legend;
+	  };
+
+	  legend.labelAlign = function(_) {
+	    if (!arguments.length) return labelAlign;
+	    if (_ == "start" || _ == "end" || _ == "middle") {
+	      labelAlign = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.labelFormat = function(_) {
+	    if (!arguments.length) return labelFormat;
+	    labelFormat = _;
+	    return legend;
+	  };
+
+	  legend.labelOffset = function(_) {
+	    if (!arguments.length) return labelOffset;
+	    labelOffset = +_;
+	    return legend;
+	  };
+
+	  legend.labelDelimiter = function(_) {
+	    if (!arguments.length) return labelDelimiter;
+	    labelDelimiter = _;
+	    return legend;
+	  };
+
+	  legend.orient = function(_){
+	    if (!arguments.length) return orient;
+	    _ = _.toLowerCase();
+	    if (_ == "horizontal" || _ == "vertical") {
+	      orient = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.ascending = function(_) {
+	    if (!arguments.length) return ascending;
+	    ascending = !!_;
+	    return legend;
+	  };
+
+	  legend.classPrefix = function(_) {
+	    if (!arguments.length) return classPrefix;
+	    classPrefix = _;
+	    return legend;
+	  };
+
+	  legend.title = function(_) {
+	    if (!arguments.length) return title;
+	    title = _;
+	    return legend;
+	  };
+
+	  d3.rebind(legend, legendDispatcher, "on");
+
+	  return legend;
+
+	};
+
+
+/***/ },
+/* 270 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var helper = __webpack_require__(268);
+
+	module.exports = function(){
+
+	  var scale = d3.scale.linear(),
+	    shape = "path",
+	    shapeWidth = 15,
+	    shapeHeight = 15,
+	    shapeRadius = 10,
+	    shapePadding = 5,
+	    cells = [5],
+	    labels = [],
+	    classPrefix = "",
+	    useClass = false,
+	    title = "",
+	    labelFormat = d3.format(".01f"),
+	    labelAlign = "middle",
+	    labelOffset = 10,
+	    labelDelimiter = "to",
+	    orient = "vertical",
+	    ascending = false,
+	    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+	    function legend(svg){
+
+	      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+	        legendG = svg.selectAll('g').data([scale]);
+
+	      legendG.enter().append('g').attr('class', classPrefix + 'legendCells');
+
+	      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+	        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6),
+	        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+	        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+	      //add event handlers
+	      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+	      //remove old shapes
+	      cell.exit().transition().style("opacity", 0).remove();
+
+	      helper.d3_drawShapes(shape, shapes, shapeHeight, shapeWidth, shapeRadius, type.feature);
+	      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+	      // sets placement
+	      var text = cell.select("text"),
+	        shapeSize = shapes[0].map( function(d){ return d.getBBox(); });
+
+	      var maxH = d3.max(shapeSize, function(d){ return d.height; }),
+	      maxW = d3.max(shapeSize, function(d){ return d.width; });
+
+	      var cellTrans,
+	      textTrans,
+	      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+	      //positions cells and text
+	      if (orient === "vertical"){
+	        cellTrans = function(d,i) { return "translate(0, " + (i * (maxH + shapePadding)) + ")"; };
+	        textTrans = function(d,i) { return "translate(" + (maxW + labelOffset) + "," +
+	              (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+	      } else if (orient === "horizontal"){
+	        cellTrans = function(d,i) { return "translate(" + (i * (maxW + shapePadding)) + ",0)"; };
+	        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) + "," +
+	              (maxH + labelOffset ) + ")"; };
+	      }
+
+	      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+	      helper.d3_title(svg, legendG, title, classPrefix);
+	      cell.transition().style("opacity", 1);
+
+	    }
+
+
+	  legend.scale = function(_) {
+	    if (!arguments.length) return scale;
+	    scale = _;
+	    return legend;
+	  };
+
+	  legend.cells = function(_) {
+	    if (!arguments.length) return cells;
+	    if (_.length > 1 || _ >= 2 ){
+	      cells = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.shapePadding = function(_) {
+	    if (!arguments.length) return shapePadding;
+	    shapePadding = +_;
+	    return legend;
+	  };
+
+	  legend.labels = function(_) {
+	    if (!arguments.length) return labels;
+	    labels = _;
+	    return legend;
+	  };
+
+	  legend.labelAlign = function(_) {
+	    if (!arguments.length) return labelAlign;
+	    if (_ == "start" || _ == "end" || _ == "middle") {
+	      labelAlign = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.labelFormat = function(_) {
+	    if (!arguments.length) return labelFormat;
+	    labelFormat = _;
+	    return legend;
+	  };
+
+	  legend.labelOffset = function(_) {
+	    if (!arguments.length) return labelOffset;
+	    labelOffset = +_;
+	    return legend;
+	  };
+
+	  legend.labelDelimiter = function(_) {
+	    if (!arguments.length) return labelDelimiter;
+	    labelDelimiter = _;
+	    return legend;
+	  };
+
+	  legend.orient = function(_){
+	    if (!arguments.length) return orient;
+	    _ = _.toLowerCase();
+	    if (_ == "horizontal" || _ == "vertical") {
+	      orient = _;
+	    }
+	    return legend;
+	  };
+
+	  legend.ascending = function(_) {
+	    if (!arguments.length) return ascending;
+	    ascending = !!_;
+	    return legend;
+	  };
+
+	  legend.classPrefix = function(_) {
+	    if (!arguments.length) return classPrefix;
+	    classPrefix = _;
+	    return legend;
+	  };
+
+	  legend.title = function(_) {
+	    if (!arguments.length) return title;
+	    title = _;
+	    return legend;
+	  };
+
+	  d3.rebind(legend, legendDispatcher, "on");
+
+	  return legend;
+
+	};
+
+
+/***/ },
+/* 271 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Element = __webpack_require__(272)
+	var Window = __webpack_require__(284)
+	var core = __webpack_require__(285)
+	var anim = __webpack_require__(286)
 
 	var ReactFauxDOM = {
 	  Element: Element,
@@ -38310,18 +39068,18 @@
 
 
 /***/ },
-/* 266 */
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1)
-	var styleAttr = __webpack_require__(267)
-	var querySelectorAll = __webpack_require__(268)
-	var camelCase = __webpack_require__(272)
-	var isString = __webpack_require__(273)
-	var isUndefined = __webpack_require__(274)
-	var assign = __webpack_require__(275)
-	var mapValues = __webpack_require__(276)
-	var styleCamelCase = __webpack_require__(277)
+	var styleAttr = __webpack_require__(273)
+	var querySelectorAll = __webpack_require__(274)
+	var camelCase = __webpack_require__(278)
+	var isString = __webpack_require__(279)
+	var isUndefined = __webpack_require__(280)
+	var assign = __webpack_require__(281)
+	var mapValues = __webpack_require__(282)
+	var styleCamelCase = __webpack_require__(283)
 
 	function Element (nodeName, parentNode) {
 	  this.nodeName = nodeName
@@ -38673,7 +39431,7 @@
 
 
 /***/ },
-/* 267 */
+/* 273 */
 /***/ function(module, exports) {
 
 	
@@ -38785,13 +39543,13 @@
 	module.exports.normalize = normalize;
 
 /***/ },
-/* 268 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(269);
+	module.exports = __webpack_require__(275);
 
 /***/ },
-/* 269 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38800,8 +39558,8 @@
 	 * @author yiminghe@gmail.com
 	 */
 
-	var util = __webpack_require__(270);
-	var parser = __webpack_require__(271);
+	var util = __webpack_require__(276);
+	var parser = __webpack_require__(277);
 
 	var EXPANDO_SELECTOR_KEY = '_ks_data_selector_id_',
 	  caches = {},
@@ -39494,7 +40252,7 @@
 	 */
 
 /***/ },
-/* 270 */
+/* 276 */
 /***/ function(module, exports) {
 
 	/**
@@ -39845,7 +40603,7 @@
 	};
 
 /***/ },
-/* 271 */
+/* 277 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -41054,7 +41812,7 @@
 	}
 
 /***/ },
-/* 272 */
+/* 278 */
 /***/ function(module, exports) {
 
 	var hyphenExpression = /\-+([a-z])/gi
@@ -41077,7 +41835,7 @@
 
 
 /***/ },
-/* 273 */
+/* 279 */
 /***/ function(module, exports) {
 
 	function isString (value) {
@@ -41088,7 +41846,7 @@
 
 
 /***/ },
-/* 274 */
+/* 280 */
 /***/ function(module, exports) {
 
 	function isUndefined (value) {
@@ -41099,7 +41857,7 @@
 
 
 /***/ },
-/* 275 */
+/* 281 */
 /***/ function(module, exports) {
 
 	function assign (dest) {
@@ -41121,7 +41879,7 @@
 
 
 /***/ },
-/* 276 */
+/* 282 */
 /***/ function(module, exports) {
 
 	function mapValues (source, fn) {
@@ -41140,10 +41898,10 @@
 
 
 /***/ },
-/* 277 */
+/* 283 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var camelCase = __webpack_require__(272)
+	var camelCase = __webpack_require__(278)
 
 	function styleCamelCase (name) {
 	  var camel = camelCase(name)
@@ -41166,7 +41924,7 @@
 
 
 /***/ },
-/* 278 */
+/* 284 */
 /***/ function(module, exports) {
 
 	var Window = {
@@ -41181,11 +41939,11 @@
 
 
 /***/ },
-/* 279 */
+/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Element = __webpack_require__(266)
-	var mapValues = __webpack_require__(276)
+	var Element = __webpack_require__(272)
+	var mapValues = __webpack_require__(282)
 
 	var mixin = {
 	  componentWillMount: function () {
@@ -41209,7 +41967,7 @@
 
 
 /***/ },
-/* 280 */
+/* 286 */
 /***/ function(module, exports) {
 
 	var anim = {
@@ -41241,7 +41999,7 @@
 
 
 /***/ },
-/* 281 */
+/* 287 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41257,7 +42015,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var React = __webpack_require__(1);
-	var onElementResize = __webpack_require__(282);
+	var onElementResize = __webpack_require__(288);
 
 	var defaultContainerStyle = {
 	  width: '100%',
@@ -41463,7 +42221,7 @@
 
 
 /***/ },
-/* 282 */
+/* 288 */
 /***/ function(module, exports) {
 
 	var exports = function exports(element, fn) {
@@ -41561,6 +42319,316 @@
 
 	module.exports = (typeof window === 'undefined') ? exports : exports.bind(window)
 
+
+/***/ },
+/* 289 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(264);
+
+	var d3 = _interopRequireWildcard(_d);
+
+	var _labled_arc = __webpack_require__(290);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var PieChart = function (_React$Component) {
+	  _inherits(PieChart, _React$Component);
+
+	  /*
+	  required props
+	    x
+	    y
+	    outerRadius
+	    innerRadius
+	    data (example):
+	      [
+	        {value: 92, label: 'Code lines'},
+	        {value: 34, label: 'Empty lines'}
+	      ]
+	  */
+
+	  function PieChart() {
+	    _classCallCheck(this, PieChart);
+
+	    var _this = _possibleConstructorReturn(this, (PieChart.__proto__ || Object.getPrototypeOf(PieChart)).call(this));
+
+	    _this.pie = d3.layout.pie().value(function (d) {
+	      return d.value;
+	    });
+	    _this.colors = d3.scale.category10();
+	    return _this;
+	  }
+
+	  _createClass(PieChart, [{
+	    key: 'getData',
+	    value: function getData() {
+
+	      var poll = this.props.data;
+	      var totalVotes = poll.options.reduce(function (total, option, i) {
+	        return total += option.votes;
+	      }, 0);
+
+	      var data = totalVotes > 0 ? poll.options : [{ name: "no votes yet" }];
+
+	      return data;
+	    }
+	  }, {
+	    key: 'arcGenerator',
+	    value: function arcGenerator(d, i) {
+	      console.log(d);
+	      console.log(i);
+	      console.log('arc-' + i);
+	      console.log(this.props.innerRadius);
+	      console.log(this.props.outerRadius);
+	      console.log(this.colors(i));
+
+	      return _react2.default.createElement(_labled_arc.LabeledArc, { key: 'arc-' + i,
+	        data: d,
+	        innerRadius: this.props.innerRadius,
+	        outerRadius: this.props.outerRadius,
+	        color: this.colors(i) });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      var pie = this.pie(this.props.data),
+	          translate = 'translate(' + this.props.x + ', ' + this.props.y + ')';
+
+	      return _react2.default.createElement(
+	        'g',
+	        { transform: translate },
+	        pie.map(function (d, i) {
+	          return _this2.arcGenerator(d, i);
+	        })
+	      );
+	    }
+	  }]);
+
+	  return PieChart;
+	}(_react2.default.Component);
+
+	exports.default = PieChart;
+
+/***/ },
+/* 290 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.LabeledArc = undefined;
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _arc = __webpack_require__(291);
+
+	var _arc2 = _interopRequireDefault(_arc);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LabeledArc = function (_Arc) {
+	    _inherits(LabeledArc, _Arc);
+
+	    function LabeledArc() {
+	        _classCallCheck(this, LabeledArc);
+
+	        return _possibleConstructorReturn(this, (LabeledArc.__proto__ || Object.getPrototypeOf(LabeledArc)).apply(this, arguments));
+	    }
+
+	    _createClass(LabeledArc, [{
+	        key: 'render',
+	        value: function render() {
+	            var _arc$centroid = this.arc.centroid(this.props.data),
+	                _arc$centroid2 = _slicedToArray(_arc$centroid, 2),
+	                labelX = _arc$centroid2[0],
+	                labelY = _arc$centroid2[1],
+	                labelTranslate = 'translate(' + labelX + ', ' + labelY + ')';
+
+	            return _react2.default.createElement(
+	                'g',
+	                null,
+	                _get(LabeledArc.prototype.__proto__ || Object.getPrototypeOf(LabeledArc.prototype), 'render', this).call(this),
+	                _react2.default.createElement(
+	                    'text',
+	                    { transform: labelTranslate,
+	                        textAnchor: 'middle' },
+	                    this.props.data.data.label
+	                )
+	            );
+	        }
+	    }]);
+
+	    return LabeledArc;
+	}(_arc2.default);
+
+	exports.LabeledArc = LabeledArc;
+
+/***/ },
+/* 291 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(264);
+
+	var _d2 = _interopRequireDefault(_d);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Arc = function (_Component) {
+	    _inherits(Arc, _Component);
+
+	    function Arc() {
+	        _classCallCheck(this, Arc);
+
+	        var _this = _possibleConstructorReturn(this, (Arc.__proto__ || Object.getPrototypeOf(Arc)).call(this));
+
+	        _this.arc = _d2.default.svg.arc();
+	        return _this;
+	    }
+
+	    _createClass(Arc, [{
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            this.updateD3(this.props);
+	        }
+	    }, {
+	        key: 'componentWillReceiveProps',
+	        value: function componentWillReceiveProps(newProps) {
+	            this.updateD3(newProps);
+	        }
+	    }, {
+	        key: 'updateD3',
+	        value: function updateD3(newProps) {
+	            this.arc.innerRadius(newProps.innerRadius);
+	            this.arc.outerRadius(newProps.outerRadius);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement('path', { d: this.arc(this.props.data),
+	                style: { fill: this.props.color } });
+	        }
+	    }]);
+
+	    return Arc;
+	}(_react.Component);
+
+	exports.default = Arc;
+
+/***/ },
+/* 292 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(264);
+
+	var d3 = _interopRequireWildcard(_d);
+
+	var _reactDimensions = __webpack_require__(287);
+
+	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Tooltip = function (_React$Component) {
+	  _inherits(Tooltip, _React$Component);
+
+	  function Tooltip() {
+	    _classCallCheck(this, Tooltip);
+
+	    return _possibleConstructorReturn(this, (Tooltip.__proto__ || Object.getPrototypeOf(Tooltip)).apply(this, arguments));
+	  }
+
+	  _createClass(Tooltip, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        ' hello from tooltip: '
+	      );
+	    }
+	  }]);
+
+	  return Tooltip;
+	}(_react2.default.Component);
+
+	exports.default = Tooltip;
 
 /***/ }
 /******/ ]);
