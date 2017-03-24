@@ -1,6 +1,6 @@
 import React from 'react'
 import * as d3 from 'd3'
-import LabeledArc from './arc'
+import {LabeledArc} from './labled_arc'
 
 class PieChart extends React.Component {
 
@@ -13,7 +13,7 @@ class PieChart extends React.Component {
     innerRadius
     data (example):
       [
-        {value: 92-34, label: 'Code lines'},
+        {value: 92, label: 'Code lines'},
         {value: 34, label: 'Empty lines'}
       ]
   */
@@ -41,20 +41,27 @@ class PieChart extends React.Component {
   }
 
   arcGenerator(d, i) {
+    console.log(d)
+    console.log(i)
+    console.log(`arc-${i}`)
+    console.log(this.props.innerRadius)
+    console.log(this.props.outerRadius)
+    console.log(this.colors(i))
+
+
     return (
-    <LabeledArc key={`arc-${i}`}
-      data={d}
-      innerRadius={this.props.innerRadius}
-      outerRadius={this.props.outerRadius}
-      color={this.colors(i)} />
+      <LabeledArc key={`arc-${i}`}
+        data={d}
+        innerRadius={this.props.innerRadius}
+        outerRadius={this.props.outerRadius}
+        color={this.colors(i)} />
     );
   }
 
   render() {
-    console.log("rendering pieChart");
-    console.log(this.props)
+
     let pie = this.pie(this.props.data),
-    translate = `translate(${this.props.x}, ${this.props.y})`;
+      translate = `translate(${this.props.x}, ${this.props.y})`;
 
     return (
       <g transform={translate}>

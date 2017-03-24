@@ -1,5 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
+import * as legend from 'd3-svg-legend';
+
 // import {event as currentEvent} from 'd3-selection';
 import {event as currentEvent} from 'd3';
 import Faux from 'react-faux-dom';
@@ -7,7 +9,6 @@ import Dimensions from 'react-dimensions';
 
 import PieChart from "./pie_chart";
 import Tooltip from "./tooltip";
-
 
 const Show = React.createClass({
   mixins: [
@@ -124,30 +125,33 @@ const Show = React.createClass({
   renderMenu(){
 
     if ( this.state.poll ) {
+      
       return (
-        <form onSubmit={this.handleSubmit} >
-          <div className="form-horizontal">
+        <div>
+          <form onSubmit={this.handleSubmit} >
+            <div className="form-horizontal">
 
-            <select
-              className="selectpicker col-sm-12"
-              name="pollOption"
-              value={this.state.pollOption}
-              onChange={this.handleChange}
-            >
-            <option selected className="text-center">Vote in this poll</option>
-              {this.state.poll.options.map(this.eachOption)}
-            </select>
-          </div>
+              <select
+                className="selectpicker col-sm-12"
+                name="pollOption"
+                value={this.state.pollOption}
+                onChange={this.handleChange}
+              >
+              <option selected className="text-center">Vote in this poll</option>
+                {this.state.poll.options.map(this.eachOption)}
+              </select>
+            </div>
 
-          <input
-            className={"btn btn-info" + this.state.pollOption ? "" : "disabled"}
-            type="submit" value="Submit" />
-        </form>
+            <input
+              className={"btn btn-info" + this.state.pollOption ? "" : "disabled"}
+              type="submit" value="Submit" />
+          </form>
+
+        </div>
       )
     } else {
+
       return (
-
-
         <form >
           <div className="form-horizontal">
             <select
@@ -166,18 +170,33 @@ const Show = React.createClass({
 
   },
 
-  renderPie() {
+  renderPie(height, width, radius) {
     if (this.state.pieData) {
       return (
-        <PieChart
-          x={100} y={100} outerRadius={100} innerRadius={50}
-          data={this.state.pieData}
-        />
+
+          <PieChart
+            x={width/2} y={height/2} outerRadius={radius} innerRadius={radius/2}
+            data={this.state.pieData}
+          />
       )
     } else {
       return "Loading..."
     }
   },
+
+  // renderLegend() {
+  //   if (this.state.pieData) {
+  //     return (
+  //
+  //         <Legend
+  //           x={100} y={100} width={50} height={50}
+  //           data={this.state.pieData}
+  //         />
+  //     )
+  //   } else {
+  //     return "Loading..."
+  //   }
+  // }
 
   render () {
     var width = 0.4 * this.props.containerWidth,
@@ -190,7 +209,7 @@ const Show = React.createClass({
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
               <svg height={height} width={width}>
-                {this.renderPie()}
+                {this.renderPie(height, width, radius)}
               </svg>
             </div>
 

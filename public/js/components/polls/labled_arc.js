@@ -1,3 +1,4 @@
+import React from 'react'
 import Arc from './arc'
 
 class LabeledArc extends Arc {
