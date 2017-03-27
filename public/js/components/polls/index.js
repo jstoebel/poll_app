@@ -41,11 +41,6 @@ class Index extends React.Component {
       <div id="poll-index">
         <h1>Polls</h1>
 
-        <Link to="/new">
-          <div className="btn btn-default">
-            New
-          </div>
-        </Link>
         { this.state.polls.map(this.eachPoll) }
 
         { this.props.children}

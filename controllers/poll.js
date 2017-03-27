@@ -78,6 +78,20 @@ exports.vote = function(req, res) {
 
 }
 
+exports.indexAdmin = function(req, res) {
+
+  models.Poll.find({user: req.user._id}, function(err, polls){
+
+    if (err) {
+      throw err;
+    }
+
+    res.json({polls: polls})
+
+  })
+
+}
+
 exports.edit = function(req, res) {
   res.end("hello from edit")
 };
@@ -87,7 +101,14 @@ exports.update = function(req, res) {
 };
 
 exports.destroy = function(req, res) {
-  // destroy all polls
+  // destroy a poll
+  console.log("hello from destroy");
+  console.log(params)
+
+}
+
+exports.destroyAll = function(req, res) {
+  // destroy ALL POLLS
 
   models.Poll.remove({}, function(err){
     if (err) {

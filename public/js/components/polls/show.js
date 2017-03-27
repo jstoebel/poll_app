@@ -1,20 +1,11 @@
 import React from 'react';
 import * as d3 from 'd3';
-import * as legend from 'd3-svg-legend';
-
-// import {event as currentEvent} from 'd3-selection';
-import {event as currentEvent} from 'd3';
-import Faux from 'react-faux-dom';
 import Dimensions from 'react-dimensions';
+import $ from 'jquery';
 
 import PieChart from "./pie_chart";
-import Tooltip from "./tooltip";
 
 const Show = React.createClass({
-  mixins: [
-    Faux.mixins.core,
-    Faux.mixins.anim
-  ],
 
   getInitialState () {
     return {
@@ -125,7 +116,7 @@ const Show = React.createClass({
   renderMenu(){
 
     if ( this.state.poll ) {
-      
+
       return (
         <div>
           <form onSubmit={this.handleSubmit} >
