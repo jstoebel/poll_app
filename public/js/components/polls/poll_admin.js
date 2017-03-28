@@ -15,6 +15,9 @@ class PollAdmin extends Component {
       this.render = this.render.bind(this)
       this.eachPoll = this.eachPoll.bind(this)
 
+      this.handleDestroy = this.handleDestroy.bind(this)
+      this.handleShare = this.handleShare.bind(this)
+
     }
 
     componentDidMount() {
@@ -52,16 +55,16 @@ class PollAdmin extends Component {
       console.log("error fetching poll");
     }
 
-    handleDestroy() {
+    handleShare(event, id) {
+      event.preventDefault();
+      console.log("a poll was shared: " + id);
+
+    }
+
+    handleDestroy(event, id) {
 
       event.preventDefault();
-
-      const target = event.target;
-      console.log(target);
-      // const value = target.value;
-      // const name = target.name;
-
-      console.log('A poll was asked to be removed: ' + this.state.pollName);
+      console.log('A poll was asked to be removed: ' + id);
 
     }
 
@@ -72,6 +75,8 @@ class PollAdmin extends Component {
     _destroyError() {
 
     }
+
+
 
     eachPoll (poll, i) {
       return (
@@ -84,21 +89,16 @@ class PollAdmin extends Component {
             </Link>
           </div>
 
-          <div className="col-xs-2">
-            
-          </div>
-
-          <div className="col-xs-6 col-md-2">
-            <div className="btn btn-info btn-block">
-              Delete
+          <div className="col-xs-1">
+            <div className="btn btn-info" onClick={(e) => this.handleShare(e, poll._id)}>
+              <i className="fa fa-share" aria-hidden="true"></i>
             </div>
           </div>
 
-          <div className="col-xs-6 col-md-2">
-            <form  onSubmit={this.handleDestroy}>
-              <input type="hidden" name="pollId" value={poll._id} />
-              <input className="btn btn-info btn-block"  type="submit" value="Submit" />
-            </form>
+          <div className="col-xs-1">
+            <div className="btn btn-danger" onClick={(e) => this.handleDestroy(e, poll._id)}>
+              <i className="fa fa-trash" aria-hidden="true"></i>
+            </div>
           </div>
 
         </div>

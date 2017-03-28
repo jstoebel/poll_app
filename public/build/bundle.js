@@ -49083,6 +49083,9 @@
 	    _this2.render = _this2.render.bind(_this2);
 	    _this2.eachPoll = _this2.eachPoll.bind(_this2);
 
+	    _this2.handleDestroy = _this2.handleDestroy.bind(_this2);
+	    _this2.handleShare = _this2.handleShare.bind(_this2);
+
 	    return _this2;
 	  }
 
@@ -49123,17 +49126,17 @@
 	      console.log("error fetching poll");
 	    }
 	  }, {
+	    key: 'handleShare',
+	    value: function handleShare(event, id) {
+	      event.preventDefault();
+	      console.log("a poll was shared: " + id);
+	    }
+	  }, {
 	    key: 'handleDestroy',
-	    value: function handleDestroy() {
+	    value: function handleDestroy(event, id) {
 
 	      event.preventDefault();
-
-	      var target = event.target;
-	      console.log(target);
-	      // const value = target.value;
-	      // const name = target.name;
-
-	      console.log('A poll was asked to be removed: ' + this.state.pollName);
+	      console.log('A poll was asked to be removed: ' + id);
 	    }
 	  }, {
 	    key: '_destroySuccess',
@@ -49146,12 +49149,14 @@
 	  }, {
 	    key: 'eachPoll',
 	    value: function eachPoll(poll, i) {
+	      var _this3 = this;
+
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'row', key: poll._id },
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'col-xs-12 col-md-8' },
+	          { className: 'col-xs-10' },
 	          _react2.default.createElement(
 	            _reactRouter.Link,
 	            { to: "/poll/" + poll._id },
@@ -49164,21 +49169,24 @@
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'col-xs-6 col-md-2' },
+	          { className: 'col-xs-1' },
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'btn btn-info btn-block' },
-	            'Delete'
+	            { className: 'btn btn-info', onClick: function onClick(e) {
+	                return _this3.handleShare(e, poll._id);
+	              } },
+	            _react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' })
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'col-xs-6 col-md-2' },
+	          { className: 'col-xs-1' },
 	          _react2.default.createElement(
-	            'form',
-	            { onSubmit: this.handleDestroy },
-	            _react2.default.createElement('input', { type: 'hidden', name: 'pollId', value: poll._id }),
-	            _react2.default.createElement('input', { className: 'btn btn-info btn-block', type: 'submit', value: 'Submit' })
+	            'div',
+	            { className: 'btn btn-danger', onClick: function onClick(e) {
+	                return _this3.handleDestroy(e, poll._id);
+	              } },
+	            _react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' })
 	          )
 	        )
 	      );
