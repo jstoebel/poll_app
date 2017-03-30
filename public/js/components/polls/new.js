@@ -52,9 +52,8 @@ class New extends React.Component {
         flashes : newFlashes
       })
     } else {
-        // TODO: redirect to login  
+        // TODO: redirect to login
     }
-
 
   }
 

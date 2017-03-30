@@ -27,12 +27,12 @@ exports.create = function(req, res) {
   var poll = new models.Poll(params);
 
   req
-  .body
-  .options
-  .split("\n")
-  .forEach(function(opt){
-    poll.options.push({name: opt, votes: 0})
-  });
+    .body
+    .options
+    .split("\n")
+    .forEach(function(opt){
+      poll.options.push({name: opt, votes: 0})
+    });
 
   poll.save(function(err, poll){
     if (err){
@@ -43,10 +43,7 @@ exports.create = function(req, res) {
       res.json({msg: `Successfully created poll ${params.name}`, success: true })
 
     }
-
-
   })
-
 };
 
 exports.show = function(req, res) {
@@ -102,8 +99,35 @@ exports.update = function(req, res) {
 
 exports.destroy = function(req, res) {
   // destroy a poll
-  console.log("hello from destroy");
-  console.log(params)
+
+  // find the poll
+
+  models.Poll.find(req.body, function(err, poll){
+    if (err){
+      req.status(204).json({msg: "Couldn't find poll to delete"})
+    }
+
+    // authorize permission to remove
+    if (poll._id = req.user._id){
+
+      models.Poll.remove(req.body, function(err) {
+        if (err) {
+          res.status(204).json({msg: "Couldn't delete record"})
+        } else {
+          res.status(200).json({msg: "Successfully removed poll", success: true });
+        }
+
+      })
+
+    } else {
+      // not authorized to delete
+      res.status(403).json({msg: "Access denied-that poll doesn't belong to you."});
+    }
+
+
+  }) // find
+
+
 
 }
 

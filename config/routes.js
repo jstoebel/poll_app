@@ -40,7 +40,6 @@ router.post("/api/polls/vote", passportConfig.isAuthenticated, controllers.poll.
 router.get('/api/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
 router.put('/api/:pollId', passportConfig.isAuthenticated, controllers.poll.update);
 
-
 router.delete('/api/poll/destroy', passportConfig.isAuthenticated, controllers.poll.destroy)
 router.delete('/api/poll/destroyAll', controllers.poll.destroyAll);
 

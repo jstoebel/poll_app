@@ -66,6 +66,14 @@ class PollAdmin extends Component {
       event.preventDefault();
       console.log('A poll was asked to be removed: ' + id);
 
+      return $.ajax({
+        url: '/api/poll/destroy',
+        type: 'DELETE',
+        data: {
+          _id: id
+        }
+      })
+
     }
 
     _destroySuccess() {
