@@ -11,6 +11,7 @@ const Show = React.createClass({
     return {
       chart: "loading...",
       pollOption: "",
+      newOption: "",
       poll: { options: []},  // mock this object until the real one is loaded in
       tooltip: {
         x: 0,
@@ -20,6 +21,14 @@ const Show = React.createClass({
   },
 
   componentWillMount() {
+
+  },
+
+  componentDidMount () {
+    var xhr = this._getRecord();
+    // xhr.done(this._getSuccess)
+    xhr.done(this._getSuccess)
+      .fail(this._getError)
 
   },
 
@@ -33,6 +42,7 @@ const Show = React.createClass({
   _getSuccess(resp) {
     console.log("get success");
     var poll = resp;
+    console.log(poll);
     if (poll) {
       var totalVotes = poll.options.reduce(function(total, option, i){
         return total += option.votes
@@ -82,8 +92,12 @@ const Show = React.createClass({
   },
 
   _submitSuccess(resp) {
-    console.log("submit success!")
+    console.log('A poll was voted on: ' + this.state.pollOption);
     console.log(resp);
+
+    var xhr = this._getRecord();
+    xhr.done(this._getSuccess)
+      .fail(this._getError)
   },
 
   _submitError(error) {
@@ -91,12 +105,40 @@ const Show = React.createClass({
     console.log(error);
   },
 
-  componentDidMount () {
-    var xhr = this._getRecord();
-    // xhr.done(this._getSuccess)
-    xhr.done(this._getSuccess)
-      .fail(this._getError)
 
+  _submitOption() {
+    return $.ajax({
+      url: '/api/polls/option',
+      type: 'POST',
+      data: {
+        pollId: this.state.poll._id,
+        optionName: this.state.newOption,
+      }
+    })
+  },
+
+  _optionSuccess(resp) {
+    console.log("here is the response");
+    console.log(resp);
+    var poll = resp.poll;
+    var option = poll.options[poll.options.length - 1];
+
+    var xhr = $.ajax({
+      url: '/api/polls/vote',
+      type: 'POST',
+      data: {
+        pollId: poll._id,
+        optionId: option._id
+      }
+    })
+
+    xhr.done(this._submitSuccess)
+      .fail(this._submitError)
+
+  },
+
+  _optionError() {
+    console.log("error adding a new option");
   },
 
   handleChange(event) {
@@ -111,11 +153,25 @@ const Show = React.createClass({
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log('A poll was voted on: ' + this.state.pollOption);
 
-    var xhr = this._submitRecord();
-    xhr.done(this._submitSuccess)
-      .fail(this._submitError)
+    // if newOption is given, try to create it, then upvote
+    // otherwise upvote based on optionId
+    // { pollId: ,
+    // optionId: ,
+    // newOption:
+
+    if (this.state.newOption) {
+      // a new option was given. attempt to add it to the poll then increment
+      var xhr = this._submitOption();
+      xhr.done(this._optionSuccess)
+        .fail(this._optionError);
+    } else {
+      // no new option was given
+      var xhr = this._submitRecord();
+      xhr.done(this._submitSuccess)
+        .fail(this._submitError)
+    }
+
   },
 
   eachOption(option, i) {
@@ -148,6 +204,12 @@ const Show = React.createClass({
             <input
               className={"btn btn-info" + this.state.pollOption ? "" : "disabled"}
               type="submit" value="Submit" />
+
+            <input
+              name="newOption"
+              type="text"
+              value={this.state.newOption}
+              onChange={this.handleChange} />
           </form>
 
         </div>
@@ -194,7 +256,7 @@ const Show = React.createClass({
       radius = 0.5 * width
     return (
       <div>
-        <h2 className="text-center">{this.state.poll.name}</h2>
+        <h1>{this.state.poll.name}</h1>
         <div className="container-fluid">
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>

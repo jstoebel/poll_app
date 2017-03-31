@@ -53,8 +53,7 @@ exports.show = function(req, res) {
 };
 
 exports.vote = function(req, res) {
-
-  console.log(req.body);
+  // expected params
 
   models.Poll.findOneAndUpdate(
     { "_id": req.body.pollId, "options._id": req.body.optionId },
@@ -127,7 +126,31 @@ exports.destroy = function(req, res) {
 
   }) // find
 
+}
 
+exports.addOption = function(req, res) {
+  // add an option to a poll and return the poll
+
+  models.Poll.findOne({_id: req.body.pollId}, function(err, poll){
+
+
+    if (err) {
+      throw err;
+    }
+
+    poll.options.push({name: req.body.optionName, votes: 0})
+
+    poll.save(function(err, poll){
+      if (err){
+          console.log(err);
+          res.status(400).json({msg: "Failed to add option to poll"})
+      } else {
+        // next make the options
+        res.json({poll: poll, msg: "Successfully updated poll", success: true })
+
+      }
+    })
+  })
 
 }
 

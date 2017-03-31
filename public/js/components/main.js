@@ -6,7 +6,7 @@ class Main extends Component {
         return(
             <div>
                 <nav className="navbar navbar-default">
-                    <div className="container-fluid">
+                    <div className="container">
                         <div className="navbar-header">
                             <a className="navbar-brand" href="#">Home</a>
                             <a className="navbar-brand" href="#/new">New Poll</a>

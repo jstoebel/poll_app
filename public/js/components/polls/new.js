@@ -51,7 +51,8 @@ class New extends React.Component {
     if (resp.success) {
 
       // redirect to poll page
-      const path = `/poll/${resp.id}`;
+      const path = `poll/${resp.id}`;
+      // this.props.history.push(path);
       hashHistory.push(path);
       // newFlashes.push({msg: resp.msg, success: true})
       // this.setState({

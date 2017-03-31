@@ -19,6 +19,8 @@ class PollAdmin extends Component {
       this.handleDestroy = this.handleDestroy.bind(this)
       this.handleShare = this.handleShare.bind(this)
 
+      this._destroySuccess = this._destroySuccess.bind(this)
+
     }
 
     componentDidMount() {
@@ -34,7 +36,8 @@ class PollAdmin extends Component {
     }
 
     _getSuccess(resp) {
-      // successfully pulled the record
+      // successfully pulled the records
+      console.log(resp);
 
       this.setState({
         polls: resp.polls
@@ -61,22 +64,38 @@ class PollAdmin extends Component {
       event.preventDefault();
       console.log('A poll was asked to be removed: ' + id);
 
-      return $.ajax({
+      var xhr = $.ajax({
         url: '/api/poll/destroy',
         type: 'DELETE',
         data: {
           _id: id
         }
       })
-
+      xhr.done(this._destroySuccess)
+        .fail(this._destroyError)
     }
 
     _destroySuccess() {
       // remove the poll from state and rerender
+
+      console.log("destroy success");
+      var xhr = $.ajax({
+        url: '/api/polls/admin',
+        type: 'GET'
+      })
+      console.log("got here");
+
+      var _this = this;
+      xhr.done(function(resp){
+        console.log("callback!");
+        _this.setState({
+          polls: resp.polls
+        })
+      })
     }
 
     _destroyError() {
-
+      console.log("destroy error");
     }
 
 
@@ -93,15 +112,16 @@ class PollAdmin extends Component {
             </Link>
           </div>
 
-          <div className="col-xs-1">
-            <div className="btn btn-info" onClick={(e) => this.handleShare(e, poll._id)}>
-              <i className="fa fa-share" ></i>
-            </div>
-          </div>
+          <div className="col-xs-2">
+            <div className="btn-group" role="group" aria-label="share and destroy">
 
-          <div className="col-xs-1">
-            <div className="btn btn-danger" onClick={(e) => this.handleDestroy(e, poll._id)}>
-              <i className="fa fa-trash" aria-hidden="true"></i>
+              <div type="button" className="btn btn-info btn-secondary" onClick={(e) => this.handleShare(e, poll._id)} aria-label="share">
+                <i className="fa fa-share" ></i>
+              </div>
+
+              <div className="btn btn-danger btn-secondary" onClick={(e) => this.handleDestroy(e, poll._id)} aria-label="destroy">
+                <i className="fa fa-trash" aria-hidden="true"></i>
+              </div>
             </div>
           </div>
 
@@ -112,6 +132,7 @@ class PollAdmin extends Component {
     render() {
       return (
         <div>
+        <h1> My Polls </h1>
           {this.state.polls.map(this.eachPoll)}
         </div>
       );

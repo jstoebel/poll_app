@@ -26625,7 +26625,7 @@
 	                    { className: 'navbar navbar-default' },
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'container-fluid' },
+	                        { className: 'container' },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'navbar-header' },
@@ -38570,7 +38570,8 @@
 	      if (resp.success) {
 
 	        // redirect to poll page
-	        var path = '/poll/' + resp.id;
+	        var path = 'poll/' + resp.id;
+	        // this.props.history.push(path);
 	        _reactRouter.hashHistory.push(path);
 	        // newFlashes.push({msg: resp.msg, success: true})
 	        // this.setState({
@@ -38731,6 +38732,7 @@
 	    return {
 	      chart: "loading...",
 	      pollOption: "",
+	      newOption: "",
 	      poll: { options: [] }, // mock this object until the real one is loaded in
 	      tooltip: {
 	        x: 0,
@@ -38739,6 +38741,11 @@
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {},
+	  componentDidMount: function componentDidMount() {
+	    var xhr = this._getRecord();
+	    // xhr.done(this._getSuccess)
+	    xhr.done(this._getSuccess).fail(this._getError);
+	  },
 	  _getRecord: function _getRecord() {
 	    return _jquery2.default.ajax({
 	      url: '/api/polls/' + this.props.params.pollId,
@@ -38748,6 +38755,7 @@
 	  _getSuccess: function _getSuccess(resp) {
 	    console.log("get success");
 	    var poll = resp;
+	    console.log(poll);
 	    if (poll) {
 	      var totalVotes = poll.options.reduce(function (total, option, i) {
 	        return total += option.votes;
@@ -38792,17 +38800,45 @@
 	    });
 	  },
 	  _submitSuccess: function _submitSuccess(resp) {
-	    console.log("submit success!");
+	    console.log('A poll was voted on: ' + this.state.pollOption);
 	    console.log(resp);
+
+	    var xhr = this._getRecord();
+	    xhr.done(this._getSuccess).fail(this._getError);
 	  },
 	  _submitError: function _submitError(error) {
 	    console.log("submit error!");
 	    console.log(error);
 	  },
-	  componentDidMount: function componentDidMount() {
-	    var xhr = this._getRecord();
-	    // xhr.done(this._getSuccess)
-	    xhr.done(this._getSuccess).fail(this._getError);
+	  _submitOption: function _submitOption() {
+	    return _jquery2.default.ajax({
+	      url: '/api/polls/option',
+	      type: 'POST',
+	      data: {
+	        pollId: this.state.poll._id,
+	        optionName: this.state.newOption
+	      }
+	    });
+	  },
+	  _optionSuccess: function _optionSuccess(resp) {
+	    console.log("here is the response");
+	    console.log(resp);
+	    var poll = resp.poll;
+	    var option = poll.options[poll.options.length - 1];
+
+	    var xhr = _jquery2.default.ajax({
+	      url: '/api/polls/vote',
+	      type: 'POST',
+	      data: {
+	        pollId: poll._id,
+	        optionId: option._id
+	      }
+	    });
+
+	    xhr.done(this._submitSuccess).fail(this._submitError);
+	  },
+	  _optionError: function _optionError() {
+	    console.log("error adding a new option");
 	  },
 	  handleChange: function handleChange(event) {
 	    // handle changing state of fields
@@ -38814,10 +38850,22 @@
 	  },
 	  handleSubmit: function handleSubmit(event) {
 	    event.preventDefault();
-	    console.log('A poll was voted on: ' + this.state.pollOption);
 
-	    var xhr = this._submitRecord();
-	    xhr.done(this._submitSuccess).fail(this._submitError);
+	    // if newOption is given, try to create it, then upvote
+	    // otherwise upvote based on optionId
+	    // { pollId: ,
+	    // optionId: ,
+	    // newOption:
+
+	    if (this.state.newOption) {
+	      // a new option was given. attempt to add it to the poll then increment
+	      var xhr = this._submitOption();
+	      xhr.done(this._optionSuccess).fail(this._optionError);
+	    } else {
+	      // no new option was given
+	      var xhr = this._submitRecord();
+	      xhr.done(this._submitSuccess).fail(this._submitError);
+	    }
 	  },
 	  eachOption: function eachOption(option, i) {
 	    return _react2.default.createElement(
@@ -38859,7 +38907,12 @@
 	          ),
 	          _react2.default.createElement('input', {
 	            className:  true ? "" : "disabled",
-	            type: 'submit', value: 'Submit' })
+	            type: 'submit', value: 'Submit' }),
+	          _react2.default.createElement('input', {
+	            name: 'newOption',
+	            type: 'text',
+	            value: this.state.newOption,
+	            onChange: this.handleChange })
 	        )
 	      );
 	    } else {
@@ -38913,8 +38966,8 @@
 	      'div',
 	      null,
 	      _react2.default.createElement(
-	        'h2',
-	        { className: 'text-center' },
+	        'h1',
+	        null,
 	        this.state.poll.name
 	      ),
 	      _react2.default.createElement(
@@ -49117,6 +49170,8 @@
 	    _this2.handleDestroy = _this2.handleDestroy.bind(_this2);
 	    _this2.handleShare = _this2.handleShare.bind(_this2);
 
+	    _this2._destroySuccess = _this2._destroySuccess.bind(_this2);
+
 	    return _this2;
 	  }
 
@@ -49135,7 +49190,8 @@
 	  }, {
 	    key: '_getSuccess',
 	    value: function _getSuccess(resp) {
-	      // successfully pulled the record
+	      // successfully pulled the records
+	      console.log(resp);
 
 	      this.setState({
 	        polls: resp.polls
@@ -49164,22 +49220,40 @@
 	      event.preventDefault();
 	      console.log('A poll was asked to be removed: ' + id);
 
-	      return _jquery2.default.ajax({
+	      var xhr = _jquery2.default.ajax({
 	        url: '/api/poll/destroy',
 	        type: 'DELETE',
 	        data: {
 	          _id: id
 	        }
 	      });
+	      xhr.done(this._destroySuccess).fail(this._destroyError);
 	    }
 	  }, {
 	    key: '_destroySuccess',
 	    value: function _destroySuccess() {
 	      // remove the poll from state and rerender
+
+	      console.log("destroy success");
+	      var xhr = _jquery2.default.ajax({
+	        url: '/api/polls/admin',
+	        type: 'GET'
+	      });
+	      console.log("got here");
+
+	      var _this = this;
+	      xhr.done(function (resp) {
+	        console.log("callback!");
+	        _this.setState({
+	          polls: resp.polls
+	        });
+	      });
 	    }
 	  }, {
 	    key: '_destroyError',
-	    value: function _destroyError() {}
+	    value: function _destroyError() {
+	      console.log("destroy error");
+	    }
 	  }, {
 	    key: 'eachPoll',
 	    value: function eachPoll(poll, i) {
@@ -49203,24 +49277,24 @@
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'col-xs-1' },
+	          { className: 'col-xs-2' },
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'btn btn-info', onClick: function onClick(e) {
-	                return _this3.handleShare(e, poll._id);
-	              } },
-	            _react2.default.createElement('i', { className: 'fa fa-share' })
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'col-xs-1' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'btn btn-danger', onClick: function onClick(e) {
-	                return _this3.handleDestroy(e, poll._id);
-	              } },
-	            _react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' })
+	            { className: 'btn-group', role: 'group', 'aria-label': 'share and destroy' },
+	            _react2.default.createElement(
+	              'div',
+	              { type: 'button', className: 'btn btn-info btn-secondary', onClick: function onClick(e) {
+	                  return _this3.handleShare(e, poll._id);
+	                }, 'aria-label': 'share' },
+	              _react2.default.createElement('i', { className: 'fa fa-share' })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'btn btn-danger btn-secondary', onClick: function onClick(e) {
+	                  return _this3.handleDestroy(e, poll._id);
+	                }, 'aria-label': 'destroy' },
+	              _react2.default.createElement('i', { className: 'fa fa-trash', 'aria-hidden': 'true' })
+	            )
 	          )
 	        )
 	      );
@@ -49231,6 +49305,11 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          ' My Polls '
+	        ),
 	        this.state.polls.map(this.eachPoll)
 	      );
 	    }
