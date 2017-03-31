@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router';
 import axios from 'axios';
+import $ from 'jquery'
 
 class Index extends React.Component {
 
@@ -13,6 +14,7 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
+    console.log("did mount");
     var _this = this;
 
       axios('/api/polls')
@@ -23,6 +25,20 @@ class Index extends React.Component {
         })
         .catch(function(err){
         })
+
+      // var xhr = $.ajax({
+      //   url: '/api/polls/',
+      //   type: 'GET'
+      // })
+
+      // xhr.done(function(result){
+      //   _this.setState({
+      //     polls: result.polls
+      //   })
+      // })
+      //   .fail(function(err){
+      //     console.log(err);
+      //   })
 
   }
 
