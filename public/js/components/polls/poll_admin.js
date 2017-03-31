@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
+import $ from 'jquery';
 
 class PollAdmin extends Component {
 
@@ -22,16 +23,6 @@ class PollAdmin extends Component {
 
     componentDidMount() {
       var _this = this;
-
-        // axios('/api/polls/admin')
-        //   .then(function(result){
-        //     _this.setState({
-        //       polls: result.data.polls
-        //     })
-        //   })
-        //   .catch(function(err){
-        //     console.log("error fetching records")
-        //   })
 
           var xhr = $.ajax({
             url: '/api/polls/admin',
@@ -56,9 +47,13 @@ class PollAdmin extends Component {
     }
 
     handleShare(event, id) {
-      event.preventDefault();
-      console.log("a poll was shared: " + id);
 
+      event.preventDefault();
+      var path = location.protocol + '//' + location.host;
+      var pollPath = path + "/poll/" + id;
+      var tweet = "Checkout my new poll! " + pollPath;
+      var href="https://twitter.com/home?status="+tweet;
+      window.open(href);
     }
 
     handleDestroy(event, id) {
@@ -87,6 +82,7 @@ class PollAdmin extends Component {
 
 
     eachPoll (poll, i) {
+
       return (
         <div className="row" key={poll._id}>
           <div className="col-xs-10">
@@ -99,7 +95,7 @@ class PollAdmin extends Component {
 
           <div className="col-xs-1">
             <div className="btn btn-info" onClick={(e) => this.handleShare(e, poll._id)}>
-              <i className="fa fa-share" aria-hidden="true"></i>
+              <i className="fa fa-share" ></i>
             </div>
           </div>
 

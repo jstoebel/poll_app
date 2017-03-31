@@ -38501,6 +38501,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(179);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -38557,6 +38559,7 @@
 	        beforeSend: function () {
 	          this.setState({ loading: true });
 	        }.bind(this)
+
 	      });
 	    }
 	  }, {
@@ -38565,13 +38568,17 @@
 
 	      var newFlashes = this.state.flashes;
 	      if (resp.success) {
-	        newFlashes.push({ msg: resp.msg, success: true });
-	        this.setState({
-	          flashes: newFlashes
-	        });
+
+	        // redirect to poll page
+	        var path = '/poll/' + resp.id;
+	        _reactRouter.hashHistory.push(path);
+	        // newFlashes.push({msg: resp.msg, success: true})
+	        // this.setState({
+	        //   flashes : newFlashes
+	        // })
 	      } else {
-	        // TODO: redirect to login
-	      }
+	          // TODO: redirect to login
+	        }
 	    }
 	  }, {
 	    key: '_onError',
@@ -38739,16 +38746,29 @@
 	    });
 	  },
 	  _getSuccess: function _getSuccess(resp) {
-
+	    console.log("get success");
 	    var poll = resp;
 	    if (poll) {
 	      var totalVotes = poll.options.reduce(function (total, option, i) {
 	        return total += option.votes;
 	      }, 0);
 
-	      var newData = totalVotes > 0 ? poll.options.map(function (option, i) {
-	        return { value: option.votes, label: option.name };
-	      }) : [{ value: 0, label: 'no votes yet' }];
+	      if (totalVotes === 0) {
+	        // no votes
+	        var newData = [{ value: 0, label: 'no votes yet' }];
+	      } else {
+	        // more than one vote, generate the object. options with no votes should
+	        // not be labeled.
+
+	        var newData = poll.options.map(function (option, i) {
+	          if (option.votes > 0) {
+	            return { value: option.votes, label: option.name + ': ' + option.votes };
+	          } else {
+	            // option has no votes. Don't lebel it.
+	            return { value: option.votes, label: "" };
+	          }
+	        });
+	      }
 	    } else {
 	      var newData = [];
 	    }
@@ -38869,30 +38889,22 @@
 	  },
 	  renderPie: function renderPie(height, width, radius) {
 	    if (this.state.pieData) {
-	      return _react2.default.createElement(_pie_chart2.default, {
-	        x: width / 2, y: height / 2, outerRadius: radius, innerRadius: radius / 2,
-	        data: this.state.pieData
-	      });
+	      return _react2.default.createElement(
+	        'svg',
+	        { height: height, width: width },
+	        _react2.default.createElement(_pie_chart2.default, {
+	          x: width / 2, y: height / 2, outerRadius: radius, innerRadius: radius / 2,
+	          data: this.state.pieData
+	        })
+	      );
 	    } else {
-	      return "Loading...";
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        ' Loading... '
+	      );
 	    }
 	  },
-
-
-	  // renderLegend() {
-	  //   if (this.state.pieData) {
-	  //     return (
-	  //
-	  //         <Legend
-	  //           x={100} y={100} width={50} height={50}
-	  //           data={this.state.pieData}
-	  //         />
-	  //     )
-	  //   } else {
-	  //     return "Loading..."
-	  //   }
-	  // }
-
 	  render: function render() {
 	    var width = 0.4 * this.props.containerWidth,
 	        height = width,
@@ -38903,7 +38915,7 @@
 	      _react2.default.createElement(
 	        'h2',
 	        { className: 'text-center' },
-	        'Here is some fancy data:'
+	        this.state.poll.name
 	      ),
 	      _react2.default.createElement(
 	        'div',
@@ -38914,11 +38926,7 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'renderedD3 col-xs-12 col-md-6' },
-	            _react2.default.createElement(
-	              'svg',
-	              { height: height, width: width },
-	              this.renderPie(height, width, radius)
-	            )
+	            this.renderPie(height, width, radius)
 	          ),
 	          _react2.default.createElement(
 	            'div',
@@ -49077,6 +49085,10 @@
 
 	var _reactRouter = __webpack_require__(179);
 
+	var _jquery = __webpack_require__(262);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49113,17 +49125,7 @@
 	    value: function componentDidMount() {
 	      var _this = this;
 
-	      // axios('/api/polls/admin')
-	      //   .then(function(result){
-	      //     _this.setState({
-	      //       polls: result.data.polls
-	      //     })
-	      //   })
-	      //   .catch(function(err){
-	      //     console.log("error fetching records")
-	      //   })
-
-	      var xhr = $.ajax({
+	      var xhr = _jquery2.default.ajax({
 	        url: '/api/polls/admin',
 	        type: 'GET'
 	      });
@@ -49147,8 +49149,13 @@
 	  }, {
 	    key: 'handleShare',
 	    value: function handleShare(event, id) {
+
 	      event.preventDefault();
-	      console.log("a poll was shared: " + id);
+	      var path = location.protocol + '//' + location.host;
+	      var pollPath = path + "/poll/" + id;
+	      var tweet = "Checkout my new poll! " + pollPath;
+	      var href = "https://twitter.com/home?status=" + tweet;
+	      window.open(href);
 	    }
 	  }, {
 	    key: 'handleDestroy',
@@ -49157,7 +49164,7 @@
 	      event.preventDefault();
 	      console.log('A poll was asked to be removed: ' + id);
 
-	      return $.ajax({
+	      return _jquery2.default.ajax({
 	        url: '/api/poll/destroy',
 	        type: 'DELETE',
 	        data: {
@@ -49202,7 +49209,7 @@
 	            { className: 'btn btn-info', onClick: function onClick(e) {
 	                return _this3.handleShare(e, poll._id);
 	              } },
-	            _react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' })
+	            _react2.default.createElement('i', { className: 'fa fa-share' })
 	          )
 	        ),
 	        _react2.default.createElement(

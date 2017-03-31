@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { hashHistory } from 'react-router'
 
 class New extends React.Component {
 
@@ -40,6 +41,7 @@ class New extends React.Component {
       beforeSend: function () {
         this.setState({loading: true});
       }.bind(this)
+
     })
   }
 
@@ -47,10 +49,14 @@ class New extends React.Component {
 
     var newFlashes = this.state.flashes
     if (resp.success) {
-      newFlashes.push({msg: resp.msg, success: true})
-      this.setState({
-        flashes : newFlashes
-      })
+
+      // redirect to poll page
+      const path = `/poll/${resp.id}`;
+      hashHistory.push(path);
+      // newFlashes.push({msg: resp.msg, success: true})
+      // this.setState({
+      //   flashes : newFlashes
+      // })
     } else {
         // TODO: redirect to login
     }

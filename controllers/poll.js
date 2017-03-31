@@ -40,7 +40,7 @@ exports.create = function(req, res) {
         res.status(400).json({msg: "Failed to create poll"})
     } else {
       // next make the options
-      res.json({msg: `Successfully created poll ${params.name}`, success: true })
+      res.json({id: poll._id, msg: `Successfully created poll ${params.name}`, success: true })
 
     }
   })
