@@ -70,7 +70,7 @@
 
 	var _show2 = _interopRequireDefault(_show);
 
-	var _poll_admin = __webpack_require__(271);
+	var _poll_admin = __webpack_require__(272);
 
 	var _poll_admin2 = _interopRequireDefault(_poll_admin);
 
@@ -38720,6 +38720,10 @@
 
 	var _pie_chart2 = _interopRequireDefault(_pie_chart);
 
+	var _legend = __webpack_require__(271);
+
+	var _legend2 = _interopRequireDefault(_legend);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -38728,6 +38732,10 @@
 
 	var Show = _react2.default.createClass({
 	  displayName: 'Show',
+
+
+	  colors: d3.scale.category10(),
+
 	  getInitialState: function getInitialState() {
 	    return {
 	      chart: "loading...",
@@ -38941,14 +38949,21 @@
 	    }
 	  },
 	  renderPie: function renderPie(height, width, radius) {
+
+	    console.log(this.colors);
 	    if (this.state.pieData) {
 	      return _react2.default.createElement(
-	        'svg',
-	        { height: height, width: width },
-	        _react2.default.createElement(_pie_chart2.default, {
-	          x: width / 2, y: height / 2, outerRadius: radius, innerRadius: radius / 2,
-	          data: this.state.pieData
-	        })
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'svg',
+	          { height: height, width: width },
+	          _react2.default.createElement(_pie_chart2.default, {
+	            x: width / 2, y: height / 2, outerRadius: radius, innerRadius: radius / 2,
+	            data: this.state.pieData, colors: this.colors
+	          })
+	        ),
+	        _react2.default.createElement(_legend2.default, { poll: this.state.poll, colors: this.colors })
 	      );
 	    } else {
 	      return _react2.default.createElement(
@@ -48921,6 +48936,7 @@
 	        {value: 92, label: 'Code lines'},
 	        {value: 34, label: 'Empty lines'}
 	      ]
+	    colors: the colors function bound to the Show component
 	  */
 
 	  function PieChart() {
@@ -48931,7 +48947,7 @@
 	    _this.pie = d3.layout.pie().value(function (d) {
 	      return d.value;
 	    });
-	    _this.colors = d3.scale.category10();
+	    // this.colors = d3.scale.category10();
 	    return _this;
 	  }
 
@@ -48956,7 +48972,7 @@
 	        data: d,
 	        innerRadius: this.props.innerRadius,
 	        outerRadius: this.props.outerRadius,
-	        color: this.colors(i) });
+	        color: this.props.colors(i) });
 	    }
 	  }, {
 	    key: 'render',
@@ -48964,11 +48980,11 @@
 	      var _this2 = this;
 
 	      var pie = this.pie(this.props.data),
-	          translate = 'translate(' + this.props.x + ', ' + this.props.y + ')';
-
+	          slicesTranslate = 'translate(' + this.props.x + ', ' + this.props.y + ')',
+	          legendTranslate = 'translate(' + this.props.x + ', ' + (this.props.y - this.props.outerRadius) + ')';
 	      return _react2.default.createElement(
 	        'g',
-	        { transform: translate },
+	        { transform: slicesTranslate },
 	        pie.map(function (d, i) {
 	          return _this2.arcGenerator(d, i);
 	        })
@@ -49122,6 +49138,82 @@
 
 /***/ },
 /* 271 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _d = __webpack_require__(265);
+
+	var d3 = _interopRequireWildcard(_d);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Legend = function (_React$Component) {
+	  _inherits(Legend, _React$Component);
+
+	  //expected props
+	  // poll: the poll item
+	  // colors: the colors function bound to Show component
+
+	  function Legend() {
+	    _classCallCheck(this, Legend);
+
+	    var _this = _possibleConstructorReturn(this, (Legend.__proto__ || Object.getPrototypeOf(Legend)).call(this));
+
+	    _this.eachOption = _this.eachOption.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(Legend, [{
+	    key: 'eachOption',
+	    value: function eachOption(option, i) {
+	      return _react2.default.createElement(
+	        'li',
+	        { key: i },
+	        _react2.default.createElement('span', { style: {
+	            backgroundColor: this.props.colors(i),
+	            height: '20px',
+	            width: '20px'
+	          } }),
+	        option.name
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'ul',
+	        null,
+	        this.props.poll.options.map(this.eachOption)
+	      );
+	    }
+	  }]);
+
+	  return Legend;
+	}(_react2.default.Component);
+
+	exports.default = Legend;
+
+/***/ },
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
