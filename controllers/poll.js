@@ -27,12 +27,12 @@ exports.create = function(req, res) {
   var poll = new models.Poll(params);
 
   req
-  .body
-  .options
-  .split("\n")
-  .forEach(function(opt){
-    poll.options.push({name: opt, votes: 0})
-  });
+    .body
+    .options
+    .split("\n")
+    .forEach(function(opt){
+      poll.options.push({name: opt, votes: 0})
+    });
 
   poll.save(function(err, poll){
     if (err){
@@ -40,13 +40,10 @@ exports.create = function(req, res) {
         res.status(400).json({msg: "Failed to create poll"})
     } else {
       // next make the options
-      res.json({msg: `Successfully created poll ${params.name}`, success: true })
+      res.json({id: poll._id, msg: `Successfully created poll ${params.name}`, success: true })
 
     }
-
-
   })
-
 };
 
 exports.show = function(req, res) {
@@ -78,6 +75,20 @@ exports.vote = function(req, res) {
 
 }
 
+exports.indexAdmin = function(req, res) {
+
+  models.Poll.find({user: req.user._id}, function(err, polls){
+
+    if (err) {
+      throw err;
+    }
+
+    res.json({polls: polls})
+
+  })
+
+}
+
 exports.edit = function(req, res) {
   res.end("hello from edit")
 };
@@ -87,7 +98,41 @@ exports.update = function(req, res) {
 };
 
 exports.destroy = function(req, res) {
-  // destroy all polls
+  // destroy a poll
+
+  // find the poll
+
+  models.Poll.find(req.body, function(err, poll){
+    if (err){
+      req.status(204).json({msg: "Couldn't find poll to delete"})
+    }
+
+    // authorize permission to remove
+    if (poll._id = req.user._id){
+
+      models.Poll.remove(req.body, function(err) {
+        if (err) {
+          res.status(204).json({msg: "Couldn't delete record"})
+        } else {
+          res.status(200).json({msg: "Successfully removed poll", success: true });
+        }
+
+      })
+
+    } else {
+      // not authorized to delete
+      res.status(403).json({msg: "Access denied-that poll doesn't belong to you."});
+    }
+
+
+  }) // find
+
+
+
+}
+
+exports.destroyAll = function(req, res) {
+  // destroy ALL POLLS
 
   models.Poll.remove({}, function(err){
     if (err) {

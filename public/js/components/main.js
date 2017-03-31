@@ -9,8 +9,8 @@ class Main extends Component {
                     <div className="container-fluid">
                         <div className="navbar-header">
                             <a className="navbar-brand" href="#">Home</a>
-                        </div>
-                        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <a className="navbar-brand" href="#/new">New Poll</a>
+                            <a className="navbar-brand" href="#/poll/admin">My Polls</a>
                         </div>
                     </div>
                 </nav>

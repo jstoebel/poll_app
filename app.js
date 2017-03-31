@@ -23,10 +23,6 @@ var proxy = httpProxy.createProxyServer();
 var config = require('./config/config')
 var httpProxy = require('http-proxy');
 
-
-
-
-
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  *
@@ -60,8 +56,6 @@ mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
   process.exit(1);
 });
-
-
 
 /**
  * Express configuration.

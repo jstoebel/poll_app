@@ -1,20 +1,11 @@
 import React from 'react';
 import * as d3 from 'd3';
-import * as legend from 'd3-svg-legend';
-
-// import {event as currentEvent} from 'd3-selection';
-import {event as currentEvent} from 'd3';
-import Faux from 'react-faux-dom';
 import Dimensions from 'react-dimensions';
+import $ from 'jquery';
 
 import PieChart from "./pie_chart";
-import Tooltip from "./tooltip";
 
 const Show = React.createClass({
-  mixins: [
-    Faux.mixins.core,
-    Faux.mixins.anim
-  ],
 
   getInitialState () {
     return {
@@ -40,18 +31,30 @@ const Show = React.createClass({
   },
 
   _getSuccess(resp) {
-
+    console.log("get success");
     var poll = resp;
     if (poll) {
       var totalVotes = poll.options.reduce(function(total, option, i){
         return total += option.votes
       }, 0)
 
-      var newData = totalVotes > 0 ?
-        poll.options.map(function(option, i){
-          return {value: option.votes, label: option.name}
-        }) :
-        [{value: 0, label: 'no votes yet'}]
+      if (totalVotes === 0) {
+        // no votes
+        var newData = [{value: 0, label: 'no votes yet'}];
+      } else {
+          // more than one vote, generate the object. options with no votes should
+          // not be labeled.
+
+          var newData = poll.options.map(function(option, i){
+            if (option.votes > 0) {
+              return {value: option.votes, label: `${option.name}: ${option.votes}`}
+            } else {
+              // option has no votes. Don't lebel it.
+              return {value: option.votes, label: ""}
+            }
+          })
+      }
+
 
     } else {
       var newData = [];
@@ -125,7 +128,7 @@ const Show = React.createClass({
   renderMenu(){
 
     if ( this.state.poll ) {
-      
+
       return (
         <div>
           <form onSubmit={this.handleSubmit} >
@@ -173,30 +176,17 @@ const Show = React.createClass({
   renderPie(height, width, radius) {
     if (this.state.pieData) {
       return (
-
+        <svg height={height} width={width}>
           <PieChart
             x={width/2} y={height/2} outerRadius={radius} innerRadius={radius/2}
             data={this.state.pieData}
           />
+        </svg>
       )
     } else {
-      return "Loading..."
+      return (<div> Loading... </div>)
     }
   },
-
-  // renderLegend() {
-  //   if (this.state.pieData) {
-  //     return (
-  //
-  //         <Legend
-  //           x={100} y={100} width={50} height={50}
-  //           data={this.state.pieData}
-  //         />
-  //     )
-  //   } else {
-  //     return "Loading..."
-  //   }
-  // }
 
   render () {
     var width = 0.4 * this.props.containerWidth,
@@ -204,13 +194,11 @@ const Show = React.createClass({
       radius = 0.5 * width
     return (
       <div>
-        <h2 className="text-center">Here is some fancy data:</h2>
+        <h2 className="text-center">{this.state.poll.name}</h2>
         <div className="container-fluid">
           <div className="row">
             <div className='renderedD3 col-xs-12 col-md-6'>
-              <svg height={height} width={width}>
                 {this.renderPie(height, width, radius)}
-              </svg>
             </div>
 
             <div className="col-xs-12 col-md-6" id="show-menu">

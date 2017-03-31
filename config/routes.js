@@ -29,6 +29,7 @@ router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
 router.get('/api/polls', controllers.poll.index);
+router.get('/api/polls/admin', passportConfig.isAuthenticated, controllers.poll.indexAdmin)
 router.get('/api/polls/:pollId', controllers.poll.show);
 
 // router.get('/api/polls/new', passportConfig.isAuthenticated, controllers.poll.new);
@@ -39,9 +40,11 @@ router.post("/api/polls/vote", passportConfig.isAuthenticated, controllers.poll.
 router.get('/api/polls/:pollId/edit', passportConfig.isAuthenticated, controllers.poll.edit);
 router.put('/api/:pollId', passportConfig.isAuthenticated, controllers.poll.update);
 
-router.delete('/api/poll/destroy', controllers.poll.destroy);
+router.delete('/api/poll/destroy', passportConfig.isAuthenticated, controllers.poll.destroy)
+router.delete('/api/poll/destroyAll', controllers.poll.destroyAll);
 
 router.post('/polls/:pollId/vote/new', passportConfig.isAuthenticated, controllers.vote.new)
+
 
 /**
  * OAuth authentication routes. (Sign in)
@@ -64,7 +67,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 });
 router.get('/auth/twitter', passport.authenticate('twitter'));
 router.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
+  res.redirect('/');
 });
 router.get('/auth/linkedin', passport.authenticate('linkedin', { state: 'SOME STATE' }));
 router.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRedirect: '/login' }), function(req, res) {

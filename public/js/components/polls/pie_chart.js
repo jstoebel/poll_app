@@ -41,13 +41,6 @@ class PieChart extends React.Component {
   }
 
   arcGenerator(d, i) {
-    console.log(d)
-    console.log(i)
-    console.log(`arc-${i}`)
-    console.log(this.props.innerRadius)
-    console.log(this.props.outerRadius)
-    console.log(this.colors(i))
-
 
     return (
       <LabeledArc key={`arc-${i}`}
