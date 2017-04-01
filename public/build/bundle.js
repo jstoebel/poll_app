@@ -38950,7 +38950,6 @@
 	  },
 	  renderPie: function renderPie(height, width, radius) {
 
-	    console.log(this.colors);
 	    if (this.state.pieData) {
 	      return _react2.default.createElement(
 	        'div',
@@ -38963,7 +38962,7 @@
 	            data: this.state.pieData, colors: this.colors
 	          })
 	        ),
-	        _react2.default.createElement(_legend2.default, { poll: this.state.poll, colors: this.colors })
+	        _react2.default.createElement(_legend2.default, { data: this.state.pieData, colors: this.colors })
 	      );
 	    } else {
 	      return _react2.default.createElement(
@@ -49116,7 +49115,7 @@
 
 	  _createClass(Legend, [{
 	    key: 'eachOption',
-	    value: function eachOption(option, i) {
+	    value: function eachOption(name, i) {
 	      return _react2.default.createElement(
 	        'li',
 	        { key: i, style: {
@@ -49127,19 +49126,25 @@
 	          className: 'legendItem'
 	        },
 	        _react2.default.createElement('i', { className: 'fa-li fa fa-circle' }),
-	        option.name
+	        name
 	      );
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      console.log(this.props.data);
+	      var names = this.props.data.map(function (item) {
+	        return item.label;
+	      });
+	      console.log(names);
+
 	      return _react2.default.createElement(
 	        'div',
 	        null,
 	        _react2.default.createElement(
 	          'ul',
 	          { className: 'fa-ul legend' },
-	          this.props.poll.options.map(this.eachOption)
+	          names.map(this.eachOption)
 	        )
 	      );
 	    }

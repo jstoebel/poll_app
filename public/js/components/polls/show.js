@@ -240,7 +240,6 @@ const Show = React.createClass({
 
   renderPie(height, width, radius) {
 
-    console.log(this.colors);
     if (this.state.pieData) {
       return (
         <div>
@@ -250,7 +249,7 @@ const Show = React.createClass({
               data={this.state.pieData} colors={this.colors}
             />
           </svg>
-          <Legend poll={this.state.poll} colors={this.colors}/>
+          <Legend data={this.state.pieData} colors={this.colors}/>
         </div>
       )
     } else {

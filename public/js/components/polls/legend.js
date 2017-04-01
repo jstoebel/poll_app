@@ -12,7 +12,7 @@ class Legend extends React.Component {
     this.eachOption = this.eachOption.bind(this);
   }
 
-  eachOption(option, i){
+  eachOption(name, i){
     return(
       <li key={i} style={
         {
@@ -25,16 +25,22 @@ class Legend extends React.Component {
       className="legendItem"
       >
         <i className="fa-li fa fa-circle"></i>
-        {option.name}
+        {name}
       </li>
     )
   }
 
   render() {
+    console.log(this.props.data);
+    var names = this.props.data.map(function(item){
+      return item.label;
+    })
+    console.log(names);
+
     return(
       <div>
         <ul className="fa-ul legend">
-          {this.props.poll.options.map(this.eachOption)}
+          {names.map(this.eachOption)}
         </ul>
 
       </div>
