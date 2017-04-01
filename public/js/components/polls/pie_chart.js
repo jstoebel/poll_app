@@ -1,6 +1,6 @@
 import React from 'react'
 import * as d3 from 'd3'
-import {LabeledArc} from './labled_arc'
+import Arc from './arc'
 
 class PieChart extends React.Component {
 
@@ -44,7 +44,7 @@ class PieChart extends React.Component {
   arcGenerator(d, i) {
 
     return (
-      <LabeledArc key={`arc-${i}`}
+      <Arc key={`arc-${i}`}
         data={d}
         innerRadius={this.props.innerRadius}
         outerRadius={this.props.outerRadius}
@@ -53,7 +53,6 @@ class PieChart extends React.Component {
   }
 
   render() {
-
     let pie = this.pie(this.props.data),
       slicesTranslate = `translate(${this.props.x}, ${this.props.y})`,
       legendTranslate = `translate(${this.props.x}, ${this.props.y - this.props.outerRadius})`

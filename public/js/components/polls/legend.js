@@ -14,15 +14,17 @@ class Legend extends React.Component {
 
   eachOption(option, i){
     return(
-      <li key={i}>
-        <span style={
-          {
-            backgroundColor: this.props.colors(i),
-            height: '20px',
-            width: '20px'
-          }
+      <li key={i} style={
+        {
+          color: this.props.colors(i),
+          // display: "inline-block",
+          whiteSpace: "nowrap"
+        }
 
-        }/>
+      }
+      className="legendItem"
+      >
+        <i className="fa-li fa fa-circle"></i>
         {option.name}
       </li>
     )
@@ -30,9 +32,12 @@ class Legend extends React.Component {
 
   render() {
     return(
-      <ul>
-        {this.props.poll.options.map(this.eachOption)}
-      </ul>
+      <div>
+        <ul className="fa-ul legend">
+          {this.props.poll.options.map(this.eachOption)}
+        </ul>
+
+      </div>
 
     )
   }

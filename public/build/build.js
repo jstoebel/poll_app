@@ -49119,15 +49119,17 @@
 	    value: function eachOption(option, i) {
 	      return _react2.default.createElement(
 	        'li',
-	        { key: i, style: {
-	            color: this.props.colors(i),
-	            // display: "inline-block",
-	            whiteSpace: "nowrap"
+	        { key: i },
+	        _react2.default.createElement(
+	          'i',
+	          {
+	            className: 'fa-li fa fa-check-square',
+	            style: {
+	              color: this.props.colors(i)
+	            }
 	          },
-	          className: 'legendItem'
-	        },
-	        _react2.default.createElement('i', { className: 'fa-li fa fa-circle' }),
-	        option.name
+	          option.name
+	        )
 	      );
 	    }
 	  }, {
@@ -49138,7 +49140,7 @@
 	        null,
 	        _react2.default.createElement(
 	          'ul',
-	          { className: 'fa-ul legend' },
+	          { className: 'fa-ul' },
 	          this.props.poll.options.map(this.eachOption)
 	        )
 	      );
