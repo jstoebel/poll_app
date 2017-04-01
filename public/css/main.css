@@ -8826,4 +8826,13 @@ textarea {
 .fa {
   margin-right: 6px; }
 
+.legend {
+  margin: 0;
+  padding: 0;
+  list-style-type: none; }
+
+.legendItem {
+  float: left;
+  padding: 0 2em 0 0; }
+
 /*# sourceMappingURL=main.css.map */

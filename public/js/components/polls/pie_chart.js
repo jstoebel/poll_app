@@ -1,6 +1,6 @@
 import React from 'react'
 import * as d3 from 'd3'
-import {LabeledArc} from './labled_arc'
+import Arc from './arc'
 
 class PieChart extends React.Component {
 
@@ -16,6 +16,7 @@ class PieChart extends React.Component {
         {value: 92, label: 'Code lines'},
         {value: 34, label: 'Empty lines'}
       ]
+    colors: the colors function bound to the Show component
   */
 
   constructor() {
@@ -23,7 +24,7 @@ class PieChart extends React.Component {
 
     this.pie = d3.layout.pie()
                  .value((d) => d.value);
-    this.colors = d3.scale.category10();
+    // this.colors = d3.scale.category10();
   }
 
   getData() {
@@ -43,22 +44,21 @@ class PieChart extends React.Component {
   arcGenerator(d, i) {
 
     return (
-      <LabeledArc key={`arc-${i}`}
+      <Arc key={`arc-${i}`}
         data={d}
         innerRadius={this.props.innerRadius}
         outerRadius={this.props.outerRadius}
-        color={this.colors(i)} />
+        color={this.props.colors(i)} />
     );
   }
 
   render() {
-
     let pie = this.pie(this.props.data),
-      translate = `translate(${this.props.x}, ${this.props.y})`;
-
+      slicesTranslate = `translate(${this.props.x}, ${this.props.y})`,
+      legendTranslate = `translate(${this.props.x}, ${this.props.y - this.props.outerRadius})`
     return (
-      <g transform={translate}>
-          {pie.map((d, i) => this.arcGenerator(d, i))}
+      <g transform={slicesTranslate}>
+        {pie.map((d, i) => this.arcGenerator(d, i))}
       </g>
     )
   }

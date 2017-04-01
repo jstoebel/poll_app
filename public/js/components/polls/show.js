@@ -4,8 +4,11 @@ import Dimensions from 'react-dimensions';
 import $ from 'jquery';
 
 import PieChart from "./pie_chart";
+import Legend from "./legend"
 
 const Show = React.createClass({
+
+  colors: d3.scale.category10(),
 
   getInitialState () {
     return {
@@ -236,14 +239,19 @@ const Show = React.createClass({
   },
 
   renderPie(height, width, radius) {
+
+    console.log(this.colors);
     if (this.state.pieData) {
       return (
-        <svg height={height} width={width}>
-          <PieChart
-            x={width/2} y={height/2} outerRadius={radius} innerRadius={radius/2}
-            data={this.state.pieData}
-          />
-        </svg>
+        <div>
+          <svg height={height} width={width}>
+            <PieChart
+              x={width/2} y={height/2} outerRadius={radius} innerRadius={radius/2}
+              data={this.state.pieData} colors={this.colors}
+            />
+          </svg>
+          <Legend poll={this.state.poll} colors={this.colors}/>
+        </div>
       )
     } else {
       return (<div> Loading... </div>)
