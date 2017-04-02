@@ -34,7 +34,7 @@
         "express-flash": "^0.0.2",
         "express-session": "^1.13.0",
         "express-validator": "^2.20.4",
-        "factory-girl": "^4.0.0-beta.7",
+        "factory-girl": "^4",
         "fbgraph": "^1.1.0",
         "flux": "^3.1.0",
         "github-api": "^1.1.0",

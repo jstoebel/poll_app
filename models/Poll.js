@@ -1,16 +1,16 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId;
-  models = require('require.all')('.')
+  ObjectId = Schema.ObjectId,
+  models = require('require.all')('.');
 
 var optionSchema = new mongoose.Schema({
-  name: String,
-  votes: Number
+  name: {required: true, type: String},
+  votes: {required: true, type: Number}
 }, {timestamps: true});
 
 var pollSchema = new mongoose.Schema({
-  name: String,
-  user:  { type: ObjectId, ref: 'User' },
+  name: {required: true, type: String},
+  user:  { type: ObjectId, ref: 'User', required: true },
   options: [optionSchema]
 
 }, {timestamps: true});

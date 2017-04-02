@@ -1,6 +1,5 @@
 //  Modified from https://github.com/elliotf/mocha-mongoose
 
-
 var config = require('../config/config');
 var mongoose = require('mongoose');
 var _ = require('underscore')
@@ -16,12 +15,6 @@ beforeEach(function (done) {
       });
     })
 
-    // for (var i in mongoose.connection.collections) {
-    //   mongoose.connection.collections.forEach(function(i){
-    //     console.log(i)
-    //   })
-    //   // mongoose.connection.collections[i].remove(function() {});
-    // }
     return done();
   }
 
