@@ -17,41 +17,28 @@ describe('Poll Model', function() {
         done();
       })
     })
-  })
+  }) // loop
 
-  it ('validates options', function(done){
+  // ['name', 'votes'].forEach(function(attr){
 
-    user = factory.create('user').then(function(user){
+    it('validates options: ' + 'spam', function(done){
+      var user = new models.User({
+        email: "fake@fake.com",
 
-      var poll = new models.Poll;
-      poll.name = "poll name"
-      poll.user = user;
+      })
+      user.save()
 
-      console.log("here");
-      poll.validate(function(err){
-        console.log(err);;
-        done();
+      var poll = new models.Poll({
+        name: "poll name",
+        user: user._id,
+        options: [{}]
       })
 
-    }).catch(function(err){
-      console.log(err);
-      done(err);
+      poll.validate(function(err){
+        expect(err.errors).to.exist;
+        done();
+      })
     })
-
-
-  })
-
-  // it ('validates required fields', function(done) {
-  //   var poll = new models.Poll;
-  //
-  //   ['name', 'user', "blarg"].forEach(function(attr){
-  //     poll.validate(function(err){
-  //       console.log("testing " + attr);
-  //       expect(err.errors[attr]).to.not.exist
-  //       console.log("tested " + attr);
-  //     })
-  //   })
-  //
-  // })
+  // }) // options loop
 
 });
