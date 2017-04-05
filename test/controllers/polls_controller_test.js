@@ -3,7 +3,6 @@ var app = require('../../app.js');
 var models = require('require.all')('../models');
 var factory = require('../factories');
 var assert = require('chai').assert;
-var login = require('../login');
 var agent = request.agent();
 passportStub = require('passport-stub');
 
@@ -26,17 +25,18 @@ describe('GET index', function() {
 })
 
 describe('POST create', function() {
-  before(function(done){
+  beforeEach(function(done){
     passportStub.install(app);
     done();
   })
 
-  after(function(done){
-    passportStub.uninstall(app);
+  afterEach(function(done){
+    passportStub.logout();
+    passportStub.uninstall()
     done();
   })
 
-  it('should return 200 OK with good params', function(done){
+  it('returns 200 OK with good params', function(done){
 
     factory.create('user')
       .then(function(user){
@@ -46,7 +46,13 @@ describe('POST create', function() {
           .then(function(poll){
             request(app)
               .post('/api/polls')
-              .send({ name: poll.name, user: poll.user })
+              .send(
+                { name: poll.name,
+                  user: poll.user,
+                  options: poll.options.map(function(option){
+                    return option.name;
+                  }).join("\n")
+                })
               .expect(200)
               .then(function(resp){
                 assert(resp.body, poll)
@@ -54,13 +60,90 @@ describe('POST create', function() {
               })
             })
           })
+
+  }) // it
+
+  it('returns 302 when not logged in', function(done){
+
+    factory.build('poll')
+    .then(function(poll){
+      request(app)
+        .post('/api/polls')
+        .send(
+          { name: poll.name,
+            user: poll.user,
+            options: poll.options.map(function(option){
+              return option.name;
+            }).join("\n")
+          })
+        .expect(302, done)
       })
 
   }) // it
 
-  // it('should return 400 on bad params', function(done){
-  //   request(app)
-  //     .post('/api/polls')
-  //     .expect(400, done)
-  // })
+  it('returns 400 on validation error', function(done){
+    factory.create('user')
+      .then(function(user){
+          passportStub.login(user);
+
+          factory.build('poll')
+          .then(function(poll){
+            request(app)
+              .post('/api/polls')
+              .send(
+                { name: "",
+                  user: poll.user,
+                  options: poll.options.map(function(option){
+                    return option.name;
+                  }).join("\n")
+                })
+              .expect(400, done)
+            })
+          })
+  })
+
+  it('returns 500 on no options', function(done){
+    factory.create('user')
+      .then(function(user){
+          passportStub.login(user);
+
+          factory.build('poll')
+          .then(function(poll){
+            request(app)
+              .post('/api/polls')
+              .send(
+                { name: poll.name,
+                  user: poll.user,
+                  options: null
+                })
+              .expect(500, done)
+          })
+      })
+  })
+
+})
+
+describe('show', function(){
+
+  it('returns 200 ok', function(done){
+    factory.create('poll')
+      .then(function(poll){
+        request(app)
+          .get(`/api/polls/${poll._id}`)
+          .expect(200)
+          .then(function(resp){
+            assert(resp.body, poll)
+            done();
+          })
+      })
+  })
+
+  it('returns 404 with bad id', function(done){
+    factory.create('poll')
+      .then(function(poll){
+        request(app)
+          .get("/api/polls/bad_id")
+          .expect(404, done)
+      })
+  })
 })

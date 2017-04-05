@@ -32,7 +32,6 @@ exports.create = function(req, res) {
 
   poll.save(function(err, poll){
     if (err){
-        console.log(err);
         res.status(400).json({msg: "Failed to create poll"})
     } else {
       // next make the options
@@ -44,6 +43,9 @@ exports.create = function(req, res) {
 
 exports.show = function(req, res) {
   models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
+    if (err){
+      res.status(404)
+    }
     res.json(poll)
   })
 };
