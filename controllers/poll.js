@@ -13,10 +13,6 @@ exports.index = function(req, res) {
 
 };
 
-exports.new = function(req, res) {
-  res.end("hello from new")
-}
-
 exports.create = function(req, res) {
 
   var params = {
@@ -88,14 +84,6 @@ exports.indexAdmin = function(req, res) {
 
 }
 
-exports.edit = function(req, res) {
-  res.end("hello from edit")
-};
-
-exports.update = function(req, res) {
-  res.end("hello from update")
-};
-
 exports.destroy = function(req, res) {
   // destroy a poll
 
@@ -153,19 +141,3 @@ exports.addOption = function(req, res) {
   })
 
 }
-
-exports.destroyAll = function(req, res) {
-  // destroy ALL POLLS
-
-  models.Poll.remove({}, function(err){
-    if (err) {
-      res.status(204).json({msg: "Polls couldn't delete records"})
-    } else {
-
-      models.Poll.count({}, function(err, c) {
-        res.status(200).json({msg: "Polls remaining: " + c})
-      });
-    }
-  })
-
-};
