@@ -8,7 +8,12 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var lusca = require('lusca');
-var dotenv = require('dotenv');
+
+try {
+  var dotenv = require('dotenv');
+  dotenv.load();
+} catch (e) {}
+
 var MongoStore = require('connect-mongo/es5')(session);
 var flash = require('express-flash');
 var path = require('path');
@@ -29,7 +34,7 @@ var httpProxy = require('http-proxy');
  *
  * Default path: .env (You can remove the path argument entirely, after renaming `.env.example` to `.env`)
  */
-dotenv.load();
+
 
 /**
  * API keys and Passport configuration.
