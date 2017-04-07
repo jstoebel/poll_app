@@ -155,7 +155,6 @@ describe('vote', function() {
 
     factory.create('poll')
       .then(function(poll){
-        console.log(poll);
         request(app)
           .post('/api/polls/vote')
           .send(
@@ -166,15 +165,25 @@ describe('vote', function() {
           .expect(201)
           .then(function(resp){
             expect(resp.body.msg).to.equal("Vote successful")
-            // assert(poll.options[0].votes == 3)
             done();
           })
       })
 
   })
 
-  // it('returns 400 with bad params', function(done){
-  //   done();
-  // })
+  it('returns 400 with bad params', function(done){
+    factory.create('poll')
+      .then(function(poll){
+        request(app)
+          .post('/api/polls/vote')
+          .send(
+            { }  )
+          .expect(400)
+          .then(function(resp){
+            expect(resp.body.msg).to.equal("Failed to update poll")
+            done();
+          })
+      })
+  })
 
 })

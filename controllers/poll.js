@@ -60,16 +60,19 @@ exports.vote = function(req, res) {
         "options.$.votes": 1
       }
     },
-    function(err,doc) {
-        if (err){
-          console.log(err);
-          res.status(400).json({msg: "Failed to update poll"})
-        } else {
-          res.status(201).json({msg: "Vote successful"})
-        }
+    {new: true},
+    function(err, poll){
+      if (!poll){
+        res.status(400).json({msg: "Failed to update poll"})
+      } else {
+        res.status(201).json({msg: "Vote successful"})
+      }
     }
+    // function(err,doc) {
+    //     console.log(err);
+    //     console.log(doc);
+    // }
   );
-
 }
 
 exports.indexAdmin = function(req, res) {
