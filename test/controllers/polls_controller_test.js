@@ -318,3 +318,41 @@ describe('destroy', function(){
   })
 
 })
+
+describe('addOption', function(){
+
+  beforeEach(function(done){
+    passportStub.install(app);
+    done();
+  })
+
+  afterEach(function(done){
+    passportStub.logout();
+    passportStub.uninstall()
+    done();
+  })
+
+  it('adds an option', function(done){
+    factory.create('poll')
+      .then(function(poll){
+        models.User.find({_id: poll.user}, function(err, user){
+
+          passportStub.login(user)
+          request(app)
+            .post('/api/polls/option')
+            .send({
+              pollId: poll._id,
+              optionName: "some option"
+            })
+            .expect(200)
+            .then(function(resp){
+              assert(resp.body.msg == "Successfully updated poll")
+              console.log("almost done!");
+              done();
+            })
+        })
+
+      })
+  })
+
+})

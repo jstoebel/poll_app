@@ -10,8 +10,6 @@ process.env.NODE_ENV = 'test';
 
 beforeEach(function (done) {
 
-  
-
   function clearDB() {
     _.each(mongoose.connection.models, function(value, key){
       value.remove({}, function(err, removed) {
