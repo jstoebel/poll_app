@@ -53,7 +53,8 @@ class PollAdmin extends Component {
 
       event.preventDefault();
       var path = location.protocol + '//' + location.host;
-      var pollPath = path + "/poll/" + id;
+      var pollPath = path + "/%23/poll/" + id;
+      console.log(pollPath);
       var tweet = "Checkout my new poll! " + pollPath;
       var href="https://twitter.com/home?status="+tweet;
       window.open(href);
