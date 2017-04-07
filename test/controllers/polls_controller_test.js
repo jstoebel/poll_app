@@ -3,6 +3,7 @@ var app = require('../../app.js');
 var models = require('require.all')('../models');
 var factory = require('../factories');
 var assert = require('chai').assert;
+var expect = require('chai').expect
 var agent = request.agent();
 passportStub = require('passport-stub');
 
@@ -146,4 +147,34 @@ describe('show', function(){
           .expect(404, done)
       })
   })
+})
+
+describe('vote', function() {
+
+  it('returns 201', function(done){
+
+    factory.create('poll')
+      .then(function(poll){
+        console.log(poll);
+        request(app)
+          .post('/api/polls/vote')
+          .send(
+            { pollId: poll._id,
+              optionId: poll.options[0]._id
+            }
+          )
+          .expect(201)
+          .then(function(resp){
+            expect(resp.body.msg).to.equal("Vote successful")
+            // assert(poll.options[0].votes == 3)
+            done();
+          })
+      })
+
+  })
+
+  // it('returns 400 with bad params', function(done){
+  //   done();
+  // })
+
 })
