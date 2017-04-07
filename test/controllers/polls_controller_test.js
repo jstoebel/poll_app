@@ -16,7 +16,8 @@ describe('GET index', function() {
           .get('/api/polls')
           .expect(200)
           .then(function(resp){
-            assert(resp.body, [poll])
+            expect(resp.body.polls.length).to.equal(1)
+            assert(resp.body.polls[0]._id == poll._id)
             done();
           })
 
@@ -56,7 +57,7 @@ describe('POST create', function() {
                 })
               .expect(200)
               .then(function(resp){
-                assert(resp.body, poll)
+                assert(resp.body.msg ==  `Successfully created poll ${poll.name}`)
                 done();
               })
             })
@@ -133,7 +134,7 @@ describe('show', function(){
           .get(`/api/polls/${poll._id}`)
           .expect(200)
           .then(function(resp){
-            assert(resp.body, poll)
+            assert(resp.body._id == poll._id)
             done();
           })
       })
@@ -176,13 +177,143 @@ describe('vote', function() {
       .then(function(poll){
         request(app)
           .post('/api/polls/vote')
-          .send(
-            { }  )
+          .send({})
           .expect(400)
           .then(function(resp){
             expect(resp.body.msg).to.equal("Failed to update poll")
             done();
           })
+      })
+  })
+
+})
+
+describe('indexAdmin', function(){
+  beforeEach(function(done){
+    passportStub.install(app);
+    done();
+  })
+
+  afterEach(function(done){
+    passportStub.logout();
+    passportStub.uninstall()
+    done();
+  })
+  it ('should return 200 OK', function(done){
+
+    factory.create('poll')
+      .then(function(poll){
+        models.User.find({_id: poll.user}, function(err, user){
+          passportStub.login(user)
+          request(app)
+            .get('/api/polls/admin')
+            .expect(200, done)
+
+        })
+
+      })
+
+  })
+
+})
+
+describe('destroy', function(){
+
+  beforeEach(function(done){
+    passportStub.install(app);
+    done();
+  })
+
+  afterEach(function(done){
+    passportStub.logout();
+    passportStub.uninstall()
+    done();
+  })
+
+  it('destroys a poll', function(done){
+
+    factory.create('poll')
+      .then(function(poll){
+        models.User.find({_id: poll.user}, function(err, user){
+
+          passportStub.login(user)
+          request(app)
+            .delete('/api/poll/destroy')
+            .send({
+              _id: poll._id
+            })
+            .expect(200)
+            .then(function(resp){
+              assert(resp.body.msg == "Successfully removed poll")
+              done();
+            })
+
+        })
+
+      })
+
+  })
+
+  it("doesn't destroy -- can't find", function(done){
+    factory.create('poll')
+      .then(function(poll){
+        models.User.find({_id: poll.user}, function(err, user){
+          passportStub.login(user)
+          request(app)
+            .delete('/api/poll/destroy')
+            .send({
+              _id: null
+            })
+            .expect(404)
+            .then(function(resp){
+              assert(resp.body.msg == "Poll not removed. It either does not exist or does not belong to you.")
+              done();
+            })
+
+        })
+
+      })
+  })
+
+  it("doesn't destroy -- access denied", function(done){
+    // poll belongs to another user
+
+    factory.create('user')
+      .then(function(user){
+        factory.create('poll')
+          .then(function(poll){
+
+            // login as the first user
+            passportStub.login(user)
+            request(app)
+              .delete("/api/poll/destroy")
+              .send({_id: poll._id})
+              .expect(404)
+              .then(function(resp){
+                assert(resp.body.msg == "Poll not removed. It either does not exist or does not belong to you.")
+                done();
+              })
+
+          })
+
+      })
+
+  })
+
+  it("doesn't destroy -- not logged in", function(done){
+    factory.create('poll')
+      .then(function(poll){
+        models.User.find({_id: poll.user}, function(err, user){
+
+          request(app)
+            .delete('/api/poll/destroy')
+            .send({
+              _id: poll._id
+            })
+            .expect(302, done)
+
+        })
+
       })
   })
 
