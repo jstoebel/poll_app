@@ -2,20 +2,16 @@ var models = require('require.all')('../models')
 
 exports.index = function(req, res) {
 
-  models.Poll.find(function(err, polls){
+  models.Poll.find({}, function(err, allPolls){
     if (err) {
       throw err;
     }
 
-    res.end(JSON.stringify( {polls: polls} ) );
+    res.json({polls: allPolls});
 
   })
 
 };
-
-exports.new = function(req, res) {
-  res.end("hello from new")
-}
 
 exports.create = function(req, res) {
 
@@ -36,7 +32,6 @@ exports.create = function(req, res) {
 
   poll.save(function(err, poll){
     if (err){
-        console.log(err);
         res.status(400).json({msg: "Failed to create poll"})
     } else {
       // next make the options
@@ -48,6 +43,9 @@ exports.create = function(req, res) {
 
 exports.show = function(req, res) {
   models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
+    if (err){
+      res.status(404)
+    }
     res.json(poll)
   })
 };
@@ -62,16 +60,15 @@ exports.vote = function(req, res) {
         "options.$.votes": 1
       }
     },
-    function(err,doc) {
-        if (err){
-          console.log(err);
-          res.status(400).json({msg: "Failed to update poll"})
-        } else {
-          res.status(201).json({msg: "Vote successful"})
-        }
+    {new: true},
+    function(err, poll){
+      if (!poll){
+        res.status(400).json({msg: "Failed to update poll"})
+      } else {
+        res.status(201).json({msg: "Vote successful"})
+      }
     }
   );
-
 }
 
 exports.indexAdmin = function(req, res) {
@@ -88,43 +85,23 @@ exports.indexAdmin = function(req, res) {
 
 }
 
-exports.edit = function(req, res) {
-  res.end("hello from edit")
-};
-
-exports.update = function(req, res) {
-  res.end("hello from update")
-};
-
 exports.destroy = function(req, res) {
   // destroy a poll
 
-  // find the poll
+  var params = {
+    _id: req.body._id,
+    user: req.user
+  }
 
-  models.Poll.find(req.body, function(err, poll){
-    if (err){
-      req.status(204).json({msg: "Couldn't find poll to delete"})
-    }
-
-    // authorize permission to remove
-    if (poll._id = req.user._id){
-
-      models.Poll.remove(req.body, function(err) {
-        if (err) {
-          res.status(204).json({msg: "Couldn't delete record"})
-        } else {
-          res.status(200).json({msg: "Successfully removed poll", success: true });
-        }
-
-      })
-
+  models.Poll.remove(params, function(err, obj){
+    console.log(err);
+    console.log(obj.result.n);
+    if (obj.result.n === 0){
+      res.status(404).json({msg: "Poll not removed. It either does not exist or does not belong to you."})
     } else {
-      // not authorized to delete
-      res.status(403).json({msg: "Access denied-that poll doesn't belong to you."});
+      res.status(200).json({msg: "Successfully removed poll", success: true})
     }
-
-
-  }) // find
+  })
 
 }
 
@@ -142,7 +119,6 @@ exports.addOption = function(req, res) {
 
     poll.save(function(err, poll){
       if (err){
-          console.log(err);
           res.status(400).json({msg: "Failed to add option to poll"})
       } else {
         // next make the options
@@ -153,19 +129,3 @@ exports.addOption = function(req, res) {
   })
 
 }
-
-exports.destroyAll = function(req, res) {
-  // destroy ALL POLLS
-
-  models.Poll.remove({}, function(err){
-    if (err) {
-      res.status(204).json({msg: "Polls couldn't delete records"})
-    } else {
-
-      models.Poll.count({}, function(err, c) {
-        res.status(200).json({msg: "Polls remaining: " + c})
-      });
-    }
-  })
-
-};

@@ -1,5 +1,9 @@
-var factory = require('factory-girl').factory;
 var models = require('require.all')('../models')
+var fg = require('factory-girl');
+
+var adapter = new fg.MongooseAdapter();
+factory = fg.factory;
+factory.setAdapter(adapter);
 
 factory.define('user', models.User, {
   email: factory.sequence(function(n) {
@@ -11,13 +15,13 @@ factory.define('user', models.User, {
 
 factory.define('poll', models.Poll, {
   name: "some poll",
-  user: factory.assoc('user', '_id')
+  user: factory.assoc('user', '_id'),
+  options: [
+    {
+      name: "first option",
+      votes: 2
+    }
+  ]
 })
-
-factory.define('option', models.Option, {
-  name: "some option"
-})
-
-factory.define('vote', models.Option, {})
 
 module.exports = factory

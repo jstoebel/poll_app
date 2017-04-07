@@ -13,6 +13,7 @@ var MongoStore = require('connect-mongo/es5')(session);
 var flash = require('express-flash');
 var path = require('path');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var passport = require('passport');
 var expressValidator = require('express-validator');
 var sass = require('node-sass-middleware');
