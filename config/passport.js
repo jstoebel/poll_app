@@ -15,7 +15,7 @@ var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 
-var User = require('../models/User').user;
+var User = require('../models/User');
 var config = require('./config')
 
 passport.serializeUser(function(user, done) {
