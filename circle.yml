@@ -6,8 +6,6 @@ machine:
 database:
   # Circle will execute the below commands
   pre:
-    # Stop MongoDB
-    - sudo service mongodb stop
     # Download MongoDB 3.2.3
     - curl -Ol https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.4.3.tgz
     # Untar it
