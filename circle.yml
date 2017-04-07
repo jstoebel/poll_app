@@ -6,3 +6,4 @@ machine:
 test:
   pre:
     - mv .env.example .env
+    - npm rebuild node-sass
