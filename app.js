@@ -8,13 +8,7 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var lusca = require('lusca');
-
-var dotenv = require('dotenv');
-try {
-  dotenv.load()
-} catch (e) {
-  console.log("no .env file found. Moving on.");
-}
+var config = require('./config/config')
 
 var MongoStore = require('connect-mongo/es5')(session);
 var flash = require('express-flash');
@@ -28,7 +22,7 @@ var multer = require('multer');
 var upload = multer({ dest: path.join(__dirname, 'uploads') });
 var httpProxy = require('http-proxy');
 var proxy = httpProxy.createProxyServer();
-var config = require('./config/config')
+
 var httpProxy = require('http-proxy');
 
 /**
