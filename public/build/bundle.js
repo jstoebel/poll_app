@@ -38901,14 +38901,19 @@
 	              this.state.poll.options.map(this.eachOption)
 	            )
 	          ),
-	          _react2.default.createElement('input', {
-	            className:  true ? "" : "disabled",
-	            type: 'submit', value: 'Submit' }),
+	          _react2.default.createElement(
+	            'h4',
+	            null,
+	            ' submit a new option '
+	          ),
 	          _react2.default.createElement('input', {
 	            name: 'newOption',
 	            type: 'text',
 	            value: this.state.newOption,
-	            onChange: this.handleChange })
+	            onChange: this.handleChange }),
+	          _react2.default.createElement('input', {
+	            className:  true ? "" : "disabled",
+	            type: 'submit', value: 'Submit' })
 	        )
 	      );
 	    } else {
