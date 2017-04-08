@@ -204,15 +204,16 @@ const Show = React.createClass({
               </select>
             </div>
 
-            <input
-              className={"btn btn-info" + this.state.pollOption ? "" : "disabled"}
-              type="submit" value="Submit" />
 
+            <h4> submit a new option </h4>
             <input
               name="newOption"
               type="text"
               value={this.state.newOption}
               onChange={this.handleChange} />
+              <input
+              className={"btn btn-info" + this.state.pollOption ? "" : "disabled"}
+              type="submit" value="Submit" />
           </form>
 
         </div>

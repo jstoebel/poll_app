@@ -1,20 +1,44 @@
 # voting
-a voting app with Freecodecamp.com
+a voting app as an assignment with Freecodecamp.com. Built using MERN stack (MongoDB, Express, React and Node)
 
 This codebase is built using [this](https://github.com/sahat/hackathon-starter/tree/es5) as boilerplate
 
-# set up with webpack:
- - start [here](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/Setting-Up-A-React-ES6-Webpack-Project)
- - then go [here](https://github.com/reactjs/react-router-tutorial/tree/master/) to learn about React router:
- - finally, use [this tutorial](http://www.christianalfoni.com/articles/2015_04_19_The-ultimate-webpack-setup) to set up hot swapping
+# User stories
+
+  - User Story: As an authenticated user, I can keep my polls and come back later to access them.
+
+  - User Story: As an authenticated user, I can share my polls with my friends.
+
+  - User Story: As an authenticated user, I can see the aggregate results of my polls.
+
+  - User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
+
+  - User Story: As an authenticated user, I can create a poll with any number of possible items.
+
+  - User Story: As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
+
+  - User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form. (This could be implemented using Chart.js or Google Charts.)
+
+  - User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
 
 # Wireframe
 
-  - As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
-      - react view that:
-      - indexes all polls
-      - renders a single poll with an option to vote on it
-      - renders a form to create a new poll
-      - renders a form to edit a poll
+The core features of this app are implemented in with React router. The specfic views are:
 
-      - get /polls is NOT an authenticated end point
+ - Index view (accessible to all users)
+    - Users can select a poll to views
+
+  - Show view (accessible to all users)
+    - users can vote on the poll
+    - users can submit new options for that poll
+    - users can see a pie chart (in D3) displaying results
+  - New view (accessible to authenticated users)
+    - users can submit a poll name with some possible options
+  - admin view (accessible to authenticated users)
+    - users can see their own polls.
+    - users can remove their own polls
+    - users can share their own polls on twitter.
+
+# Notes
+
+Using D3 within a React component was a bit of a learning experience. [This blog post](http://www.jstoebel.com/getting-react-and-d3-to-play-nice/) outlines how I did it:
