@@ -1,9 +1,10 @@
 // borrowed from here: http://stackoverflow.com/questions/5778245/expressjs-how-to-structure-an-application/7350875#7350875
 
 try {
-  var dotenv = require('dotenv');
-  dotenv.load();
-} catch (e) {}
+  dotenv.load()
+} catch (e) {
+  console.log("no .env file found. Moving on.");
+}
 
 exports.currentEnv = process.env.NODE_ENV || 'production'
 
