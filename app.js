@@ -9,10 +9,23 @@ var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var lusca = require('lusca');
 
+var dotenv = require('dotenv');
 try {
-  var dotenv = require('dotenv');
-  dotenv.load();
-} catch (e) {}
+  dotenv.load()
+} catch (e) {
+  console.log("no .env file found. Moving on.");
+}
+
+// var fs = require('fs')
+//
+// fs.stat('.env', function(err, stat) {
+//     if(err == null) {
+//       console.log("loading .env");
+//       dotenv.load()
+//     } else {
+//       console.log("not loading .env");
+//     }
+// });
 
 var MongoStore = require('connect-mongo/es5')(session);
 var flash = require('express-flash');
