@@ -8,11 +8,11 @@ var _ = require('underscore');
 // this is helpful when you would like to change behavior when testing
 process.env.NODE_ENV = 'test';
 
-beforeEach(function (done) {
+beforeEach(done => {
 
   function clearDB() {
-    _.each(mongoose.connection.models, function(value, key){
-      value.remove({}, function(err, removed) {
+    _.each(mongoose.connection.models, (value, key) => {
+      value.remove({}, (err, removed) => {
       });
     })
 
@@ -20,7 +20,7 @@ beforeEach(function (done) {
   }
 
   if (mongoose.connection.readyState === 0) {
-    mongoose.connect(config.db.URL, function (err) {
+    mongoose.connect(config.db.URL, err => {
       if (err) {
         throw err;
       }
@@ -32,7 +32,7 @@ beforeEach(function (done) {
 });
 
 
-afterEach(function (done) {
+afterEach(done => {
   mongoose.disconnect();
   return done();
 });

@@ -26,20 +26,6 @@ class Index extends React.Component {
         .catch(function(err){
         })
 
-      // var xhr = $.ajax({
-      //   url: '/api/polls/',
-      //   type: 'GET'
-      // })
-
-      // xhr.done(function(result){
-      //   _this.setState({
-      //     polls: result.polls
-      //   })
-      // })
-      //   .fail(function(err){
-      //     console.log(err);
-      //   })
-
   }
 
   eachPoll(poll, i) {

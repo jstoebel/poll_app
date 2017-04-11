@@ -5,7 +5,7 @@ var factory = require('../factories')
 
 require('../test_config')
 
-describe('User Model', function() {
+describe('User Model', () => {
 
   // it('requires a unique email', function(done) {
   //   factory.createMany('user', 2, {email: "same@email.com"}).then(function(users){
