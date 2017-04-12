@@ -7,7 +7,9 @@ var factory = fg.factory
 factory.setAdapter(adapter);
 
 factory.define('user', models.User, {
-  email: factory.sequence(n => 'user' + n + '@demo.com'),
+  email: factory.sequence(n => {
+    'user' + n + '@demo.com'
+  }),
   password: '123',
 
 });

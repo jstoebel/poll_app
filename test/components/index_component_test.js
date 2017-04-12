@@ -23,7 +23,8 @@ describe("<INDEX />", () => {
     const wrapper = shallow(<Index />);
 
     factory.attrsMany('poll', 3).then(attrs => {
-      // postAttrsArray is an array of 5 post json objects
+      // postAttrsArray is an array of 3 post json objects
+      console.log("inside attrsMany");
       wrapper.setState({polls: attrs})
       expect(wrapper.find(Link)).to.have.length(3)
       done();

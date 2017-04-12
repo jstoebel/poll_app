@@ -43,9 +43,7 @@ const Show = React.createClass({
   },
 
   _getSuccess(resp) {
-    console.log("get success");
     var poll = resp;
-    console.log(poll);
     if (poll) {
       var totalVotes = poll.options.reduce(function(total, option, i){
         return total += option.votes

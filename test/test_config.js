@@ -8,31 +8,26 @@ var _ = require('underscore');
 // this is helpful when you would like to change behavior when testing
 process.env.NODE_ENV = 'test';
 
-beforeEach(done => {
+function clearDB() {
+  console.log("starting clearDB");
 
-  function clearDB() {
-    _.each(mongoose.connection.models, (value, key) => {
-      value.remove({}, (err, removed) => {
-      });
-    })
-
-    return done();
-  }
-
-  if (mongoose.connection.readyState === 0) {
-    mongoose.connect(config.db.URL, err => {
-      if (err) {
-        throw err;
-      }
-      return clearDB();
+  _.each(mongoose.connection.models, (value, key) => {
+    console.log("removed a model");
+    value.remove({}, (err, removed) => {
     });
-  } else {
-    return clearDB();
-  }
+  })
+
+}
+
+beforeEach(done => {
+  clearDB();
+  done();
 });
 
 
 afterEach(done => {
+  console.log("starting afterEach");
+  clearDB();
   mongoose.disconnect();
   return done();
 });
