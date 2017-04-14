@@ -15,8 +15,6 @@ describe("<SHOW />", () => {
     factory.attrs('poll').then(poll => {
         wrapper = shallow(<Show />);
 
-
-
         var newData = poll.options.map(function(option, i){
           return {value: option.votes, label: `${option.name}: ${option.votes}`}
         })
@@ -25,6 +23,11 @@ describe("<SHOW />", () => {
           poll: poll,
           pieData: newData
         })
+
+        wrapper.setProps({
+          containerWidth: 100
+        })
+
         done();
       }).catch(reason => {
         done(reason);
@@ -36,13 +39,19 @@ describe("<SHOW />", () => {
     done();
   });
 
-  // it("contains poll a container-fluid", (done) => {
-  //
-  // });
+  describe("pie chart", () => {
 
-  // it("contains poll a ", (done) => {
-  //
-  // });
+    it("contains an svg with correct height and width", (done) => {
+      var svg = wrapper.find('svg')
+
+      expect((svg.props()).to.have.property('width', '40'));
+      expect((svg.props()).to.have.property('height', '40'));
+      done();
+    })
+
+
+  })
+
 
 
 

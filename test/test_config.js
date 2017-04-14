@@ -1,5 +1,4 @@
 //  Modified from https://github.com/elliotf/mocha-mongoose
-
 var config = require('../config/config');
 var mongoose = require('mongoose');
 var _ = require('underscore');
@@ -8,26 +7,44 @@ var _ = require('underscore');
 // this is helpful when you would like to change behavior when testing
 process.env.NODE_ENV = 'test';
 
-function clearDB() {
-  console.log("starting clearDB");
+beforeEach(function () {
 
-  _.each(mongoose.connection.models, (value, key) => {
-    console.log("removed a model");
-    value.remove({}, (err, removed) => {
-    });
+  _.each(mongoose.connection.models, function(model, name){
+    model.remove({}, function(err, removed){
+    })
   })
-
-}
-
-beforeEach(done => {
-  clearDB();
-  done();
+  //
+  // function clearDB() {
+  //   console.log("starting clearDB");
+  //   _.each(mongoose.connection.models, function(model, name){
+  //     console.log(`removing ${name}...`);
+  //     model.remove({}, function(err, removed) {
+  //       if (err){
+  //         done(err);
+  //       }
+  //       model.count({}, function(err, c){
+  //         console.log(`${name} qty: ${c}`);
+  //       })
+  //     });
+  //   })
+  // }
+  //
+  // if (mongoose.connection.readyState === 0) {
+  //   mongoose.connect(config.db.URL, function (err) {
+  //     if (err) {
+  //       throw err;
+  //     }
+  //     clearDB();
+  //     console.log("done with clearDB");
+  //   });
+  // } else {
+  //   clearDB();
+  //   console.log("done with clearDB");
+  // }
 });
 
 
-afterEach(done => {
-  console.log("starting afterEach");
-  clearDB();
-  mongoose.disconnect();
-  return done();
-});
+// afterEach(function (done) {
+//   mongoose.disconnect();
+//   return done();
+// });
