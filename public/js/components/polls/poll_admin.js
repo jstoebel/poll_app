@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-import $ from 'jquery';
+import axios from 'axios';
 
 class PollAdmin extends Component {
 
@@ -24,23 +24,30 @@ class PollAdmin extends Component {
     }
 
     componentDidMount() {
+      // var _this = this;
+      //
+      //     var xhr = $.ajax({
+      //       url: '/api/polls/admin',
+      //       type: 'GET'
+      //     })
+      //
+      //     xhr.done(this._getSuccess)
+      //       .fail(this._getError)
+
       var _this = this;
 
-          var xhr = $.ajax({
-            url: '/api/polls/admin',
-            type: 'GET'
-          })
-
-          xhr.done(this._getSuccess)
-            .fail(this._getError)
+        axios('/api/polls/admin')
+          .then(this._getSuccess)
+          .catch(this._getError)
     }
 
     _getSuccess(resp) {
       // successfully pulled the records
+      console.log("starting _getSuccess");
       console.log(resp);
 
       this.setState({
-        polls: resp.polls
+        polls: resp.data.polls
       })
 
     }
@@ -104,7 +111,7 @@ class PollAdmin extends Component {
     eachPoll (poll, i) {
 
       return (
-        <div className="row" key={poll._id}>
+        <div className="row" key={i}>
           <div className="col-xs-10">
             <Link to={"/poll/" + poll._id} >
               <div className="btn btn-info btn-block">
@@ -117,7 +124,7 @@ class PollAdmin extends Component {
             <div className="btn-group" role="group" aria-label="share and destroy">
 
               <div type="button" className="btn btn-info btn-secondary" onClick={(e) => this.handleShare(e, poll._id)} aria-label="share">
-                <i className="fa fa-share" ></i>
+                <i className="fa fa-share" aria-hidden="true" ></i>
               </div>
 
               <div className="btn btn-danger btn-secondary" onClick={(e) => this.handleDestroy(e, poll._id)} aria-label="destroy">

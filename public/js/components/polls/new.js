@@ -112,6 +112,7 @@ class New extends React.Component {
             <div className="col-10">
               <input
                 className="form-control"
+                ref="pollName"
                 name="pollName"
                 type="text"
                 value={this.state.pollName}
@@ -127,6 +128,7 @@ class New extends React.Component {
               className="form-control"
               rows="3"
               type="text"
+              ref="pollOptions"
               name="pollOptions"
               value={this.state.pollOptions}
               onChange={this.handleChange}

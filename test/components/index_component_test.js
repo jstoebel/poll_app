@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import Index from '../../public/js/components/polls/index';
 import factory from '../factories';
 
+
 describe("<INDEX />", () => {
   it("contains poll index", (done) => {
     const wrapper = shallow(<Index />);
@@ -32,5 +33,7 @@ describe("<INDEX />", () => {
       done(reason);
     });
   })
+
+
 
 });
