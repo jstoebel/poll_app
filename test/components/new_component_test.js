@@ -60,14 +60,9 @@ describe("<NEW />", () => {
 
     it("responds to name change", done => {
 
-      // const handleChangeSpy = sinon.spy();
-      // const event = {target: {name: "pollName", value: "spam"}};
-      // const wrap = mount(
-      //   <New handleChange={handleChangeSpy} />
-      // );
-      //
-      // wrap.ref('pollName').simulate('change', event);
-      // expect(handleChangeSpy.calledOnce).to.equal(true);
+      const event = {target: {name: "pollName", value: "spam"}};
+      wrapper.ref("pollName").simulate("change", event);
+      expect(wrapper.state("pollName")).to.equal("spam");
       done();
     })
 
@@ -86,6 +81,9 @@ describe("<NEW />", () => {
     })
 
     it("responds to options change", done => {
+      const event = {target: {name: "pollOptions", value: "spam\neggs"}};
+      wrapper.ref("pollOptions").simulate("change", event);
+      expect(wrapper.state("pollOptions")).to.equal("spam\neggs");
       done();
 
     })
@@ -107,6 +105,16 @@ describe("<NEW />", () => {
       // wrapper.find('.btn').simulate('click');
       //
       // expect(handleSubmitSpy.calledOnce).to.equal(true);
+
+      // sinon.spy(Foo.prototype, 'componentDidMount');
+      // const wrapper = mount(<Foo />);
+      // expect(Foo.prototype.componentDidMount.calledOnce).to.equal(true);
+
+      sinon.spy(New.prototype, "handleSubmit");
+      const newWrapper = mount(<New />);
+      newWrapper.find(".btn").simulate('submit');
+      expect(New.prototype.handleSubmit.calledOnce).to.equal(true);
+
       done();
 
     })

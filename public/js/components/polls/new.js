@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import { hashHistory } from 'react-router'
+import $ from 'jquery'
+import axios from 'axios';
+
 
 class New extends React.Component {
 
@@ -73,15 +76,22 @@ class New extends React.Component {
   }
 
   handleSubmit(event) {
+
+    // TODO: switch to axios
+
     event.preventDefault();
     console.log('A poll was submitted: ' + this.state.pollName);
     var formData = {
       pollName: this.state.pollName
     }
 
+
     var xhr = this._create();
     xhr.done(this._onSuccess)
       .fail(this._onError)
+    // axios.post('/api/polls')
+    //   .then(this._onSuccess)
+    //   .catch(this._onError)
   }
 
   eachFlash(flash, i) {
