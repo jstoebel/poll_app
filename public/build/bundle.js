@@ -28758,8 +28758,6 @@
 	    key: '_onSuccess',
 	    value: function _onSuccess(resp) {
 
-	      console.log("sucessful submission!");
-	      console.log(resp.data);
 	      if (resp.data.success) {
 	        // redirect to poll page
 	        var path = 'poll/' + resp.data.id;
@@ -28771,11 +28769,14 @@
 	  }, {
 	    key: '_onError',
 	    value: function _onError(resp) {
-	      console.log("error!");
-	      console.log(resp);
 
 	      var newFlashes = this.state.flashes;
-	      newFlashes.push({ msg: resp.data.msg, success: false });
+
+	      if (resp.data && resp.data.msg) {
+	        newFlashes.push({ msg: resp.data.msg, success: false });
+	      } else {
+	        newFlashes.push({ msg: "Oops something went wrong!", success: false });
+	      }
 	      this.setState({
 	        flashes: newFlashes
 	      });
@@ -28787,7 +28788,6 @@
 	      // TODO: switch to axios
 
 	      event.preventDefault();
-	      console.log('A poll was submitted: ' + this.state.pollName);
 	      var formData = {
 	        pollName: this.state.pollName
 	      };
@@ -39265,8 +39265,6 @@
 	    });
 	  },
 	  _submitSuccess: function _submitSuccess(resp) {
-	    console.log('A poll was voted on: ' + this.state.pollOption);
-	    console.log(resp);
 
 	    var xhr = this._getRecord();
 	    xhr.done(this._getSuccess).fail(this._getError);
@@ -39286,8 +39284,6 @@
 	    });
 	  },
 	  _optionSuccess: function _optionSuccess(resp) {
-	    console.log("here is the response");
-	    console.log(resp);
 	    var poll = resp.poll;
 	    var option = poll.options[poll.options.length - 1];
 

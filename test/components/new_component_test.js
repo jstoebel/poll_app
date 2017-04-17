@@ -98,18 +98,6 @@ describe("<NEW />", () => {
 
 
     it("responds to submit", done => {
-      // const handleSubmitSpy = sinon.spy();
-      // const wrapper = mount(
-      //   <New handleSubmit={handleSubmitSpy} />
-      // );
-      // wrapper.find('.btn').simulate('click');
-      //
-      // expect(handleSubmitSpy.calledOnce).to.equal(true);
-
-      // sinon.spy(Foo.prototype, 'componentDidMount');
-      // const wrapper = mount(<Foo />);
-      // expect(Foo.prototype.componentDidMount.calledOnce).to.equal(true);
-
       sinon.spy(New.prototype, "handleSubmit");
       const newWrapper = mount(<New />);
       newWrapper.find(".btn").simulate('submit');

@@ -64,10 +64,16 @@ class New extends React.Component {
   _onError(resp) {
 
     var newFlashes = this.state.flashes
-    newFlashes.push({msg: resp.data.msg, success: false})
+
+    if (resp.data && resp.data.msg ) {
+      newFlashes.push({msg: resp.data.msg, success: false})
+    } else {
+      newFlashes.push({msg: "Oops something went wrong!", success: false})        
+    }
     this.setState({
       flashes : newFlashes
     })
+
   }
 
   handleSubmit(event) {
@@ -75,7 +81,6 @@ class New extends React.Component {
     // TODO: switch to axios
 
     event.preventDefault();
-    console.log('A poll was submitted: ' + this.state.pollName);
     var formData = {
       pollName: this.state.pollName
     }
