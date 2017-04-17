@@ -62,7 +62,7 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _new = __webpack_require__(266);
+	var _new = __webpack_require__(265);
 
 	var _new2 = _interopRequireDefault(_new);
 
@@ -27111,10 +27111,6 @@
 
 	var _axios2 = _interopRequireDefault(_axios);
 
-	var _jquery = __webpack_require__(265);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28675,6 +28671,227 @@
 
 /***/ },
 /* 265 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(182);
+
+	var _jquery = __webpack_require__(266);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _axios = __webpack_require__(240);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var New = function (_React$Component) {
+	  _inherits(New, _React$Component);
+
+	  function New(props) {
+	    _classCallCheck(this, New);
+
+	    var _this = _possibleConstructorReturn(this, (New.__proto__ || Object.getPrototypeOf(New)).call(this, props));
+
+	    _this.state = {
+	      pollName: "",
+	      flashes: []
+	    };
+
+	    // methods that need access this `this`
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.handleSubmit = _this.handleSubmit.bind(_this);
+	    _this.eachFlash = _this.eachFlash.bind(_this);
+	    _this._onSuccess = _this._onSuccess.bind(_this);
+	    _this._onError = _this._onError.bind(_this);
+
+	    return _this;
+	  }
+
+	  _createClass(New, [{
+	    key: 'handleChange',
+	    value: function handleChange(event) {
+	      // handle changing state of fields
+
+	      var target = event.target;
+	      var value = target.value;
+	      var name = target.name;
+	      this.setState(_defineProperty({}, name, value));
+	    }
+	  }, {
+	    key: '_create',
+	    value: function _create() {
+	      return _jquery2.default.ajax({
+	        url: '/api/polls',
+	        type: 'POST',
+	        data: {
+	          name: this.state.pollName,
+	          options: this.state.pollOptions
+	        },
+	        beforeSend: function () {
+	          this.setState({ loading: true });
+	        }.bind(this)
+
+	      });
+	    }
+	  }, {
+	    key: '_onSuccess',
+	    value: function _onSuccess(resp) {
+
+	      console.log("sucessful submission!");
+	      console.log(resp.data);
+	      if (resp.data.success) {
+	        // redirect to poll page
+	        var path = 'poll/' + resp.data.id;
+	        _reactRouter.hashHistory.push(path);
+	      } else {
+	        // TODO: redirect to login
+	      }
+	    }
+	  }, {
+	    key: '_onError',
+	    value: function _onError(resp) {
+	      console.log("error!");
+	      console.log(resp);
+
+	      var newFlashes = this.state.flashes;
+	      newFlashes.push({ msg: resp.data.msg, success: false });
+	      this.setState({
+	        flashes: newFlashes
+	      });
+	    }
+	  }, {
+	    key: 'handleSubmit',
+	    value: function handleSubmit(event) {
+
+	      // TODO: switch to axios
+
+	      event.preventDefault();
+	      console.log('A poll was submitted: ' + this.state.pollName);
+	      var formData = {
+	        pollName: this.state.pollName
+	      };
+
+	      // var xhr = this._create();
+	      // xhr.done(this._onSuccess)
+	      //   .fail(this._onError)
+	      _axios2.default.post('/api/polls', {
+	        name: this.state.pollName,
+	        options: this.state.pollOptions
+	      }).then(this._onSuccess).catch(this._onError);
+	    }
+	  }, {
+	    key: 'eachFlash',
+	    value: function eachFlash(flash, i) {
+
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          className: "alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable",
+	          key: i
+	        },
+	        _react2.default.createElement(
+	          'a',
+	          { href: '#', className: 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
+	          '\xD7'
+	        ),
+	        flash.msg
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          ' Create a new poll '
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'flashes' },
+	          ' ',
+	          this.state.flashes.map(this.eachFlash),
+	          ' '
+	        ),
+	        _react2.default.createElement(
+	          'form',
+	          { onSubmit: this.handleSubmit },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group row' },
+	            _react2.default.createElement(
+	              'label',
+	              { className: 'col-2 col-form-label form-text' },
+	              'Poll Name'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-10' },
+	              _react2.default.createElement('input', {
+	                className: 'form-control',
+	                ref: 'pollName',
+	                name: 'pollName',
+	                type: 'text',
+	                value: this.state.pollName,
+	                onChange: this.handleChange
+	              })
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group row' },
+	            _react2.default.createElement(
+	              'label',
+	              { className: 'form-text' },
+	              'Options (One choice per line)'
+	            ),
+	            _react2.default.createElement('textarea', {
+	              className: 'form-control',
+	              rows: '3',
+	              type: 'text',
+	              ref: 'pollOptions',
+	              name: 'pollOptions',
+	              value: this.state.pollOptions,
+	              onChange: this.handleChange
+	            })
+	          ),
+	          _react2.default.createElement('input', { className: 'btn btn-info', type: 'submit', value: 'Submit' })
+	        )
+	      );
+	    }
+	  }]);
+
+	  return New;
+	}(_react2.default.Component);
+
+	exports.default = New;
+
+/***/ },
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -38933,213 +39150,6 @@
 
 
 /***/ },
-/* 266 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactRouter = __webpack_require__(182);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var New = function (_React$Component) {
-	  _inherits(New, _React$Component);
-
-	  function New(props) {
-	    _classCallCheck(this, New);
-
-	    var _this = _possibleConstructorReturn(this, (New.__proto__ || Object.getPrototypeOf(New)).call(this, props));
-
-	    _this.state = {
-	      pollName: "",
-	      flashes: []
-	    };
-
-	    // methods that need access this `this`
-	    _this.handleChange = _this.handleChange.bind(_this);
-	    _this.handleSubmit = _this.handleSubmit.bind(_this);
-	    _this.eachFlash = _this.eachFlash.bind(_this);
-	    _this._onSuccess = _this._onSuccess.bind(_this);
-	    _this._onError = _this._onError.bind(_this);
-
-	    return _this;
-	  }
-
-	  _createClass(New, [{
-	    key: 'handleChange',
-	    value: function handleChange(event) {
-	      // handle changing state of fields
-
-	      var target = event.target;
-	      var value = target.value;
-	      var name = target.name;
-	      this.setState(_defineProperty({}, name, value));
-	    }
-	  }, {
-	    key: '_create',
-	    value: function _create() {
-	      return $.ajax({
-	        url: '/api/polls',
-	        type: 'POST',
-	        data: {
-	          name: this.state.pollName,
-	          options: this.state.pollOptions
-	        },
-	        beforeSend: function () {
-	          this.setState({ loading: true });
-	        }.bind(this)
-
-	      });
-	    }
-	  }, {
-	    key: '_onSuccess',
-	    value: function _onSuccess(resp) {
-
-	      var newFlashes = this.state.flashes;
-	      if (resp.success) {
-
-	        // redirect to poll page
-	        var path = 'poll/' + resp.id;
-	        // this.props.history.push(path);
-	        _reactRouter.hashHistory.push(path);
-	        // newFlashes.push({msg: resp.msg, success: true})
-	        // this.setState({
-	        //   flashes : newFlashes
-	        // })
-	      } else {
-	          // TODO: redirect to login
-	        }
-	    }
-	  }, {
-	    key: '_onError',
-	    value: function _onError(error) {
-	      var newFlashes = this.state.flashes;
-	      newFlashes.push({ msg: resp.msg, success: false });
-	      this.setState({
-	        flashes: newFlashes
-	      });
-	    }
-	  }, {
-	    key: 'handleSubmit',
-	    value: function handleSubmit(event) {
-	      event.preventDefault();
-	      console.log('A poll was submitted: ' + this.state.pollName);
-	      var formData = {
-	        pollName: this.state.pollName
-	      };
-
-	      var xhr = this._create();
-	      xhr.done(this._onSuccess).fail(this._onError);
-	    }
-	  }, {
-	    key: 'eachFlash',
-	    value: function eachFlash(flash, i) {
-
-	      return _react2.default.createElement(
-	        'div',
-	        {
-	          className: "alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable",
-	          key: i
-	        },
-	        _react2.default.createElement(
-	          'a',
-	          { href: '#', className: 'close', 'data-dismiss': 'alert', 'aria-label': 'close' },
-	          '\xD7'
-	        ),
-	        flash.msg
-	      );
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          ' Create a new poll '
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'flashes' },
-	          ' ',
-	          this.state.flashes.map(this.eachFlash),
-	          ' '
-	        ),
-	        _react2.default.createElement(
-	          'form',
-	          { onSubmit: this.handleSubmit },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'form-group row' },
-	            _react2.default.createElement(
-	              'label',
-	              { className: 'col-2 col-form-label form-text' },
-	              'Poll Name'
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'col-10' },
-	              _react2.default.createElement('input', {
-	                className: 'form-control',
-	                ref: 'pollName',
-	                name: 'pollName',
-	                type: 'text',
-	                value: this.state.pollName,
-	                onChange: this.handleChange
-	              })
-	            )
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'form-group row' },
-	            _react2.default.createElement(
-	              'label',
-	              { className: 'form-text' },
-	              'Options (One choice per line)'
-	            ),
-	            _react2.default.createElement('textarea', {
-	              className: 'form-control',
-	              rows: '3',
-	              type: 'text',
-	              ref: 'pollOptions',
-	              name: 'pollOptions',
-	              value: this.state.pollOptions,
-	              onChange: this.handleChange
-	            })
-	          ),
-	          _react2.default.createElement('input', { className: 'btn btn-info', type: 'submit', value: 'Submit' })
-	        )
-	      );
-	    }
-	  }]);
-
-	  return New;
-	}(_react2.default.Component);
-
-	exports.default = New;
-
-/***/ },
 /* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -39161,7 +39171,7 @@
 
 	var _reactDimensions2 = _interopRequireDefault(_reactDimensions);
 
-	var _jquery = __webpack_require__(265);
+	var _jquery = __webpack_require__(266);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -49642,10 +49652,6 @@
 
 	var _reactRouter = __webpack_require__(182);
 
-	var _jquery = __webpack_require__(265);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
 	var _axios = __webpack_require__(240);
 
 	var _axios2 = _interopRequireDefault(_axios);
@@ -49735,7 +49741,7 @@
 	      event.preventDefault();
 	      console.log('A poll was asked to be removed: ' + id);
 
-	      var xhr = _jquery2.default.ajax({
+	      var xhr = $.ajax({
 	        url: '/api/poll/destroy',
 	        type: 'DELETE',
 	        data: {
@@ -49750,7 +49756,7 @@
 	      // remove the poll from state and rerender
 
 	      console.log("destroy success");
-	      var xhr = _jquery2.default.ajax({
+	      var xhr = $.ajax({
 	        url: '/api/polls/admin',
 	        type: 'GET'
 	      });
@@ -49776,7 +49782,7 @@
 
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'row', key: poll._id },
+	        { className: 'row', key: i },
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'col-xs-10' },
@@ -49801,7 +49807,7 @@
 	              { type: 'button', className: 'btn btn-info btn-secondary', onClick: function onClick(e) {
 	                  return _this3.handleShare(e, poll._id);
 	                }, 'aria-label': 'share' },
-	              _react2.default.createElement('i', { className: 'fa fa-share' })
+	              _react2.default.createElement('i', { className: 'fa fa-share', 'aria-hidden': 'true' })
 	            ),
 	            _react2.default.createElement(
 	              'div',

@@ -50,26 +50,21 @@ class New extends React.Component {
 
   _onSuccess(resp) {
 
-    var newFlashes = this.state.flashes
-    if (resp.success) {
-
+    if (resp.data.success) {
       // redirect to poll page
-      const path = `poll/${resp.id}`;
-      // this.props.history.push(path);
+      const path = `poll/${resp.data.id}`;
       hashHistory.push(path);
-      // newFlashes.push({msg: resp.msg, success: true})
-      // this.setState({
-      //   flashes : newFlashes
-      // })
+
     } else {
         // TODO: redirect to login
     }
 
   }
 
-  _onError(error) {
+  _onError(resp) {
+
     var newFlashes = this.state.flashes
-    newFlashes.push({msg: resp.msg, success: false})
+    newFlashes.push({msg: resp.data.msg, success: false})
     this.setState({
       flashes : newFlashes
     })
@@ -86,12 +81,15 @@ class New extends React.Component {
     }
 
 
-    var xhr = this._create();
-    xhr.done(this._onSuccess)
-      .fail(this._onError)
-    // axios.post('/api/polls')
-    //   .then(this._onSuccess)
-    //   .catch(this._onError)
+    // var xhr = this._create();
+    // xhr.done(this._onSuccess)
+    //   .fail(this._onError)
+    axios.post('/api/polls', {
+      name: this.state.pollName,
+      options: this.state.pollOptions
+    })
+      .then(this._onSuccess)
+      .catch(this._onError)
   }
 
   eachFlash(flash, i) {
