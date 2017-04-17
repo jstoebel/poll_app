@@ -6,6 +6,7 @@ import PieChart from '../../public/js/components/polls/pie_chart';
 import Arc from '../../public/js/components/polls/arc';
 import factory from '../factories';
 import sinon from 'sinon';
+import _ from 'underscore'
 
 // https://github.com/airbnb/enzyme/issues/341
 import jsdom from 'jsdom'
@@ -16,7 +17,8 @@ global.window = doc.defaultView
 describe("<PieChart />", () => {
 
   var wrapper,
-    pieData;
+    pieData,
+    expectedProps;
 
   beforeEach( done => {
 
@@ -27,14 +29,15 @@ describe("<PieChart />", () => {
           return {value: option.votes, label: `${option.name}: ${option.votes}`}
         } )
 
+
         const colorsStub = (i) => {
           return "#000000"
         }
+        expectedProps = { x: 100, y: 100, data: pieData, outerRadius: 100,
+          innerRadius: 50, colors: colorsStub
+        }
 
-        wrapper = shallow(<PieChart
-          x={100} y={100}  data={pieData} outerRadius={100} innerRadius={100}
-          colors={colorsStub}
-        />);
+        wrapper = shallow(<PieChart {...expectedProps} />);
 
         done();
       }).catch( err => {
@@ -46,5 +49,24 @@ describe("<PieChart />", () => {
     expect(wrapper.find(Arc)).to.have.length(1);
     done();
   })
+
+  describe("passes props to Arc", () => {
+
+    var actualProps;
+
+    beforeEach( done => {
+      actualProps = wrapper.find(Arc).first().props();
+      done();
+    })
+
+    ["innerRadius", 'outerRadius'].forEach( prop => {
+
+      it(`passes ${prop}`, done => {
+        expect(expectedProps[prop]).to.equal(actualProps.prop)
+      })
+
+    }) // loop
+
+  }) // inner describe
 
 });
