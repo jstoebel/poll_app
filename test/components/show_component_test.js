@@ -1,8 +1,8 @@
-// TODO This component is trickier because it is wrapped in a react demensions
-// component. This seems to be complicating things emensly and I have no idea
-// how to test for it.
-// I submitted a question here: https://github.com/digidem/react-dimensions/issues/65
-
+// // TODO This component is trickier because it is wrapped in a react demensions
+// // component. This seems to be complicating things emensly and I have no idea
+// // how to test for it.
+// // I submitted a question here: https://github.com/digidem/react-dimensions/issues/65
+//
 // import React from 'react';
 // import { expect } from 'chai';
 // import { shallow, mount, render } from 'enzyme';

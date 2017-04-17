@@ -38,11 +38,27 @@ describe("<PieChart />", () => {
         }
 
         wrapper = shallow(<PieChart {...expectedProps} />);
-
         done();
+
       }).catch( err => {
         done(err)
       })
+  })
+
+  it("has a g element at root", done => {
+    expect(wrapper.find('g')).to.have.length(1)
+    done();
+  })
+
+  it("transforms g element based on props", done => {
+    const expectedTranslate = `translate(${expectedProps.x}, ${expectedProps.y})`
+    expect(wrapper
+      .find('g')
+      .filterWhere( (i) => {
+        return i.prop('transform') === expectedTranslate
+      })
+    ).to.have.lengthOf(1)
+    done();
   })
 
   it("contains an Arc", done => {
@@ -59,13 +75,21 @@ describe("<PieChart />", () => {
       done();
     })
 
-    ["innerRadius", 'outerRadius'].forEach( prop => {
+    const radiusProps = ["innerRadius", "outerRadius"];
+
+    radiusProps.forEach( prop => {
 
       it(`passes ${prop}`, done => {
-        expect(expectedProps[prop]).to.equal(actualProps.prop)
+        expect(expectedProps[prop]).to.equal(actualProps[prop])
+        done();
       })
 
     }) // loop
+
+    it("passes the right color", done => {
+      expect(actualProps.color).to.equal("#000000")
+      done();
+    })
 
   }) // inner describe
 
