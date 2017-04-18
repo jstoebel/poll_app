@@ -6,6 +6,7 @@ machine:
 dependencies:
   override:
     - yarn
+    - yarn add node-sass --force
 test:
   pre:
     - mv .env.example .env
