@@ -16,25 +16,22 @@ global.window = doc.defaultView
 
 describe("<Arc />", () => {
 
-  var pieData,
-    arcProps;
+  var arcProps;
 
   beforeEach(done => {
 
-    factory.attrs('poll')
-      .then( attrs => {
-
-        pieData = attrs.options.map( (option, i) =>{
-          return {value: option.votes, label: `${option.name}: ${option.votes}`}
-        })
-
-        arcProps = {
-          data: pieData,
-          innerRadius: 100,
-          outerRadius: 100
-        }
-        done();
-      })
+    arcProps = {
+      data:
+       { data: { value: 2, label: 'first option: 2' },
+         value: 2,
+         startAngle: 0,
+         endAngle: 6.283185307179586,
+         padAngle: 0 },
+      innerRadius: 50,
+      outerRadius: 100,
+      color: '#000000'
+    }
+    done();
   })
 
   describe("updateD3", () => {
@@ -75,12 +72,17 @@ describe("<Arc />", () => {
 
   it("has d attr based on props", done => {
     const arc = d3.svg.arc();
-    console.log(arcProps);
-    const wrapper = shallow(<Arc {...arcProps} />);
-    console.log(wrapper.props())
-    // expect(wrapper.prop('d')).to.equal(arc(wrapper.props().data))
+    arc.innerRadius(arcProps.innerRadius)
+    arc.outerRadius(arcProps.outerRadius)
+    const wrapper = mount(<Arc {...arcProps} />);
+    expect(wrapper.find('path').prop('d')).to.equal(arc(wrapper.props().data))
     done();
   })
 
+  it("has style based on props", done => {
+    const wrapper = shallow(<Arc {...arcProps} />);
+    expect(wrapper.find('path').prop('style')).to.eql({fill: arcProps.color})
+    done();
+  })
 
 });

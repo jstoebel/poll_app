@@ -37,7 +37,7 @@ describe("<PieChart />", () => {
           innerRadius: 50, colors: colorsStub
         }
 
-        wrapper = shallow(<PieChart {...expectedProps} />);
+        wrapper = mount(<PieChart {...expectedProps} />);
         done();
 
       }).catch( err => {
@@ -62,6 +62,7 @@ describe("<PieChart />", () => {
   })
 
   it("contains an Arc", done => {
+
     expect(wrapper.find(Arc)).to.have.length(1);
     done();
   })
