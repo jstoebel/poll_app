@@ -89,6 +89,7 @@
         "tumblr.js": "^1.0.0",
         "twilio": "^3.3.0-edge",
         "twit": "^2.2.4",
+        "uglify-js": "^2.8.22",
         "underscore": "^1.8.3",
         "validator": "^5.2.0",
         "yui": "^3.18.1"
