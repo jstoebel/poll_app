@@ -6,7 +6,7 @@ import Index from '../../public/js/components/polls/index';
 import factory from '../factories';
 
 
-describe("<INDEX />", () => {
+describe("<Index />", () => {
   it("contains poll index", (done) => {
     const wrapper = shallow(<Index />);
     expect(wrapper.find('#poll-index')).to.have.length(1);

@@ -120,7 +120,7 @@ describe('POST create', () => {
 
 })
 
-describe('show', () => {
+describe('GET show', () => {
 
   it('returns 200 ok', done => {
     factory.create('poll')
@@ -145,7 +145,7 @@ describe('show', () => {
   })
 })
 
-describe('vote', () => {
+describe('POST vote', () => {
 
   it('returns 201', done => {
 
@@ -183,7 +183,7 @@ describe('vote', () => {
 
 })
 
-describe('indexAdmin', () => {
+describe('GET indexAdmin', () => {
   beforeEach(done => {
     passportStub.install(app);
     done();
@@ -212,7 +212,7 @@ describe('indexAdmin', () => {
 
 })
 
-describe('destroy', () => {
+describe('DELETE destroy', () => {
 
   beforeEach(done => {
     passportStub.install(app);
@@ -314,7 +314,7 @@ describe('destroy', () => {
 
 })
 
-describe('addOption', () => {
+describe('POST addOption', () => {
 
   beforeEach(done => {
     passportStub.install(app);
