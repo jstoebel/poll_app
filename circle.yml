@@ -3,7 +3,11 @@ machine:
     # Circle will use node v4.0.0
     version: 7.4.0
 
+dependencies:
+  override:
+    - yarn
 test:
   pre:
     - mv .env.example .env
-    - npm rebuild node-sass
+  override:
+    - yarn test
