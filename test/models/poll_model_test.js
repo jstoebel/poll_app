@@ -24,9 +24,8 @@ describe('Poll Model', () => {
     })
   }) // loop
 
-  // ['name', 'votes'].forEach(function(attr){
 
-    it('validates options: ' + 'spam', done => {
+    it('validates options: ' + 'bogus', done => {
       var user = new models.User({
         email: "fake@fake.com",
 

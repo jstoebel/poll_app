@@ -3,7 +3,7 @@ import d3 from 'd3';
 import { expect } from 'chai';
 import { shallow, mount, render } from 'enzyme';
 import { Link } from 'react-router';
-import Arc from '../../public/js/components/polls/arc';
+import Legend from '../../public/js/components/polls/legend';
 import factory from '../factories';
 import sinon from 'sinon';
 import _ from 'underscore'
