@@ -10,8 +10,11 @@ if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'test'){
 
 exports.appName = "voting";
 
+var dbName = exports.appName.toLowerCase()+"_"+exports.currentEnv
 // either Heroku's URL or create my own
 exports.db = {URL: process.env.MONGODB_URI ||
-  "mongodb://localhost:27017/"+exports.appName.toLowerCase()+"_"+exports.currentEnv}
+    "mongodb://localhost:27017/" + dbName,
+  name: dbName
+}
 
 exports.secret = process.env.SESSION_SECRET;

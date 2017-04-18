@@ -2,20 +2,21 @@ var request = require('supertest');
 var app = require('../../app.js');
 var models = require('require.all')('../models');
 var factory = require('../factories');
+
 var assert = require('chai').assert;
 var expect = require('chai').expect
 var agent = request.agent();
-passportStub = require('passport-stub');
+var passportStub = require('passport-stub');
 
-describe('GET index', function() {
-  it ('should return 200 OK', function(done){
+describe('GET index', () => {
+  it ('should return 200 OK', done => {
 
     factory.create('poll')
-      .then(function(poll){
+      .then(poll => {
         request(app)
           .get('/api/polls')
           .expect(200)
-          .then(function(resp){
+          .then(resp => {
             expect(resp.body.polls.length).to.equal(1)
             assert(resp.body.polls[0]._id == poll._id)
             done();
@@ -26,37 +27,35 @@ describe('GET index', function() {
   })
 })
 
-describe('POST create', function() {
-  beforeEach(function(done){
+describe('POST create', () => {
+  beforeEach(done => {
     passportStub.install(app);
     done();
   })
 
-  afterEach(function(done){
+  afterEach(done => {
     passportStub.logout();
     passportStub.uninstall()
     done();
   })
 
-  it('returns 200 OK with good params', function(done){
+  it('returns 200 OK with good params', done => {
 
     factory.create('user')
-      .then(function(user){
+      .then(user => {
           passportStub.login(user);
 
           factory.build('poll')
-          .then(function(poll){
+          .then(poll => {
             request(app)
               .post('/api/polls')
               .send(
                 { name: poll.name,
                   user: poll.user,
-                  options: poll.options.map(function(option){
-                    return option.name;
-                  }).join("\n")
+                  options: poll.options.map(option => option.name).join("\n")
                 })
               .expect(200)
-              .then(function(resp){
+              .then(resp => {
                 assert(resp.body.msg ==  `Successfully created poll ${poll.name}`)
                 done();
               })
@@ -65,52 +64,48 @@ describe('POST create', function() {
 
   }) // it
 
-  it('returns 302 when not logged in', function(done){
+  it('returns 302 when not logged in', done => {
 
     factory.build('poll')
-    .then(function(poll){
+    .then(poll => {
       request(app)
         .post('/api/polls')
         .send(
           { name: poll.name,
             user: poll.user,
-            options: poll.options.map(function(option){
-              return option.name;
-            }).join("\n")
+            options: poll.options.map(option => option.name).join("\n")
           })
         .expect(302, done)
       })
 
   }) // it
 
-  it('returns 400 on validation error', function(done){
+  it('returns 400 on validation error', done => {
     factory.create('user')
-      .then(function(user){
+      .then(user => {
           passportStub.login(user);
 
           factory.build('poll')
-          .then(function(poll){
+          .then(poll => {
             request(app)
               .post('/api/polls')
               .send(
                 { name: "",
                   user: poll.user,
-                  options: poll.options.map(function(option){
-                    return option.name;
-                  }).join("\n")
+                  options: poll.options.map(option => option.name).join("\n")
                 })
               .expect(400, done)
             })
           })
   })
 
-  it('returns 500 on no options', function(done){
+  it('returns 500 on no options', done => {
     factory.create('user')
-      .then(function(user){
+      .then(user => {
           passportStub.login(user);
 
           factory.build('poll')
-          .then(function(poll){
+          .then(poll => {
             request(app)
               .post('/api/polls')
               .send(
@@ -125,24 +120,24 @@ describe('POST create', function() {
 
 })
 
-describe('show', function(){
+describe('show', () => {
 
-  it('returns 200 ok', function(done){
+  it('returns 200 ok', done => {
     factory.create('poll')
-      .then(function(poll){
+      .then(poll => {
         request(app)
           .get(`/api/polls/${poll._id}`)
           .expect(200)
-          .then(function(resp){
+          .then(resp => {
             assert(resp.body._id == poll._id)
             done();
           })
       })
   })
 
-  it('returns 404 with bad id', function(done){
+  it('returns 404 with bad id', done => {
     factory.create('poll')
-      .then(function(poll){
+      .then(poll => {
         request(app)
           .get("/api/polls/bad_id")
           .expect(404, done)
@@ -150,12 +145,12 @@ describe('show', function(){
   })
 })
 
-describe('vote', function() {
+describe('vote', () => {
 
-  it('returns 201', function(done){
+  it('returns 201', done => {
 
     factory.create('poll')
-      .then(function(poll){
+      .then(poll => {
         request(app)
           .post('/api/polls/vote')
           .send(
@@ -164,7 +159,7 @@ describe('vote', function() {
             }
           )
           .expect(201)
-          .then(function(resp){
+          .then(resp => {
             expect(resp.body.msg).to.equal("Vote successful")
             done();
           })
@@ -172,14 +167,14 @@ describe('vote', function() {
 
   })
 
-  it('returns 400 with bad params', function(done){
+  it('returns 400 with bad params', done => {
     factory.create('poll')
-      .then(function(poll){
+      .then(poll => {
         request(app)
           .post('/api/polls/vote')
           .send({})
           .expect(400)
-          .then(function(resp){
+          .then(resp => {
             expect(resp.body.msg).to.equal("Failed to update poll")
             done();
           })
@@ -188,22 +183,22 @@ describe('vote', function() {
 
 })
 
-describe('indexAdmin', function(){
-  beforeEach(function(done){
+describe('indexAdmin', () => {
+  beforeEach(done => {
     passportStub.install(app);
     done();
   })
 
-  afterEach(function(done){
+  afterEach(done => {
     passportStub.logout();
     passportStub.uninstall()
     done();
   })
-  it ('should return 200 OK', function(done){
+  it ('should return 200 OK', done => {
 
     factory.create('poll')
-      .then(function(poll){
-        models.User.find({_id: poll.user}, function(err, user){
+      .then(poll => {
+        models.User.find({_id: poll.user}, (err, user) => {
           passportStub.login(user)
           request(app)
             .get('/api/polls/admin')
@@ -217,24 +212,24 @@ describe('indexAdmin', function(){
 
 })
 
-describe('destroy', function(){
+describe('destroy', () => {
 
-  beforeEach(function(done){
+  beforeEach(done => {
     passportStub.install(app);
     done();
   })
 
-  afterEach(function(done){
+  afterEach(done => {
     passportStub.logout();
     passportStub.uninstall()
     done();
   })
 
-  it('destroys a poll', function(done){
+  it('destroys a poll', done => {
 
     factory.create('poll')
-      .then(function(poll){
-        models.User.find({_id: poll.user}, function(err, user){
+      .then(poll => {
+        models.User.find({_id: poll.user}, (err, user) => {
 
           passportStub.login(user)
           request(app)
@@ -243,7 +238,7 @@ describe('destroy', function(){
               _id: poll._id
             })
             .expect(200)
-            .then(function(resp){
+            .then(resp => {
               assert(resp.body.msg == "Successfully removed poll")
               done();
             })
@@ -254,10 +249,10 @@ describe('destroy', function(){
 
   })
 
-  it("doesn't destroy -- can't find", function(done){
+  it("doesn't destroy -- can't find", done => {
     factory.create('poll')
-      .then(function(poll){
-        models.User.find({_id: poll.user}, function(err, user){
+      .then(poll => {
+        models.User.find({_id: poll.user}, (err, user) => {
           passportStub.login(user)
           request(app)
             .delete('/api/poll/destroy')
@@ -265,7 +260,7 @@ describe('destroy', function(){
               _id: null
             })
             .expect(404)
-            .then(function(resp){
+            .then(resp => {
               assert(resp.body.msg == "Poll not removed. It either does not exist or does not belong to you.")
               done();
             })
@@ -275,13 +270,13 @@ describe('destroy', function(){
       })
   })
 
-  it("doesn't destroy -- access denied", function(done){
+  it("doesn't destroy -- access denied", done => {
     // poll belongs to another user
 
     factory.create('user')
-      .then(function(user){
+      .then(user => {
         factory.create('poll')
-          .then(function(poll){
+          .then(poll => {
 
             // login as the first user
             passportStub.login(user)
@@ -289,7 +284,7 @@ describe('destroy', function(){
               .delete("/api/poll/destroy")
               .send({_id: poll._id})
               .expect(404)
-              .then(function(resp){
+              .then(resp => {
                 assert(resp.body.msg == "Poll not removed. It either does not exist or does not belong to you.")
                 done();
               })
@@ -300,10 +295,10 @@ describe('destroy', function(){
 
   })
 
-  it("doesn't destroy -- not logged in", function(done){
+  it("doesn't destroy -- not logged in", done => {
     factory.create('poll')
-      .then(function(poll){
-        models.User.find({_id: poll.user}, function(err, user){
+      .then(poll => {
+        models.User.find({_id: poll.user}, (err, user) => {
 
           request(app)
             .delete('/api/poll/destroy')
@@ -319,23 +314,23 @@ describe('destroy', function(){
 
 })
 
-describe('addOption', function(){
+describe('addOption', () => {
 
-  beforeEach(function(done){
+  beforeEach(done => {
     passportStub.install(app);
     done();
   })
 
-  afterEach(function(done){
+  afterEach(done => {
     passportStub.logout();
     passportStub.uninstall()
     done();
   })
 
-  it('adds an option', function(done){
+  it('adds an option', done => {
     factory.create('poll')
-      .then(function(poll){
-        models.User.find({_id: poll.user}, function(err, user){
+      .then(poll => {
+        models.User.find({_id: poll.user}, (err, user) => {
 
           passportStub.login(user)
           request(app)
@@ -345,7 +340,7 @@ describe('addOption', function(){
               optionName: "some option"
             })
             .expect(200)
-            .then(function(resp){
+            .then(resp => {
               assert(resp.body.msg == "Successfully updated poll")
               console.log("almost done!");
               done();

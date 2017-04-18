@@ -1,5 +1,4 @@
 //  Modified from https://github.com/elliotf/mocha-mongoose
-
 var config = require('../config/config');
 var mongoose = require('mongoose');
 var _ = require('underscore');
@@ -8,31 +7,18 @@ var _ = require('underscore');
 // this is helpful when you would like to change behavior when testing
 process.env.NODE_ENV = 'test';
 
-beforeEach(function (done) {
+const clearDB = function (){
 
-  function clearDB() {
-    _.each(mongoose.connection.models, function(value, key){
-      value.remove({}, function(err, removed) {
-      });
+  _.each(mongoose.connection.models, function(model, name){
+    model.remove({}, function(err, removed){
     })
+  })
+};
 
-    return done();
-  }
-
-  if (mongoose.connection.readyState === 0) {
-    mongoose.connect(config.db.URL, function (err) {
-      if (err) {
-        throw err;
-      }
-      return clearDB();
-    });
-  } else {
-    return clearDB();
-  }
+beforeEach(function () {
+  clearDB();
 });
 
-
-afterEach(function (done) {
-  mongoose.disconnect();
-  return done();
+afterEach(function () {
+  clearDB();
 });

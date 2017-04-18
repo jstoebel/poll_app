@@ -17,7 +17,6 @@ class Legend extends React.Component {
       <li key={i} style={
         {
           color: this.props.colors(i),
-          // display: "inline-block",
           whiteSpace: "nowrap"
         }
 
@@ -31,11 +30,9 @@ class Legend extends React.Component {
   }
 
   render() {
-    console.log(this.props.data);
     var names = this.props.data.map(function(item){
       return item.label;
     })
-    console.log(names);
 
     return(
       <div>

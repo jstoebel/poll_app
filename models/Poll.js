@@ -1,7 +1,6 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId,
-  models = require('require.all')('.');
+  ObjectId = Schema.ObjectId;
 
 var optionSchema = new mongoose.Schema({
   name: {required: true, type: String},
@@ -17,4 +16,4 @@ var pollSchema = new mongoose.Schema({
 
 var Poll = mongoose.model('Poll', pollSchema);
 
-module.exports = Poll
+module.exports = Poll;

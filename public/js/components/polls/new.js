@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import { hashHistory } from 'react-router'
+import $ from 'jquery'
+import axios from 'axios';
+
 
 class New extends React.Component {
 
@@ -47,41 +50,51 @@ class New extends React.Component {
 
   _onSuccess(resp) {
 
-    var newFlashes = this.state.flashes
-    if (resp.success) {
-
+    if (resp.data.success) {
       // redirect to poll page
-      const path = `poll/${resp.id}`;
-      // this.props.history.push(path);
+      const path = `poll/${resp.data.id}`;
       hashHistory.push(path);
-      // newFlashes.push({msg: resp.msg, success: true})
-      // this.setState({
-      //   flashes : newFlashes
-      // })
+
     } else {
         // TODO: redirect to login
     }
 
   }
 
-  _onError(error) {
+  _onError(resp) {
+
     var newFlashes = this.state.flashes
-    newFlashes.push({msg: resp.msg, success: false})
+
+    if (resp.data && resp.data.msg ) {
+      newFlashes.push({msg: resp.data.msg, success: false})
+    } else {
+      newFlashes.push({msg: "Oops something went wrong!", success: false})        
+    }
     this.setState({
       flashes : newFlashes
     })
+
   }
 
   handleSubmit(event) {
+
+    // TODO: switch to axios
+
     event.preventDefault();
-    console.log('A poll was submitted: ' + this.state.pollName);
     var formData = {
       pollName: this.state.pollName
     }
 
-    var xhr = this._create();
-    xhr.done(this._onSuccess)
-      .fail(this._onError)
+
+    // var xhr = this._create();
+    // xhr.done(this._onSuccess)
+    //   .fail(this._onError)
+    axios.post('/api/polls', {
+      name: this.state.pollName,
+      options: this.state.pollOptions
+    })
+      .then(this._onSuccess)
+      .catch(this._onError)
   }
 
   eachFlash(flash, i) {
@@ -112,6 +125,7 @@ class New extends React.Component {
             <div className="col-10">
               <input
                 className="form-control"
+                ref="pollName"
                 name="pollName"
                 type="text"
                 value={this.state.pollName}
@@ -127,6 +141,7 @@ class New extends React.Component {
               className="form-control"
               rows="3"
               type="text"
+              ref="pollOptions"
               name="pollOptions"
               value={this.state.pollOptions}
               onChange={this.handleChange}

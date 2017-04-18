@@ -1,27 +1,31 @@
-var chai = require('chai');
-var should = chai.should();
-var models = require('require.all')('../models')
-var factory = require('../factories')
-var expect = require('chai').expect
+// var chai = require('chai');
+// var should = chai.should();
+// var models = require('require.all')('../models');
+// var factory = require('../factories');
+// var expect = require('chai').expect;
 
-require('../test_config')
+import chai from 'chai';
+import {should, expect} from 'chai';
+import requireAll from 'require.all';
+import factory from '../factories';
+require('../test_config');
 
-describe('Poll Model', function() {
+const models = requireAll('../models');
 
-  ['name', 'user'].forEach(function(attr){
-    it ('validates ' + attr, function(done){
+describe('Poll Model', () => {
+  ['name', 'user'].forEach(attr => {
+    it ('validates ' + attr, done => {
       var poll = new models.Poll;
 
-      poll.validate(function(err){
+      poll.validate(err => {
         expect(err.errors[attr]).to.exist;
         done();
       })
     })
   }) // loop
 
-  // ['name', 'votes'].forEach(function(attr){
 
-    it('validates options: ' + 'spam', function(done){
+    it('validates options: ' + 'bogus', done => {
       var user = new models.User({
         email: "fake@fake.com",
 
@@ -34,7 +38,7 @@ describe('Poll Model', function() {
         options: [{}]
       })
 
-      poll.validate(function(err){
+      poll.validate(err => {
         expect(err.errors).to.exist;
         done();
       })

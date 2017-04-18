@@ -43,9 +43,7 @@ const Show = React.createClass({
   },
 
   _getSuccess(resp) {
-    console.log("get success");
     var poll = resp;
-    console.log(poll);
     if (poll) {
       var totalVotes = poll.options.reduce(function(total, option, i){
         return total += option.votes
@@ -95,8 +93,6 @@ const Show = React.createClass({
   },
 
   _submitSuccess(resp) {
-    console.log('A poll was voted on: ' + this.state.pollOption);
-    console.log(resp);
 
     var xhr = this._getRecord();
     xhr.done(this._getSuccess)
@@ -121,8 +117,6 @@ const Show = React.createClass({
   },
 
   _optionSuccess(resp) {
-    console.log("here is the response");
-    console.log(resp);
     var poll = resp.poll;
     var option = poll.options[poll.options.length - 1];
 
