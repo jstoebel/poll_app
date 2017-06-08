@@ -13,36 +13,35 @@ require('../test_config');
 const models = requireAll('../models');
 
 describe('Poll Model', () => {
-  ['name', 'user'].forEach(attr => {
-    it ('validates ' + attr, done => {
-      var poll = new models.Poll;
+  ['name', 'user'].forEach((attr) => {
+    it('validates ' + attr, (done) => {
+      let poll = new models.Poll;
 
-      poll.validate(err => {
+      poll.validate((err) => {
         expect(err.errors[attr]).to.exist;
         done();
-      })
-    })
-  }) // loop
+      });
+    });
+  }); // loop
 
 
-    it('validates options: ' + 'bogus', done => {
-      var user = new models.User({
-        email: "fake@fake.com",
+    it('validates options: ' + 'bogus', (done) => {
+      let user = new models.User({
+        email: 'fake@fake.com',
 
-      })
-      user.save()
+      });
+      user.save();
 
-      var poll = new models.Poll({
-        name: "poll name",
+      let poll = new models.Poll({
+        name: 'poll name',
         user: user._id,
-        options: [{}]
-      })
+        options: [{}],
+      });
 
-      poll.validate(err => {
+      poll.validate((err) => {
         expect(err.errors).to.exist;
         done();
-      })
-    })
+      });
+    });
   // }) // options loop
-
 });

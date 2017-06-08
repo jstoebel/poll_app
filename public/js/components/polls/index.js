@@ -1,47 +1,45 @@
 
 import React, {Component} from 'react';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 import axios from 'axios';
 
 class Index extends React.Component {
   /*
   fetches all polls and displays them
-  */ 
+  */
 
-  constructor(props){
-
+  constructor(props) {
     super(props);
     this.state = {
-      polls: []
-    }
+      polls: [],
+    };
   }
 
   componentDidMount() {
-    var _this = this;
+    let _this = this;
 
       axios('/api/polls')
-        .then(function(result){
+        .then(function(result) {
           _this.setState({
-            polls: result.data.polls
-          })
+            polls: result.data.polls,
+          });
         })
-        .catch(function(err){
-        })
-
+        .catch(function(err) {
+        });
   }
 
   eachPoll(poll, i) {
-      return(
-          <Link to={"/poll/" + poll._id} key={poll._id}>
+      return (
+          <Link to={'/poll/' + poll._id} key={poll._id}>
             <div className="btn btn-info btn-block">
               {poll.name}
             </div>
           </Link>
-      )
+      );
   }
 
   render() {
-    return(
+    return (
       <div id="poll-index">
         <h1>Polls</h1>
 
@@ -49,7 +47,7 @@ class Index extends React.Component {
 
         { this.props.children}
       </div>
-    )
+    );
   }
 
 }

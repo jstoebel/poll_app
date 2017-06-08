@@ -3,19 +3,15 @@
  * Home page.
  */
 
-var models = require('require.all')('../models')
-var factory = require('../test/factories')
+let models = require('require.all')('../models');
+let factory = require('../test/factories');
 
 exports.index = function(req, res) {
-
   res.render('home', {
-    title: 'Home'
+    title: 'Home',
   });
-
 };
 
 exports.welcome = function(req, res) {
-
-  res.render('welcome')
-
+  res.render('welcome');
 };

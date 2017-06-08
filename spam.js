@@ -1,5 +1,5 @@
-var factory = require('./test/factories')
+let factory = require('./test/factories');
 
-factory.create('user').then(function(user){
-  console.log(user)
-})
+factory.create('user').then(function(user) {
+  console.log(user);
+});

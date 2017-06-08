@@ -1,27 +1,27 @@
 /**
  * Module dependencies.
  */
-var express = require('express');
-var compress = require('compression');
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var logger = require('morgan');
-var errorHandler = require('errorhandler');
-var lusca = require('lusca');
-var config = require('./config/config')
+let express = require('express');
+let compress = require('compression');
+let session = require('express-session');
+let bodyParser = require('body-parser');
+let logger = require('morgan');
+let errorHandler = require('errorhandler');
+let lusca = require('lusca');
+let config = require('./config/config');
 
-var MongoStore = require('connect-mongo/es5')(session);
-var flash = require('express-flash');
-var path = require('path');
-var mongoose = require('mongoose');
+let MongoStore = require('connect-mongo/es5')(session);
+let flash = require('express-flash');
+let path = require('path');
+let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-var passport = require('passport');
-var expressValidator = require('express-validator');
-var sass = require('node-sass-middleware');
-var multer = require('multer');
-var upload = multer({ dest: path.join(__dirname, 'uploads') });
+let passport = require('passport');
+let expressValidator = require('express-validator');
+let sass = require('node-sass-middleware');
+let multer = require('multer');
+let upload = multer({dest: path.join(__dirname, 'uploads')});
 var httpProxy = require('http-proxy');
-var proxy = httpProxy.createProxyServer();
+let proxy = httpProxy.createProxyServer();
 
 var httpProxy = require('http-proxy');
 
@@ -35,23 +35,23 @@ var httpProxy = require('http-proxy');
 /**
  * API keys and Passport configuration.
  */
-var passportConfig = require('./config/passport');
+let passportConfig = require('./config/passport');
 
 /**
  * Create Express server.
  */
-var app = express();
+let app = express();
 
 // end
 
 /**
  * Connect to MongoDB.
  */
-console.log("trying to connect to " +config.db.URL)
+console.log('trying to connect to ' +config.db.URL);
 mongoose.connect(config.db.URL);
 
-mongoose.connection.on('connected', function () {
-  console.log("connected to " + config.db.URL)
+mongoose.connection.on('connected', function() {
+  console.log('connected to ' + config.db.URL);
 });
 
 mongoose.connection.on('error', function() {
@@ -69,11 +69,11 @@ app.use(compress());
 app.use(sass({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
-  sourceMap: true
+  sourceMap: true,
 }));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressValidator());
 app.use(session({
   resave: true,
@@ -81,8 +81,8 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   store: new MongoStore({
     url: config.db.URL,
-    autoReconnect: true
-  })
+    autoReconnect: true,
+  }),
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -107,10 +107,10 @@ app.use(function(req, res, next) {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-app.use(express.static(path.join(__dirname, 'dist'), { maxAge: 31557600000 }));
+app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
+app.use(express.static(path.join(__dirname, 'dist'), {maxAge: 31557600000}));
 
-app.use('/', require('./config/routes'))
+app.use('/', require('./config/routes'));
 
 /**
  * Error Handler.
@@ -149,7 +149,7 @@ proxy.on('error', function(e) {
 /**
  * Start Express server.
  */
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000;
 app.listen(port, function() {
   console.log('Express server listening on port %d in %s mode', port, config.currentEnv);
 });

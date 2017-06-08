@@ -1,6 +1,6 @@
-import React from 'react'
-import * as d3 from 'd3'
-import Arc from './arc'
+import React from 'react';
+import * as d3 from 'd3';
+import Arc from './arc';
 
 class PieChart extends React.Component {
 
@@ -28,21 +28,19 @@ class PieChart extends React.Component {
   }
 
   getData() {
+    let poll = this.props.data;
+    let totalVotes = poll.options.reduce(function(total, option, i) {
+      return total += option.votes;
+    }, 0);
 
-    var poll = this.props.data;
-    var totalVotes = poll.options.reduce(function(total, option, i){
-      return total += option.votes
-    }, 0)
-
-    var data = totalVotes > 0 ?
+    let data = totalVotes > 0 ?
     poll.options :
-    [ { name: "no votes yet"} ]
+    [{name: 'no votes yet'}];
 
     return data;
   }
 
   arcGenerator(d, i) {
-
     return (
       <Arc key={`arc-${i}`}
         data={d}
@@ -55,12 +53,12 @@ class PieChart extends React.Component {
   render() {
     let pie = this.pie(this.props.data),
       slicesTranslate = `translate(${this.props.x}, ${this.props.y})`,
-      legendTranslate = `translate(${this.props.x}, ${this.props.y - this.props.outerRadius})`
+      legendTranslate = `translate(${this.props.x}, ${this.props.y - this.props.outerRadius})`;
     return (
       <g transform={slicesTranslate}>
         {pie.map((d, i) => this.arcGenerator(d, i))}
       </g>
-    )
+    );
   }
 
 }

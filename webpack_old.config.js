@@ -1,10 +1,10 @@
-var Webpack = require('webpack');
-var path = require('path');
-var nodeModulesPath = path.resolve(__dirname, 'node_modules');
-var buildPath = path.resolve(__dirname, 'public', 'build');
-var mainPath = path.resolve(__dirname, 'public', 'js', 'client.js');
+let Webpack = require('webpack');
+let path = require('path');
+let nodeModulesPath = path.resolve(__dirname, 'node_modules');
+let buildPath = path.resolve(__dirname, 'public', 'build');
+let mainPath = path.resolve(__dirname, 'public', 'js', 'client.js');
 
-var config = {
+let config = {
 
   // Makes sure errors in console map to the correct file
   // and line number
@@ -31,7 +31,7 @@ var config = {
 
     // Everything related to Webpack should go through a build path,
     // localhost:3000/build. That makes proxying easier to handle
-    publicPath: '/build/'
+    publicPath: '/build/',
   },
   module: {
 
@@ -44,24 +44,24 @@ var config = {
       loader: 'babel',
       query:
         {
-          presets:['react']
+          presets: ['react'],
         },
-      exclude: [nodeModulesPath]
+      exclude: [nodeModulesPath],
     },
 
     // Let us also add the style-loader and css-loader, which you can
     // expand with less-loader etc.
     {
       test: /\.css$/,
-      loader: 'style!css'
-    }
+      loader: 'style!css',
+    },
 
-    ]
+    ],
   },
 
   // We have to manually add the Hot Replacement plugin when running
   // from Node
-  plugins: [new Webpack.HotModuleReplacementPlugin()]
+  plugins: [new Webpack.HotModuleReplacementPlugin()],
 };
 
 module.exports = config;

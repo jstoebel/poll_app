@@ -1,114 +1,106 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router';
+import React, {Component} from 'react';
+import {Link} from 'react-router';
 import axios from 'axios';
 
 class PollAdmin extends Component {
-  
+
     /*
       admin page for polls (all of users own polls)
     */
 
-    constructor(props){
-
+    constructor(props) {
       super(props);
       this.state = {
-        polls: []
-      }
+        polls: [],
+      };
 
-      this.componentDidMount = this.componentDidMount.bind(this)
-      this._getSuccess = this._getSuccess.bind(this)
-      this.render = this.render.bind(this)
-      this.eachPoll = this.eachPoll.bind(this)
+      this.componentDidMount = this.componentDidMount.bind(this);
+      this._getSuccess = this._getSuccess.bind(this);
+      this.render = this.render.bind(this);
+      this.eachPoll = this.eachPoll.bind(this);
 
-      this.handleDestroy = this.handleDestroy.bind(this)
-      this.handleShare = this.handleShare.bind(this)
+      this.handleDestroy = this.handleDestroy.bind(this);
+      this.handleShare = this.handleShare.bind(this);
 
-      this._destroySuccess = this._destroySuccess.bind(this)
-
+      this._destroySuccess = this._destroySuccess.bind(this);
     }
 
     componentDidMount() {
-
-      var _this = this;
+      let _this = this;
 
         axios('/api/polls/admin')
           .then(this._getSuccess)
-          .catch(this._getError)
+          .catch(this._getError);
     }
 
     _getSuccess(resp) {
       // successfully pulled the records
-      console.log("starting _getSuccess");
+      console.log('starting _getSuccess');
       console.log(resp);
 
       this.setState({
-        polls: resp.data.polls
-      })
-
+        polls: resp.data.polls,
+      });
     }
 
     _getError() {
-      console.log("error fetching poll");
+      console.log('error fetching poll');
     }
 
     handleShare(event, id) {
-
       event.preventDefault();
-      var path = location.protocol + '//' + location.host;
-      var pollPath = path + "/%23/poll/" + id;
+      let path = location.protocol + '//' + location.host;
+      let pollPath = path + '/%23/poll/' + id;
       console.log(pollPath);
-      var tweet = "Checkout my new poll! " + pollPath;
-      var href="https://twitter.com/home?status="+tweet;
+      let tweet = 'Checkout my new poll! ' + pollPath;
+      let href='https://twitter.com/home?status='+tweet;
       window.open(href);
     }
 
     handleDestroy(event, id) {
-
       event.preventDefault();
       console.log('A poll was asked to be removed: ' + id);
 
-      var xhr = $.ajax({
+      let xhr = $.ajax({
         url: '/api/poll/destroy',
         type: 'DELETE',
         data: {
-          _id: id
-        }
-      })
+          _id: id,
+        },
+      });
       xhr.done(this._destroySuccess)
-        .fail(this._destroyError)
+        .fail(this._destroyError);
     }
 
     _destroySuccess() {
       // remove the poll from state and rerender
 
-      console.log("destroy success");
-      var xhr = $.ajax({
+      console.log('destroy success');
+      let xhr = $.ajax({
         url: '/api/polls/admin',
-        type: 'GET'
-      })
-      console.log("got here");
+        type: 'GET',
+      });
+      console.log('got here');
 
-      var _this = this;
-      xhr.done(function(resp){
-        console.log("callback!");
+      let _this = this;
+      xhr.done(function(resp) {
+        console.log('callback!');
         _this.setState({
-          polls: resp.polls
-        })
-      })
+          polls: resp.polls,
+        });
+      });
     }
 
     _destroyError() {
-      console.log("destroy error");
+      console.log('destroy error');
     }
 
 
-
-    eachPoll (poll, i) {
-
+    eachPoll(poll, i) {
       return (
         <div className="row" key={i}>
           <div className="col-xs-10">
-            <Link to={"/poll/" + poll._id} >
+            <Link to={'/poll/' + poll._id} >
               <div className="btn btn-info btn-block">
                 {poll.name}
               </div>
@@ -129,7 +121,7 @@ class PollAdmin extends Component {
           </div>
 
         </div>
-      )
+      );
     }
 
     render() {

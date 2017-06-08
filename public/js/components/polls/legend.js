@@ -1,9 +1,9 @@
-import React from 'react'
-import * as d3 from 'd3'
+import React from 'react';
+import * as d3 from 'd3';
 
 class Legend extends React.Component {
 
-  //expected props
+  // expected props
     // poll: the poll item
     // colors: the colors function bound to Show component
 
@@ -12,12 +12,12 @@ class Legend extends React.Component {
     this.eachOption = this.eachOption.bind(this);
   }
 
-  eachOption(name, i){
-    return(
+  eachOption(name, i) {
+    return (
       <li key={i} style={
         {
           color: this.props.colors(i),
-          whiteSpace: "nowrap"
+          whiteSpace: 'nowrap',
         }
 
       }
@@ -26,15 +26,15 @@ class Legend extends React.Component {
         <i className="fa-li fa fa-circle"></i>
         {name}
       </li>
-    )
+    );
   }
 
   render() {
-    var names = this.props.data.map(function(item){
+    let names = this.props.data.map(function(item) {
       return item.label;
-    })
+    });
 
-    return(
+    return (
       <div>
         <ul className="fa-ul legend">
           {names.map(this.eachOption)}
@@ -42,7 +42,7 @@ class Legend extends React.Component {
 
       </div>
 
-    )
+    );
   }
 
 }

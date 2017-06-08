@@ -1,13 +1,13 @@
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import d3 from 'd3';
 
 class Arc extends Component {
-  /* 
+  /*
   A single arc in a pie chart
   expected props:
   data: example: {value: 92, label: 'some option'}
-  */ 
+  */
     constructor() {
         super();
         this.arc = d3.svg.arc();

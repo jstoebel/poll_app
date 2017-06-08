@@ -1,21 +1,21 @@
 import React, {Component} from 'react';
-import { hashHistory } from 'react-router'
-import $ from 'jquery'
+import {hashHistory} from 'react-router';
+import $ from 'jquery';
 import axios from 'axios';
 
 
 class New extends React.Component {
   /*
     form to submit a new poll
-  */ 
+  */
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-      pollName: "",
-      flashes: []
-    }
+      pollName: '',
+      flashes: [],
+    };
 
     // methods that need access this `this`
     this.handleChange = this.handleChange.bind(this);
@@ -23,7 +23,6 @@ class New extends React.Component {
     this.eachFlash = this.eachFlash.bind(this);
     this._onSuccess = this._onSuccess.bind(this);
     this._onError = this._onError.bind(this);
-
   }
 
   handleChange(event) {
@@ -31,9 +30,8 @@ class New extends React.Component {
 
     const target = event.target;
     const value = target.value;
-    const name = target.name
-    this.setState({[name]: value})
-
+    const name = target.name;
+    this.setState({[name]: value});
   }
 
   _create() {
@@ -43,13 +41,13 @@ class New extends React.Component {
       type: 'POST',
       data: {
         name: this.state.pollName,
-        options: this.state.pollOptions
+        options: this.state.pollOptions,
       },
-      beforeSend: function () {
+      beforeSend: function() {
         this.setState({loading: true});
-      }.bind(this)
+      }.bind(this),
 
-    })
+    });
   }
 
   _onSuccess(resp) {
@@ -59,42 +57,39 @@ class New extends React.Component {
       // redirect to poll page
       const path = `poll/${resp.data.id}`;
       hashHistory.push(path);
-
     } else {
         // TODO: redirect to login
     }
-
   }
 
   _onError(resp) {
     // if the server returned an error
 
-    var newFlashes = this.state.flashes
+    let newFlashes = this.state.flashes;
 
     if (resp.data && resp.data.msg ) {
-      newFlashes.push({msg: resp.data.msg, success: false})
+      newFlashes.push({msg: resp.data.msg, success: false});
     } else {
-      newFlashes.push({msg: "Oops something went wrong!", success: false})        
+      newFlashes.push({msg: 'Oops something went wrong!', success: false});
     }
     this.setState({
-      flashes : newFlashes
-    })
-
+      flashes: newFlashes,
+    });
   }
 
   handleSubmit(event) {
     // handle submition of form
     event.preventDefault();
-    var formData = {
-      pollName: this.state.pollName
-    }
+    let formData = {
+      pollName: this.state.pollName,
+    };
 
     axios.post('/api/polls', {
       name: this.state.pollName,
-      options: this.state.pollOptions
+      options: this.state.pollOptions,
     })
       .then(this._onSuccess)
-      .catch(this._onError)
+      .catch(this._onError);
   }
 
   eachFlash(flash, i) {
@@ -102,19 +97,18 @@ class New extends React.Component {
 
     return (
       <div
-        className={"alert alert-" + (flash.success ? 'success' : 'danger') + " alert-dismissable" }
+        className={'alert alert-' + (flash.success ? 'success' : 'danger') + ' alert-dismissable' }
         key={i}
       >
           <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
           {flash.msg}
       </div>
 
-    )
+    );
   }
 
   render() {
-
-    return(
+    return (
 
       <div>
         <h1> Create a new poll </h1>
@@ -152,11 +146,11 @@ class New extends React.Component {
           </div>
 
 
-          <input className="btn btn-info"  type="submit" value="Submit" />
+          <input className="btn btn-info" type="submit" value="Submit" />
         </form>
       </div>
 
-    )
+    );
   }
 
 }

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 
 class Main extends Component {
-    render(){
-        return(
+    render() {
+        return (
             <div>
                 <nav className="navbar navbar-default">
                     <div className="container">
@@ -22,4 +22,4 @@ class Main extends Component {
     }
 }
 
-export default Main
+export default Main;

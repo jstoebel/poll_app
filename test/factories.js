@@ -1,8 +1,8 @@
-var models = require('require.all')('../models')
-var fg = require('factory-girl');
+let models = require('require.all')('../models');
+let fg = require('factory-girl');
 
-var adapter = new fg.MongooseAdapter();
-var factory = fg.factory
+let adapter = new fg.MongooseAdapter();
+let factory = fg.factory;
 factory.setAdapter(adapter);
 
 factory.define('user', models.User, {
@@ -12,14 +12,14 @@ factory.define('user', models.User, {
 });
 
 factory.define('poll', models.Poll, {
-  name: "some poll",
+  name: 'some poll',
   user: factory.assoc('user', '_id'),
   options: [
     {
-      name: "first option",
-      votes: 2
-    }
-  ]
-})
+      name: 'first option',
+      votes: 2,
+    },
+  ],
+});
 
 module.exports = factory;

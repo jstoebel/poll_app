@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import { render } from 'react-dom'
-import { Router, Route, hashHistory, IndexRoute } from 'react-router'
+import {render} from 'react-dom';
+import {Router, Route, hashHistory, IndexRoute} from 'react-router';
 
-import Main from "./components/main";
-import Index from "./components/polls/index";
-import New from "./components/polls/new";
-import Show from "./components/polls/show";
-import PollAdmin from "./components/polls/poll_admin"
+import Main from './components/main';
+import Index from './components/polls/index';
+import New from './components/polls/new';
+import Show from './components/polls/show';
+import PollAdmin from './components/polls/poll_admin';
 
 render((
   <Router history={hashHistory}>
@@ -18,4 +18,4 @@ render((
     </Route>
 
   </Router>
-), document.getElementById('app'))
+), document.getElementById('app'));
