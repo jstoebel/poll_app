@@ -28,6 +28,10 @@ router.post('/account/password', passportConfig.isAuthenticated, controllers.use
 router.post('/account/delete', passportConfig.isAuthenticated, controllers.user.postDeleteAccount);
 router.get('/account/unlink/:provider', passportConfig.isAuthenticated, controllers.user.getOauthUnlink);
 
+
+/*
+  Routes for voting api
+*/
 router.get('/api/polls', controllers.poll.index);
 router.get('/api/polls/admin', passportConfig.isAuthenticated, controllers.poll.indexAdmin)
 router.get('/api/polls/:pollId', controllers.poll.show);

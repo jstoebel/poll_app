@@ -5,6 +5,9 @@ import axios from 'axios';
 
 
 class New extends React.Component {
+  /*
+    form to submit a new poll
+  */ 
 
   constructor(props){
     super(props);
@@ -34,6 +37,7 @@ class New extends React.Component {
   }
 
   _create() {
+    // submit the form data
     return $.ajax({
       url: '/api/polls',
       type: 'POST',
@@ -49,6 +53,7 @@ class New extends React.Component {
   }
 
   _onSuccess(resp) {
+    // after succssful creation
 
     if (resp.data.success) {
       // redirect to poll page
@@ -62,6 +67,7 @@ class New extends React.Component {
   }
 
   _onError(resp) {
+    // if the server returned an error
 
     var newFlashes = this.state.flashes
 
@@ -77,18 +83,12 @@ class New extends React.Component {
   }
 
   handleSubmit(event) {
-
-    // TODO: switch to axios
-
+    // handle submition of form
     event.preventDefault();
     var formData = {
       pollName: this.state.pollName
     }
 
-
-    // var xhr = this._create();
-    // xhr.done(this._onSuccess)
-    //   .fail(this._onError)
     axios.post('/api/polls', {
       name: this.state.pollName,
       options: this.state.pollOptions
@@ -98,6 +98,7 @@ class New extends React.Component {
   }
 
   eachFlash(flash, i) {
+    // display each flash message
 
     return (
       <div

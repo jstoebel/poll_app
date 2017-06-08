@@ -3,6 +3,10 @@ import { Link } from 'react-router';
 import axios from 'axios';
 
 class PollAdmin extends Component {
+  
+    /*
+      admin page for polls (all of users own polls)
+    */
 
     constructor(props){
 
@@ -24,15 +28,6 @@ class PollAdmin extends Component {
     }
 
     componentDidMount() {
-      // var _this = this;
-      //
-      //     var xhr = $.ajax({
-      //       url: '/api/polls/admin',
-      //       type: 'GET'
-      //     })
-      //
-      //     xhr.done(this._getSuccess)
-      //       .fail(this._getError)
 
       var _this = this;
 

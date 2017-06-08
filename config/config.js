@@ -1,5 +1,8 @@
 // borrowed from here: http://stackoverflow.com/questions/5778245/expressjs-how-to-structure-an-application/7350875#7350875
 
+/* 
+  basic configuration that loads at server run time
+*/
 if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'test'){
   var dotenv = require('dotenv');
   dotenv.load()

@@ -7,6 +7,7 @@ import PieChart from "./pie_chart";
 import Legend from "./legend"
 
 const Show = React.createClass({
+  // display info on a single poll
 
   colors: d3.scale.category10(),
 
@@ -150,12 +151,6 @@ const Show = React.createClass({
 
   handleSubmit(event) {
     event.preventDefault();
-
-    // if newOption is given, try to create it, then upvote
-    // otherwise upvote based on optionId
-    // { pollId: ,
-    // optionId: ,
-    // newOption:
 
     if (this.state.newOption) {
       // a new option was given. attempt to add it to the poll then increment

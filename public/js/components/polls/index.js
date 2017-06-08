@@ -1,8 +1,12 @@
+
 import React, {Component} from 'react';
 import { Link } from 'react-router';
 import axios from 'axios';
 
 class Index extends React.Component {
+  /*
+  fetches all polls and displays them
+  */ 
 
   constructor(props){
 
@@ -13,7 +17,6 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
-    console.log("did mount");
     var _this = this;
 
       axios('/api/polls')

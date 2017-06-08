@@ -1,6 +1,7 @@
 var models = require('require.all')('../models')
 
 exports.index = function(req, res) {
+  // show all polls
 
   models.Poll.find({}, function(err, allPolls){
     if (err) {
@@ -14,6 +15,7 @@ exports.index = function(req, res) {
 };
 
 exports.create = function(req, res) {
+  // create a new poll
 
   var params = {
     name: req.body.name,
@@ -22,6 +24,7 @@ exports.create = function(req, res) {
 
   var poll = new models.Poll(params);
 
+  // split the contents of the text box by new line. each is a new option
   req
     .body
     .options
@@ -42,6 +45,7 @@ exports.create = function(req, res) {
 };
 
 exports.show = function(req, res) {
+  // returns info on a single poll
   models.Poll.findOne({_id: req.params.pollId}, function(err, poll){
     if (err){
       res.status(404)
@@ -51,8 +55,10 @@ exports.show = function(req, res) {
 };
 
 exports.vote = function(req, res) {
-  // expected params
+  
+  // process vote on a poll
 
+  // find a poll and increment the chosen option by 1
   models.Poll.findOneAndUpdate(
     { "_id": req.body.pollId, "options._id": req.body.optionId },
     {
@@ -72,6 +78,7 @@ exports.vote = function(req, res) {
 }
 
 exports.indexAdmin = function(req, res) {
+  // return all of user's polls
 
   models.Poll.find({user: req.user._id}, function(err, polls){
 

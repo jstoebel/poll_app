@@ -13,8 +13,8 @@ class PieChart extends React.Component {
     innerRadius
     data (example):
       [
-        {value: 92, label: 'Code lines'},
-        {value: 34, label: 'Empty lines'}
+        {value: 92, label: 'some option'},
+        {value: 34, label: 'another option'}
       ]
     colors: the colors function bound to the Show component
   */
@@ -62,8 +62,6 @@ class PieChart extends React.Component {
       </g>
     )
   }
-
-
 
 }
 
