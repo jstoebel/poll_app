@@ -1,5 +1,5 @@
 # voting
-a voting app as an assignment with Freecodecamp.com. Built using MERN stack (MongoDB, Express, React and Node)
+a voting app as an assignment with Freecodecamp.com. It was built using MERN stack (MongoDB, Express, React and Node)
 
 This codebase is built using [this](https://github.com/sahat/hackathon-starter/tree/es5) as boilerplate
 
